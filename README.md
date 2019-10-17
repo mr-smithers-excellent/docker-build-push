@@ -47,4 +47,4 @@ with:
 
 ## Tagging the image using GitOps
 
-By default, this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable develops to more easily use [GitOps](https://dzone.com/articles/what-is-gitops-really) in their CI/CD pipelines.
+By default, this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://dzone.com/articles/what-is-gitops-really) in their CI/CD pipelines.
