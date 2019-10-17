@@ -1,5 +1,5 @@
 # Docker Build & Push Action
-<p><a href="https://github.com/mr-smithers-excellent/docker-build-push-action"><img alt="GitHub Actions status" src="https://github.com/mr-smithers-excellent/docker-build-push-action/workflows/Tests/badge.svg"></a></p>
+<p><a href="https://github.com/mr-smithers-excellent/docker-build-push-action"><img alt="GitHub Actions status" src="https://github.com/mr-smithers-excellent/docker-build-push-action/workflows/.github/ci.yml/badge.svg"></a></p>
 
 Builds a Docker image using a `Dockerfile` in the root project directory and pushes the resulting Docker image to the private registry of your choosing.
 
