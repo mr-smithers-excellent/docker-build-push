@@ -26,7 +26,7 @@ steps:
 ### Docker Hub
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push-action@master
+uses: mr-smithers-excellent/docker-build-push@master
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -37,7 +37,7 @@ with:
 ### Google Container Registry (GCR)
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push-action@master
+uses: mr-smithers-excellent/docker-build-push@master
 with:
   image: gcp-project/image-name
   registry: gcr.io
