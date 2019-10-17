@@ -27,7 +27,7 @@ with:
   image: docker-hub-repo/image-name
   registry: docker.io
   username: your-username
-  password: ${{ secrets.password }}
+  password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
 ### Google Container Registry (GCR)
@@ -36,9 +36,9 @@ with:
 uses: mr-smithers-excellent/docker-build-push-action@master
 with:
   image: gcp-project/image-name
-  registry: https://gcr.io
+  registry: gcr.io
   username: _json_key
-  password: ${{ secrets.password }}
+  password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
 ## Tagging the image using GitOps
