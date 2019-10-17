@@ -16,9 +16,7 @@ describe('Create & push Docker image', () => {
       .mockReturnValueOnce(registry)
       .mockReturnValueOnce(null);
 
-    core.setOutput = jest
-      .fn()
-      .mockReturnValueOnce(`${registry}/${image}:${tag}`);
+    core.setOutput = jest.fn().mockReturnValueOnce(`${registry}/${image}:${tag}`);
 
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
     docker.build = jest.fn();
