@@ -14,8 +14,12 @@ steps:
 
 ## Inputs
 
-| Name | Description |
-|------|-------------|
+| Name     | Description                |
+|----------|----------------------------|
+| image    | Docker image name          |
+| registry | Registry host              |
+| username | Registry username          |
+| password | Registry password or token |
 
 ## Examples
 
