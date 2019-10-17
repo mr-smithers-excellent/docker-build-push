@@ -1,0 +1,27 @@
+name: 'Docker Build & Push'
+description: 'Builds a Docker image and pushes to a private registry'
+inputs:
+  image:
+    description: 'Name of the Docker image'
+    required: true
+  tag:
+    description: 'Tag override for Docker image'
+    required: false
+  registry:
+    description: 'Target Docker registry'
+    required: true
+  username:
+    description: 'Docker registry username'
+    required: true
+  password:
+    description: 'Docker registry password'
+    required: true
+outputs:
+  imageFullName:
+    description: 'Full name of the Docker image'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'codesandbox'
+  color: 'black'

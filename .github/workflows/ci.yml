@@ -1,0 +1,15 @@
+name: 'CI Pipeline'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: npm ci
+      - run: npm test
