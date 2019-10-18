@@ -21,12 +21,12 @@ steps:
 
 ## Inputs
 
-| Name     | Description                |
-|----------|----------------------------|
-| image    | Docker image name          |
-| registry | Registry host              |
-| username | Registry username          |
-| password | Registry password or token |
+| Name     | Description                | Required |
+|----------|----------------------------|----------|
+| image    | Docker image name          | Yes      |
+| registry | Registry host              | Yes      |
+| username | Registry username          | No       |
+| password | Registry password or token | No       |
 
 ## Examples
 
