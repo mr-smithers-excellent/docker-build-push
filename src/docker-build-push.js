@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const docker = require('./docker');
 
-const run = async () => {
+const run = () => {
   try {
     // Get GitHub Action inputs
     const image = core.getInput('image', { required: true });
