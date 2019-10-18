@@ -11,7 +11,7 @@ inputs:
     description: 'Target Docker registry'
     required: true
   dockerfile:
-    description: 'Location of Dockerfile, if not in root directory'
+    description: 'Location of Dockerfile, if not Dockerfile in root directory'
     required: false
     default: 'Dockerfile'
   username:
