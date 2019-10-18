@@ -42,7 +42,7 @@ with:
   image: gcp-project/image-name
   registry: gcr.io
   username: _json_key
-  password: ${{ secrets.DOCKER_PASSWORD }}
+  password: ${{ secrets.DOCKER_PASSWORD }} # Use content of service account JSON key
 ```
 
 ## Tagging the image using GitOps
