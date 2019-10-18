@@ -1,7 +1,7 @@
 # Docker Build & Push Action
 <p><a href="https://github.com/mr-smithers-excellent/docker-build-push"><img alt="GitHub Actions status" src="https://github.com/mr-smithers-excellent/docker-build-push/workflows/Tests/badge.svg"></a></p>
 
-Builds a Docker image using a `Dockerfile` in the root project directory and pushes the resulting Docker image to the private registry of your choosing.
+Builds a Docker image and pushes it to the private registry of your choosing.
 
 ## Requirements
 
@@ -15,33 +15,43 @@ steps:
     with:
       image: repo/image
       registry: registry-url.io
+      dockerfile: Dockerfile.ci
       username: username
       password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
 ## Inputs
 
-| Name     | Description                | Required |
-|----------|----------------------------|----------|
-| image    | Docker image name          | Yes      |
-| registry | Registry host              | Yes      |
-| username | Registry username          | No       |
-| password | Registry password or token | No       |
+| Name       | Description                                       | Required |
+|------------|---------------------------------------------------|----------|
+| image      | Docker image name                                 | Yes      |
+| registry   | Registry host                                     | Yes      |
+| dockerfile | Location of Dockerfile (defaults to `Dockerfile`) | No       |
+| username   | Registry username                                 | No       |
+| password   | Registry password or token                        | No       |
 
 ## Examples
 
 ### Docker Hub
+
+* Save your Docker Hub username (`DOCKER_USERNAME`) and password (`DOCKER_PASSWORD`) as secrets in your GitHub repo
+* Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
 uses: mr-smithers-excellent/docker-build-push@master
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
-  username: your-username
+  username: ${{ secrets.DOCKER_USERNAME }}
   password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
 ### Google Container Registry (GCR)
+
+* Create a service account with the ability to push to GCR (see [configuring access control](https://cloud.google.com/container-registry/docs/access-control))
+* Create JSON key for new service account
+* Save content of `.json` file as a secret called `DOCKER_PASSWORD` in your GitHub repo
+* Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
 uses: mr-smithers-excellent/docker-build-push@master
@@ -53,6 +63,11 @@ with:
 ```
 
 ### AWS Elastic Container Registry (ECR)
+
+* Create an IAM user with the ability to push to ECR (see [example policies](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ecr_managed_policies.html))
+* Create and download access keys
+* Save `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as secrets in your GitHub repo
+* Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
 uses: mr-smithers-excellent/docker-build-push@master
