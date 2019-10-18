@@ -7,7 +7,7 @@ const fs = require('fs');
 const docker = require('../src/docker.js');
 
 describe('Create Docker image tag from git ref', () => {
-  test('Create from tag push', async () => {
+  test('Create from tag push', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
 
