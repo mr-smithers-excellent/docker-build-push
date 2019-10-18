@@ -560,6 +560,8 @@ const createTag = () => {
       'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push-event-push'
     );
   }
+
+  core.info(`Docker tag created: ${dockerTag}`);
   return dockerTag;
 };
 
@@ -570,7 +572,7 @@ const build = imageName => {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  core.info(`Building Docker image: ${imageName}...`);
+  core.info(`Building Docker image: ${imageName}`);
   cp.execSync(`docker build -f ${dockerfile} -t ${imageName} .`);
 };
 
@@ -593,7 +595,7 @@ const login = () => {
     core.info(`Logging into ECR region ${region}...`);
     cp.execSync(`$(aws ecr get-login --region ${region} --no-include-email)`);
   } else if (username && password) {
-    core.info('Logging into Docker registry...');
+    core.info(`Logging into Docker registry ${registry}...`);
     cp.execSync(`docker login -u ${username} --password-stdin ${registry}`, {
       input: password
     });
@@ -601,7 +603,7 @@ const login = () => {
 };
 
 const push = imageName => {
-  core.info('Pushing Docker image...');
+  core.info(`Pushing Docker image ${imageName}`);
   cp.execSync(`docker push ${imageName}`);
 };
 
