@@ -37,8 +37,9 @@ const createTag = () => {
 
 const build = imageName => {
   core.info(`Building Docker image: ${imageName}...`);
-  if (!fs.existsSync('./Dockerfile')) {
-    core.setFailed('Dockerfile does not exist in root project directory!');
+  const dockerfile = core.getInput('dockerfile');
+  if (!fs.existsSync(dockerfile)) {
+    core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
   cp.execSync(`docker build -t ${imageName} .`);
