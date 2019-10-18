@@ -531,17 +531,11 @@ const core = __webpack_require__(470);
 const fs = __webpack_require__(747);
 const { context } = __webpack_require__(469);
 
-const isGitHubTag = ref => {
-  return ref && ref.includes('refs/tags/');
-};
+const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
-const isMasterBranch = ref => {
-  return ref && ref === 'refs/heads/master';
-};
+const isMasterBranch = ref => ref && ref === 'refs/heads/master';
 
-const isNotMasterBranch = ref => {
-  return ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
-};
+const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
 
 const createTag = () => {
   core.debug('Creating Docker image tag...');
@@ -559,7 +553,7 @@ const createTag = () => {
     // If we're on a non-master branch, use branch-prefix-{GIT_SHORT_SHA) as the Docker tag
     // refs/heads/jira-123/feature/something
     const branchName = ref.replace('refs/heads/', '');
-    const branchPrefix = branchName.substring(0, branchName.indexOf('/'));
+    const branchPrefix = branchName.includes('/') ? branchName.substring(0, branchName.indexOf('/')) : branchName;
     dockerTag = `${branchPrefix}-${shortSha}`;
   } else {
     core.setFailed(
@@ -1560,7 +1554,7 @@ module.exports = require("child_process");
 const core = __webpack_require__(470);
 const docker = __webpack_require__(95);
 
-const run = async () => {
+const run = () => {
   try {
     // Get GitHub Action inputs
     const image = core.getInput('image', { required: true });
