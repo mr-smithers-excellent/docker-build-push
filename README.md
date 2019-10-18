@@ -10,6 +10,13 @@ Builds a Docker image using a `Dockerfile` in the root project directory and pus
 ```yaml
 steps:
   - uses: actions/checkout@v1
+
+  - uses: mr-smithers-excellent/docker-build-push@master
+    with:
+      image: repo/image
+      registry: registry-url.io
+      username: username
+      password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
 ## Inputs
@@ -47,4 +54,10 @@ with:
 
 ## Tagging the image using GitOps
 
-By default, this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://dzone.com/articles/what-is-gitops-really) in their CI/CD pipelines.
+By default, this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
+
+| Trigger                  | Commit SHA | Docker Tag           |
+|--------------------------|------------|----------------------|
+| /refs/tags/v1.0          | N/A        | v1.0                 |
+| /refs/heads/master       | 1234567    | dev-1234567          |
+| /refs/heads/some-feature | 1234567    | some-feature-1234567 | 
