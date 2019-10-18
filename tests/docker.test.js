@@ -51,23 +51,26 @@ describe('Create Docker image tag from git ref', () => {
 
 describe('Build image', () => {
   test('No Dockerfile', () => {
+    const dockerfile = 'Dockerfile.nonexistent';
+    core.getInput = jest.fn().mockReturnValue(dockerfile);
     fs.existsSync = jest.fn().mockReturnValueOnce(false);
     core.setFailed = jest.fn();
     cp.execSync = jest.fn();
 
     docker.build('gcr.io/some-project/image:v1');
-    expect(fs.existsSync).toHaveBeenCalledWith('./Dockerfile');
-    expect(core.setFailed).toHaveBeenCalledWith('Dockerfile does not exist in root project directory!');
+    expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
+    expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
   });
 
   test('Dockerfile exists', () => {
+    core.getInput = jest.fn().mockReturnValue('Dockerfile');
     fs.existsSync = jest.fn().mockReturnValueOnce(true);
     cp.execSync = jest.fn();
     const image = 'gcr.io/some-project/image:v1';
 
     docker.build(image);
-    expect(fs.existsSync).toHaveBeenCalledWith('./Dockerfile');
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -t ${image} .`);
+    expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`);
   });
 });
 
@@ -89,6 +92,22 @@ describe('Registry login', () => {
     expect(cp.execSync).toHaveBeenCalledWith(`docker login -u ${username} --password-stdin ${registry}`, {
       input: password
     });
+  });
+
+  test('ECR login', () => {
+    const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
+
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce(registry)
+      .mockReturnValueOnce('')
+      .mockReturnValueOnce('');
+
+    cp.execSync = jest.fn();
+
+    docker.login();
+
+    expect(cp.execSync).toHaveBeenCalledWith(`$(aws ecr get-login --region us-east-1 --no-include-email)`);
   });
 });
 

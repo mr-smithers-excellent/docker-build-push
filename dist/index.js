@@ -564,13 +564,14 @@ const createTag = () => {
 };
 
 const build = imageName => {
-  core.info(`Building Docker image: ${imageName}...`);
   const dockerfile = core.getInput('dockerfile');
+
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  cp.execSync(`docker build -t ${imageName} .`);
+  core.info(`Building Docker image: ${imageName}...`);
+  cp.execSync(`docker build -f ${dockerfile} -t ${imageName} .`);
 };
 
 const isEcr = registry => {
