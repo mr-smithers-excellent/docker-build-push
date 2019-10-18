@@ -52,6 +52,18 @@ with:
   password: ${{ secrets.DOCKER_PASSWORD }} # Use content of service account JSON key
 ```
 
+### AWS Elastic Container Registry (ECR)
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@master
+with:
+  image: image-name
+  registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
 ## Tagging the image using GitOps
 
 By default, this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
