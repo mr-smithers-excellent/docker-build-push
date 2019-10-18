@@ -53,7 +53,6 @@ const getRegion = registry => {
 };
 
 const login = () => {
-
   const registry = core.getInput('registry', { required: true });
   const username = core.getInput('username');
   const password = core.getInput('password');
