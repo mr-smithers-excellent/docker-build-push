@@ -28,6 +28,13 @@ describe('Create Docker image tag from git ref', () => {
     expect(docker.createTag()).toBe('jira-123-f427b0b');
   });
 
+  test('Create from feature branch without Jira number', () => {
+    context.ref = 'refs/heads/no-jira-number';
+    context.sha = 'd3c98d2f50ab48322994ad6f80e460bde166b32f';
+
+    expect(docker.createTag()).toBe('no-jira-number-d3c98d2');
+  });
+
   test('Create from pull request push (not supported)', () => {
     context.ref = 'refs/pull/1';
     context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
