@@ -12,10 +12,10 @@ inputs:
     required: true
   username:
     description: 'Docker registry username'
-    required: true
+    required: false
   password:
     description: 'Docker registry password'
-    required: true
+    required: false
 outputs:
   imageFullName:
     description: 'Full name of the Docker image'
