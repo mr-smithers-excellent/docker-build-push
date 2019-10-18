@@ -27,5 +27,5 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: 'codesandbox'
+  icon: 'anchor'
   color: 'black'
