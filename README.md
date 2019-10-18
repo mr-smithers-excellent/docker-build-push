@@ -49,17 +49,18 @@ with:
 ### Google Container Registry (GCR)
 
 * Create a service account with the ability to push to GCR (see [configuring access control](https://cloud.google.com/container-registry/docs/access-control))
-* Create JSON key for new service account
+* Create and download JSON key for new service account
 * Save content of `.json` file as a secret called `DOCKER_PASSWORD` in your GitHub repo
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file 
+* Ensure you set the username to `_json_key`
 
 ```yaml
 uses: mr-smithers-excellent/docker-build-push@master
 with:
   image: gcp-project/image-name
   registry: gcr.io
-  username: _json_key
-  password: ${{ secrets.DOCKER_PASSWORD }} # Use content of service account JSON key
+  username: _json_key 
+  password: ${{ secrets.DOCKER_PASSWORD }} 
 ```
 
 ### AWS Elastic Container Registry (ECR)
