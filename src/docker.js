@@ -3,17 +3,11 @@ const core = require('@actions/core');
 const fs = require('fs');
 const { context } = require('@actions/github');
 
-const isGitHubTag = ref => {
-  return ref && ref.includes('refs/tags/');
-};
+const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
-const isMasterBranch = ref => {
-  return ref && ref === 'refs/heads/master';
-};
+const isMasterBranch = ref => ref && ref === 'refs/heads/master';
 
-const isNotMasterBranch = ref => {
-  return ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
-};
+const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
 
 const createTag = () => {
   core.debug('Creating Docker image tag...');
