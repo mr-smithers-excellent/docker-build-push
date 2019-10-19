@@ -9,9 +9,9 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 * Run [checkout action](https://github.com/actions/checkout) before using this action
 ```yaml
 steps:
-  - uses: actions/checkout@v1
+  - uses: actions/checkout@v1.0
 
-  - uses: mr-smithers-excellent/docker-build-push@master
+  - uses: mr-smithers-excellent/docker-build-push@v1.0
     with:
       image: repo/image
       registry: registry-url.io
@@ -38,7 +38,7 @@ steps:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@master
+uses: mr-smithers-excellent/docker-build-push@v1.0
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -55,7 +55,7 @@ with:
 * Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@master
+uses: mr-smithers-excellent/docker-build-push@v1.0
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -71,7 +71,7 @@ with:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@master
+uses: mr-smithers-excellent/docker-build-push@v1.0
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
