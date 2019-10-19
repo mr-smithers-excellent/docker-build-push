@@ -48,13 +48,9 @@ const build = imageName => {
   cp.execSync(`docker build -f ${dockerfile} -t ${imageName} .`);
 };
 
-const isEcr = registry => {
-  return registry && registry.includes('amazonaws');
-};
+const isEcr = registry => registry && registry.includes('amazonaws');
 
-const getRegion = registry => {
-  return registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
-};
+const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
 const login = () => {
   const registry = core.getInput('registry', { required: true });
