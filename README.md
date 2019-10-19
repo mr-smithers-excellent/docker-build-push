@@ -14,6 +14,7 @@ steps:
   - uses: mr-smithers-excellent/docker-build-push@v1.0
     with:
       image: repo/image
+      tag: latest
       registry: registry-url.io
       dockerfile: Dockerfile.ci
       username: username
@@ -22,13 +23,14 @@ steps:
 
 ## Inputs
 
-| Name       | Description                                       | Required |
-|------------|---------------------------------------------------|----------|
-| image      | Docker image name                                 | Yes      |
-| registry   | Registry host                                     | Yes      |
-| dockerfile | Location of Dockerfile (defaults to `Dockerfile`) | No       |
-| username   | Registry username                                 | No       |
-| password   | Registry password or token                        | No       |
+| Name       | Description                                                                             | Required |
+|------------|-----------------------------------------------------------------------------------------|----------|
+| image      | Docker image name                                                                       | Yes      |
+| tag        | Docker image tag (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
+| registry   | Docker registry host                                                                    | Yes      |
+| dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                       | No       |
+| username   | Docker registry username                                                                | No       |
+| password   | Docker registry password or token                                                       | No       |
 
 ## Examples
 
@@ -82,10 +84,10 @@ env:
 
 ## Tagging the image using GitOps
 
-By default, this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
+By default, if you do not pass a `tag` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
 
 | Trigger                  | Commit SHA | Docker Tag           |
 |--------------------------|------------|----------------------|
 | /refs/tags/v1.0          | N/A        | v1.0                 |
 | /refs/heads/master       | 1234567    | dev-1234567          |
-| /refs/heads/some-feature | 1234567    | some-feature-1234567 | 
+| /refs/heads/SOME-feature | 1234567    | some-feature-1234567 | 
