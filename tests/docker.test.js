@@ -14,6 +14,13 @@ describe('Create Docker image tag from git ref', () => {
     expect(docker.createTag()).toBe('v1.0');
   });
 
+  test('Create from tag push with capital letters', () => {
+    context.ref = 'refs/tags/V1.0';
+    context.sha = '60336540c3df28b52b1e364a65ff5b8f6ec135b8';
+
+    expect(docker.createTag()).toBe('v1.0');
+  });
+
   test('Create from master branch push', () => {
     context.ref = 'refs/heads/master';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
@@ -33,6 +40,13 @@ describe('Create Docker image tag from git ref', () => {
     context.sha = 'd3c98d2f50ab48322994ad6f80e460bde166b32f';
 
     expect(docker.createTag()).toBe('no-jira-number-d3c98d2');
+  });
+
+  test('Create from feature branch with capital letters', () => {
+    context.ref = 'refs/heads/SOME-mixed-CASE-Branch';
+    context.sha = '152568521eb446d7b331a4e7c1215d29605bf884';
+
+    expect(docker.createTag()).toBe('some-mixed-case-branch-1525685');
   });
 
   test('Create from pull request push (not supported)', () => {
