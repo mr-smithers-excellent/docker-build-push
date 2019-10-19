@@ -539,7 +539,8 @@ const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== '
 
 const createTag = () => {
   core.info('Creating Docker image tag...');
-  const { ref, sha } = context;
+  const { sha } = context;
+  const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   let dockerTag;
 
