@@ -49,75 +49,98 @@ describe('Create Docker image tag from git ref', () => {
   });
 });
 
-describe('Build image', () => {
-  test('No Dockerfile', () => {
-    const dockerfile = 'Dockerfile.nonexistent';
-    core.getInput = jest.fn().mockReturnValue(dockerfile);
-    fs.existsSync = jest.fn().mockReturnValueOnce(false);
-    core.setFailed = jest.fn();
-    cp.execSync = jest.fn();
+describe('core and cp methods', () => {
+  core.getInput = jest.fn();
+  core.setFailed = jest.fn();
+  cp.execSync = jest.fn();
+  fs.existsSync = jest.fn();
 
-    docker.build('gcr.io/some-project/image:v1');
-    expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
-    expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
+  afterEach(() => {
+    core.getInput.mockReset();
+    core.setFailed.mockReset();
+    cp.execSync.mockReset();
+    fs.existsSync.mockReset();
   });
 
-  test('Dockerfile exists', () => {
-    core.getInput = jest.fn().mockReturnValue('Dockerfile');
-    fs.existsSync = jest.fn().mockReturnValueOnce(true);
-    cp.execSync = jest.fn();
-    const image = 'gcr.io/some-project/image:v1';
-
-    docker.build(image);
-    expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`);
+  afterAll(() => {
+    core.getInput.mockRestore();
+    core.setFailed.mockRestore();
+    cp.execSync.mockRestore();
+    fs.existsSync.mockRestore();
   });
-});
 
-describe('Registry login', () => {
-  test('Docker Hub login', () => {
-    const registry = 'docker.io';
-    const username = 'mrsmithers';
-    const password = 'areallysecurepassword';
+  describe('Build image', () => {
+    test('No Dockerfile', () => {
+      const dockerfile = 'Dockerfile.nonexistent';
+      core.getInput.mockReturnValue(dockerfile);
+      fs.existsSync.mockReturnValueOnce(false);
 
-    core.getInput = jest
-      .fn()
-      .mockReturnValueOnce(registry)
-      .mockReturnValueOnce(username)
-      .mockReturnValueOnce(password);
-    cp.execSync = jest.fn();
+      docker.build('gcr.io/some-project/image:v1');
+      expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
+      expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
+    });
 
-    docker.login();
+    test('Dockerfile exists', () => {
+      core.getInput.mockReturnValue('Dockerfile');
+      fs.existsSync.mockReturnValueOnce(true);
+      const image = 'gcr.io/some-project/image:v1';
 
-    expect(cp.execSync).toHaveBeenCalledWith(`docker login -u ${username} --password-stdin ${registry}`, {
-      input: password
+      docker.build(image);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`);
     });
   });
 
-  test('ECR login', () => {
-    const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
+  describe('Registry login', () => {
+    test('Docker Hub login', () => {
+      const registry = 'docker.io';
+      const username = 'mrsmithers';
+      const password = 'areallysecurepassword';
 
-    core.getInput = jest
-      .fn()
-      .mockReturnValueOnce(registry)
-      .mockReturnValueOnce('')
-      .mockReturnValueOnce('');
+      core.getInput
+        .mockReturnValueOnce(registry)
+        .mockReturnValueOnce(username)
+        .mockReturnValueOnce(password);
 
-    cp.execSync = jest.fn();
+      docker.login();
 
-    docker.login();
+      expect(cp.execSync).toHaveBeenCalledWith(`docker login -u ${username} --password-stdin ${registry}`, {
+        input: password
+      });
+    });
 
-    expect(cp.execSync).toHaveBeenCalledWith(`$(aws ecr get-login --region us-east-1 --no-include-email)`);
+    test('ECR login', () => {
+      const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
+
+      core.getInput
+        .mockReturnValueOnce(registry)
+        .mockReturnValueOnce('')
+        .mockReturnValueOnce('');
+
+      docker.login();
+
+      expect(cp.execSync).toHaveBeenCalledWith(`$(aws ecr get-login --region us-east-1 --no-include-email)`);
+    });
+
+    test("returns undefined if empty login and doesn't execute command", () => {
+      core.getInput
+        .mockReturnValueOnce('')
+        .mockReturnValueOnce('')
+        .mockReturnValueOnce('');
+
+      docker.login();
+
+      expect(cp.execSync.mock.calls.length).toEqual(0);
+    });
   });
-});
 
-describe('Docker push', () => {
-  test('Docker Hub push', () => {
-    const imageName = 'gcr.io/my-project/image:v1';
-    cp.execSync = jest.fn();
+  describe('Docker push', () => {
+    test('Docker Hub push', () => {
+      const imageName = 'gcr.io/my-project/image:v1';
 
-    docker.push(imageName);
+      docker.push(imageName);
 
-    expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`);
+    });
   });
 });
