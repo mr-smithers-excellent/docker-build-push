@@ -1583,7 +1583,7 @@ const run = () => {
     docker.build(imageName);
     docker.push(imageName);
 
-    core.setOutput(imageName);
+    core.setOutput('imageFullName', imageName);
   } catch (error) {
     core.setFailed(error.message);
   }
