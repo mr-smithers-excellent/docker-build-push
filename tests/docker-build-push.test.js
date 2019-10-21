@@ -22,13 +22,13 @@ describe('Create & push Docker image', () => {
       .mockReturnValueOnce(image)
       .mockReturnValueOnce(registry)
       .mockReturnValueOnce(null);
-    core.setOutput = jest.fn().mockReturnValueOnce(`${registry}/${image}:${tag}`);
+    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
 
     run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(3);
-    expect(core.setOutput).toHaveBeenCalledWith(`${registry}/${image}:${tag}`);
+    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
   });
 });
 
