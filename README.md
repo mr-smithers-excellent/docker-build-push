@@ -3,21 +3,21 @@
 
 Builds a Docker image and pushes it to the private registry of your choosing.
 
-## Requirements
+## Basic usage
 
-* [GitHub Actions Beta](https://github.com/features/actions) program participation
-* Run [checkout action](https://github.com/actions/checkout) before using this action
+* Ensure you run the [checkout action](https://github.com/actions/checkout) before using this action
+* Add the following to a workflow `.yml` file in the `/.github` directory of your repo
 ```yaml
 steps:
   - uses: actions/checkout@v1.0
 
-  - uses: mr-smithers-excellent/docker-build-push@v1.0
+  - uses: mr-smithers-excellent/docker-build-push@v1.1
     with:
       image: repo/image
       tag: latest
       registry: registry-url.io
       dockerfile: Dockerfile.ci
-      username: username
+      username: ${{ secrets.DOCKER_USERNAME }}
       password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
@@ -41,7 +41,7 @@ steps:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v1.0
+uses: mr-smithers-excellent/docker-build-push@v1.1
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -58,7 +58,7 @@ with:
 * Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v1.0
+uses: mr-smithers-excellent/docker-build-push@v1.1
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -74,7 +74,7 @@ with:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v1.0
+uses: mr-smithers-excellent/docker-build-push@v1.1
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
