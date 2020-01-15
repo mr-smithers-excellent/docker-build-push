@@ -25,7 +25,7 @@ describe('Create & push Docker image', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
     const tag = 'dev-1234567';
-    const buildArgs = null;
+    const buildArgs = '';
     const dockerfile = 'Dockerfile';
 
     docker.login = jest.fn();
@@ -48,7 +48,7 @@ describe('Create & push Docker image with build args', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
     const tag = 'latest';
-    const buildArgs = ['VERSION=1.1.1', 'BUILD_DATE=2020-01-14'];
+    const buildArgs = 'VERSION=1.1.1,BUILD_DATE=2020-01-14';
     const dockerfile = 'Dockerfile.custom';
 
     docker.login = jest.fn();

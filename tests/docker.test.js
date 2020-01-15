@@ -103,6 +103,19 @@ describe('core and cp methods', () => {
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`);
     });
+
+    test('Build with build args', () => {
+      core.getInput.mockReturnValue('Dockerfile');
+      fs.existsSync.mockReturnValueOnce(true);
+      const image = 'docker.io/this-project/that-image:latest';
+      const buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
+
+      docker.build(image, buildArgs);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`
+      );
+    });
   });
 
   describe('Registry login', () => {
