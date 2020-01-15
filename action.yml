@@ -31,4 +31,4 @@ runs:
   main: 'dist/index.js'
 branding:
   icon: 'anchor'
-  color: 'black'
+  color: 'blue'
