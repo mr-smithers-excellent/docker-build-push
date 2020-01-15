@@ -1,5 +1,6 @@
 name: 'Docker Build & Push'
 description: 'Builds a Docker image and pushes to a private registry'
+author: 'Sean Smith'
 inputs:
   image:
     description: 'Name of the Docker image'
