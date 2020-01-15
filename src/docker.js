@@ -56,7 +56,6 @@ const build = (imageName, buildArgs) => {
   }
 
   core.info(`Building Docker image: ${imageName}`);
-  core.info(`Build command: ${createBuildCommand(dockerfile, imageName, buildArgs)}`);
   cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs));
 };
 
