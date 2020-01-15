@@ -7,11 +7,12 @@ const run = () => {
     const image = core.getInput('image', { required: true });
     const registry = core.getInput('registry', { required: true });
     const tag = core.getInput('tag') || docker.createTag();
+    const buildArgs = core.getInput('buildArgs');
 
     const imageName = `${registry}/${image}:${tag}`;
 
     docker.login();
-    docker.build(imageName);
+    docker.build(imageName, buildArgs);
     docker.push(imageName);
 
     core.setOutput('imageFullName', imageName);

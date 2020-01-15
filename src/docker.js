@@ -9,6 +9,16 @@ const isMasterBranch = ref => ref && ref === 'refs/heads/master';
 
 const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
 
+const createBuildCommand = (dockerfile, imageName, buildArgs) => {
+  let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}`;
+  if (buildArgs) {
+    const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
+  }
+
+  return `${buildCommandPrefix} .`;
+};
+
 const createTag = () => {
   core.info('Creating Docker image tag...');
   const { sha } = context;
@@ -38,7 +48,7 @@ const createTag = () => {
   return dockerTag;
 };
 
-const build = imageName => {
+const build = (imageName, buildArgs) => {
   const dockerfile = core.getInput('dockerfile');
 
   if (!fs.existsSync(dockerfile)) {
@@ -46,7 +56,7 @@ const build = imageName => {
   }
 
   core.info(`Building Docker image: ${imageName}`);
-  cp.execSync(`docker build -f ${dockerfile} -t ${imageName} .`);
+  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs));
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
