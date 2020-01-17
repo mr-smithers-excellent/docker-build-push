@@ -530,6 +530,7 @@ const cp = __webpack_require__(129);
 const core = __webpack_require__(470);
 const fs = __webpack_require__(747);
 const { context } = __webpack_require__(469);
+const maxBufferSize = __webpack_require__(535);
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
@@ -584,7 +585,7 @@ const build = (imageName, buildArgs) => {
   }
 
   core.info(`Building Docker image: ${imageName}`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), { maxBuffer: 50 * 1024 * 1024 });
+  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), { maxBuffer: maxBufferSize });
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
@@ -7366,6 +7367,16 @@ module.exports.Collection = Hook.Collection
 const factory = __webpack_require__(47);
 
 module.exports = factory();
+
+
+/***/ }),
+
+/***/ 535:
+/***/ (function(module) {
+
+const maxBufferSize = 50 * 1024 * 1024;
+
+module.exports = maxBufferSize;
 
 
 /***/ }),
