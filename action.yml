@@ -1,5 +1,6 @@
 name: 'Docker Build & Push'
 description: 'Builds a Docker image and pushes to a private registry'
+author: 'Sean Smith'
 inputs:
   image:
     description: 'Name of the Docker image'
@@ -14,6 +15,9 @@ inputs:
     description: 'Location of Dockerfile, if not Dockerfile in root directory'
     required: false
     default: 'Dockerfile'
+  buildArgs:
+    description: 'Docker build arguments in format KEY=VALUE,KEY=VALUE'
+    required: false
   username:
     description: 'Docker registry username'
     required: false
@@ -28,4 +32,4 @@ runs:
   main: 'dist/index.js'
 branding:
   icon: 'anchor'
-  color: 'black'
+  color: 'blue'
