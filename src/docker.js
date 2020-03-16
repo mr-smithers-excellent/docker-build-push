@@ -1,6 +1,7 @@
 const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
+const path = require('path');
 const { context } = require('@actions/github');
 const maxBufferSize = require('../src/settings');
 
@@ -10,8 +11,8 @@ const isMasterBranch = ref => ref && ref === 'refs/heads/master';
 
 const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
 
-const createBuildCommand = (dockerfile, imageName, buildArgs) => {
-  let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}`;
+const createBuildCommand = (projectPath = '.', dockerfile, imageName, buildArgs) => {
+  let buildCommandPrefix = `cd ${projectPath} && docker build -f ${dockerfile} -t ${imageName}`;
   if (buildArgs) {
     const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
@@ -51,13 +52,16 @@ const createTag = () => {
 
 const build = (imageName, buildArgs) => {
   const dockerfile = core.getInput('dockerfile');
+  const projectPath = core.getInput('project_path');
 
-  if (!fs.existsSync(dockerfile)) {
+  const dockerFileCompletePath = projectPath ? path.join(projectPath, dockerfile) : dockerfile;
+
+  if (!fs.existsSync(dockerFileCompletePath)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
   core.info(`Building Docker image: ${imageName}`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), { maxBuffer: maxBufferSize });
+  cp.execSync(createBuildCommand(projectPath, dockerfile, imageName, buildArgs), { maxBuffer: maxBufferSize });
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');

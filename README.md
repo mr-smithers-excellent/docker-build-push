@@ -11,9 +11,10 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 steps:
   - uses: actions/checkout@v1.0
 
-  - uses: mr-smithers-excellent/docker-build-push@v2
+  - uses: techpool/docker-build-push@master
     with:
       image: repo/image
+      project_path: .
       tag: latest
       registry: registry-url.io
       dockerfile: Dockerfile.ci
@@ -23,15 +24,16 @@ steps:
 
 ## Inputs
 
-| Name       | Description                                                                             | Required |
-|------------|-----------------------------------------------------------------------------------------|----------|
-| image      | Docker image name                                                                       | Yes      |
-| tag        | Docker image tag (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
-| registry   | Docker registry host                                                                    | Yes      |
-| dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                       | No       |
-| buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
-| username   | Docker registry username                                                                | No       |
-| password   | Docker registry password or token                                                       | No       |
+| Name           | Description                                                                             | Required |
+|----------------|-----------------------------------------------------------------------------------------|----------|
+| image          | Docker image name                                                                       | Yes      |
+| tag            | Docker image tag (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
+| registry       | Docker registry host                                                                    | Yes      |
+| dockerfile     | Location of Dockerfile (defaults to `Dockerfile`)                                       | No       |
+| buildArgs      | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
+| username       | Docker registry username                                                                | No       |
+| password       | Docker registry password or token                                                       | No       |
+| project_path   | Docker registry password or token                                                       | No       |
 
 ## Examples
 
