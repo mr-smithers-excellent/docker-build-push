@@ -33,7 +33,7 @@ steps:
 | buildArgs      | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
 | username       | Docker registry username                                                                | No       |
 | password       | Docker registry password or token                                                       | No       |
-| project_path   | Docker registry password or token                                                       | No       |
+| project_path   | Path of the project where the Dockerfile is to be build                                 | No       |
 
 ## Examples
 
