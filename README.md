@@ -1,5 +1,6 @@
+![Tests](https://github.com/mr-smithers-excellent/docker-build-push/workflows/Tests/badge.svg?branch=master&event=push)
+
 # Docker Build & Push Action
-<p><a href="https://github.com/mr-smithers-excellent/docker-build-push"><img alt="GitHub Actions status" src="https://github.com/mr-smithers-excellent/docker-build-push/workflows/Tests/badge.svg"></a></p>
 
 Builds a Docker image and pushes it to the private registry of your choosing.
 
