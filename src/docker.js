@@ -2,7 +2,7 @@ const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
 const { context } = require('@actions/github');
-const maxBufferSize = require('../src/settings');
+const maxBufferSize = require('./settings');
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
