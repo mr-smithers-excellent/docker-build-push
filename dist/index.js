@@ -1553,7 +1553,10 @@ module.exports = require("child_process");
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 const core = __webpack_require__(470);
+const github = __webpack_require__(469);
 const docker = __webpack_require__(95);
+
+const GITHUB_REGISTRY = 'docker.pkg.github.com';
 
 // Convert buildArgs from String to Array, as GH Actions currently does not support Arrays
 const processBuildArgsInput = buildArgsInput => {
@@ -1565,15 +1568,28 @@ const processBuildArgsInput = buildArgsInput => {
   return buildArgs;
 };
 
+const isGitHubRegistry = registry => {
+  return registry === GITHUB_REGISTRY;
+};
+
 const run = () => {
   try {
     // Get GitHub Action inputs
     const image = core.getInput('image', { required: true });
     const registry = core.getInput('registry', { required: true });
     const tag = core.getInput('tag') || docker.createTag();
+    const githubRepo = core.getInput('githubRepo') || github.context.repo;
     const buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
 
-    const imageName = `${registry}/${image}:${tag}`;
+    // Create the full Docker image name
+    let imageName;
+    if (isGitHubRegistry(registry)) {
+      imageName = `${GITHUB_REGISTRY}/${githubRepo}/${image}:${tag}`;
+    } else {
+      imageName = `${registry}/${image}:${tag}`;
+    }
+
+    // docker image push is only supported with a tag of the format :owner/:repo_name/:image_name
 
     docker.login();
     docker.build(imageName, buildArgs);

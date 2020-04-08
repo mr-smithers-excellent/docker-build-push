@@ -3,6 +3,13 @@
 
 Builds a Docker image and pushes it to the private registry of your choosing.
 
+## Supported Docker registries
+
+* Docker Hub
+* Google Container Registry (GCR)
+* AWS Elastic Container Registry (ECR)
+* GitHub Docker Registry
+
 ## Basic usage
 
 * Ensure you run the [checkout action](https://github.com/actions/checkout) before using this action
@@ -10,8 +17,10 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 ```yaml
 steps:
   - uses: actions/checkout@v1.0
+    name: Check out code
 
-  - uses: mr-smithers-excellent/docker-build-push@v2
+  - uses: mr-smithers-excellent/docker-build-push@v3
+    name: Build & push Docker image
     with:
       image: repo/image
       tag: latest
@@ -32,6 +41,7 @@ steps:
 | buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
 | username   | Docker registry username                                                                | No       |
 | password   | Docker registry password or token                                                       | No       |
+| githubRepo | GitHub repo in format `owner/repo-name` to push the image                               | No       |
 
 ## Examples
 
@@ -41,7 +51,7 @@ steps:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v2
+uses: mr-smithers-excellent/docker-build-push@v3
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -58,7 +68,7 @@ with:
 * Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v2
+uses: mr-smithers-excellent/docker-build-push@v3
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -74,13 +84,29 @@ with:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v2
+uses: mr-smithers-excellent/docker-build-push@v3
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
+### GitHub Docker Registry
+
+* Provide either the `github.actor` or an alternate username for Docker login
+* Pass the default GitHub Actions token or custom secret with [proper push permissions](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token)
+* If pushing to a repo outside where this Action is run, provide the name of the repo with the `githubRepo` input 
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v3
+with:
+  image: image-name
+  registry: docker.pkg.github.com
+  githubRepo: owner/repo-name 
+  username: ${{ github.actor }}
+  password: ${{ secrets.GITHUB_TOKEN }} 
 ```
 
 ## Tagging the image using GitOps
