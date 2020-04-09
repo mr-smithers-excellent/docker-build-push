@@ -11,7 +11,10 @@ const maxBufferSize = require('../src/settings');
 
 beforeAll(() => {
   docker.push = jest.fn();
-  github.context.repo = 'some-repo';
+  github.context.repo = {
+    owner: 'owner',
+    repo: 'some-repo'
+  };
 });
 
 const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubRepo) => {
