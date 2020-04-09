@@ -65,6 +65,8 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
 const login = () => {
+  core.info('Docker Login');
+  core.info('---------------------------------------');
   const registry = core.getInput('registry', { required: true });
   const username = core.getInput('username');
   const password = core.getInput('password');
@@ -80,6 +82,7 @@ const login = () => {
       input: password
     });
   }
+  core.info('---------------------------------------');
 };
 
 const push = imageName => {

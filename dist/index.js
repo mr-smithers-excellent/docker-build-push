@@ -582,6 +582,8 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
 const login = () => {
+  core.info('Docker Login');
+  core.info('---------------------------------------');
   const registry = core.getInput('registry', { required: true });
   const username = core.getInput('username');
   const password = core.getInput('password');
@@ -597,6 +599,7 @@ const login = () => {
       input: password
     });
   }
+  core.info('---------------------------------------');
 };
 
 const push = imageName => {
@@ -1601,11 +1604,8 @@ const processInputs = () => {
 const createFullImageName = () => {
   let imageFullName;
   if (registry === GITHUB_REGISTRY) {
-    core.info(`Using GitHub Registry...`);
-    core.info(`githubOwner: ${githubOwner}`);
     imageFullName = `${GITHUB_REGISTRY}/${githubOwner}/${image}:${tag}`;
   } else {
-    core.info(`Using non-GitHub Registry...`);
     imageFullName = `${registry}/${image}:${tag}`;
   }
   return imageFullName;
@@ -1614,7 +1614,6 @@ const createFullImageName = () => {
 const run = () => {
   try {
     processInputs();
-    core.info(`githubOwner: ${githubOwner}`);
 
     const imageFullName = createFullImageName();
     core.info(`Docker image name created: ${imageFullName}`);
