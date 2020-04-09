@@ -1,5 +1,8 @@
 const core = require('@actions/core');
+const github = require('@actions/github');
 const docker = require('./docker');
+
+const GITHUB_REGISTRY = 'docker.pkg.github.com';
 
 // Convert buildArgs from String to Array, as GH Actions currently does not support Arrays
 const processBuildArgsInput = buildArgsInput => {
@@ -11,6 +14,10 @@ const processBuildArgsInput = buildArgsInput => {
   return buildArgs;
 };
 
+const isGitHubRegistry = registry => {
+  return registry === GITHUB_REGISTRY;
+};
+
 const run = () => {
   try {
     // Get GitHub Action inputs
@@ -18,8 +25,15 @@ const run = () => {
     const registry = core.getInput('registry', { required: true });
     const tag = core.getInput('tag') || docker.createTag();
     const buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
+    const githubRepo = core.getInput('githubRepo') || github.context.repo;
 
-    const imageName = `${registry}/${image}:${tag}`;
+    // Create the full Docker image name
+    let imageName;
+    if (isGitHubRegistry(registry)) {
+      imageName = `${GITHUB_REGISTRY}/${githubRepo}/${image}:${tag}`;
+    } else {
+      imageName = `${registry}/${image}:${tag}`;
+    }
 
     docker.login();
     docker.build(imageName, buildArgs);

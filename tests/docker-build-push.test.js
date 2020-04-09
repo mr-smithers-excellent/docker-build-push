@@ -1,7 +1,9 @@
 jest.mock('@actions/core');
+jest.mock('@actions/github');
 jest.mock('child_process');
 
 const core = require('@actions/core');
+const github = require('@actions/github');
 const cp = require('child_process');
 const docker = require('../src/docker');
 const run = require('../src/docker-build-push');
@@ -9,17 +11,46 @@ const maxBufferSize = require('../src/settings');
 
 beforeAll(() => {
   docker.push = jest.fn();
+  github.context.repo = 'some-repo';
 });
 
-const mockInputs = (image, registry, tag, buildArgs, dockerfile) => {
+const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubRepo) => {
   core.getInput = jest
     .fn()
     .mockReturnValueOnce(image)
     .mockReturnValueOnce(registry)
     .mockReturnValueOnce(tag)
     .mockReturnValueOnce(buildArgs)
+    .mockReturnValueOnce(githubRepo)
     .mockReturnValueOnce(dockerfile);
 };
+
+describe('Create & push Docker image to GitHub Registry', () => {
+  test('Valid Docker inputs', () => {
+    const image = 'image-name';
+    const registry = 'docker.pkg.github.com';
+    const tag = 'latest';
+    const buildArgs = '';
+    const dockerfile = 'Dockerfile';
+    const githubRepo = 'override-repo';
+    const githubFullImageName = `${registry}/${githubRepo}/${image}:${tag}`;
+
+    docker.login = jest.fn();
+    docker.createTag = jest.fn().mockReturnValueOnce(tag);
+    mockInputs(image, registry, null, buildArgs, dockerfile, githubRepo);
+    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
+    cp.execSync = jest.fn();
+
+    run();
+
+    expect(docker.createTag).toHaveBeenCalledTimes(1);
+    expect(core.getInput).toHaveBeenCalledTimes(6);
+    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', githubFullImageName);
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${githubFullImageName} .`, {
+      maxBuffer: maxBufferSize
+    });
+  });
+});
 
 describe('Create & push Docker image', () => {
   test('Valid Docker inputs', () => {
@@ -38,7 +69,7 @@ describe('Create & push Docker image', () => {
     run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(5);
+    expect(core.getInput).toHaveBeenCalledTimes(6);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
     expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${registry}/${image}:${tag} .`, {
       maxBuffer: maxBufferSize
@@ -63,7 +94,7 @@ describe('Create & push Docker image with build args', () => {
     run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(5);
+    expect(core.getInput).toHaveBeenCalledTimes(6);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
     expect(cp.execSync).toHaveBeenCalledWith(
       `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 .`,

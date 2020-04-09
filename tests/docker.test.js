@@ -130,10 +130,7 @@ describe('core and cp methods', () => {
       const username = 'mrsmithers';
       const password = 'areallysecurepassword';
 
-      core.getInput
-        .mockReturnValueOnce(registry)
-        .mockReturnValueOnce(username)
-        .mockReturnValueOnce(password);
+      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce(username).mockReturnValueOnce(password);
 
       docker.login();
 
@@ -145,10 +142,7 @@ describe('core and cp methods', () => {
     test('ECR login', () => {
       const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
 
-      core.getInput
-        .mockReturnValueOnce(registry)
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('');
+      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce('').mockReturnValueOnce('');
 
       docker.login();
 
@@ -156,10 +150,7 @@ describe('core and cp methods', () => {
     });
 
     test("returns undefined if empty login and doesn't execute command", () => {
-      core.getInput
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('');
+      core.getInput.mockReturnValueOnce('').mockReturnValueOnce('').mockReturnValueOnce('');
 
       docker.login();
 
