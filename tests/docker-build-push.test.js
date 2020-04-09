@@ -3,18 +3,17 @@ jest.mock('@actions/github');
 jest.mock('child_process');
 
 const core = require('@actions/core');
-const github = require('@actions/github');
 const cp = require('child_process');
 const docker = require('../src/docker');
-const run = require('../src/docker-build-push');
+const main = require('../src/docker-build-push');
 const maxBufferSize = require('../src/settings');
+
+const mockOwner = 'owner';
+const mockRepoName = 'some-repo';
 
 beforeAll(() => {
   docker.push = jest.fn();
-  github.context.repo = {
-    owner: 'owner',
-    repo: 'some-repo'
-  };
+  main.getRepoName = jest.fn().mockReturnValue(`${mockOwner}/${mockRepoName}`);
 });
 
 const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubRepo) => {
@@ -28,7 +27,7 @@ const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubRepo) => 
     .mockReturnValueOnce(dockerfile);
 };
 
-describe('Create & push Docker image to GitHub Registry', () => {
+describe('Create & push Docker image to GitHub Registry - override repo', () => {
   test('Valid Docker inputs', () => {
     const image = 'image-name';
     const registry = 'docker.pkg.github.com';
@@ -44,10 +43,36 @@ describe('Create & push Docker image to GitHub Registry', () => {
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
     cp.execSync = jest.fn();
 
-    run();
+    main.run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
+    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', githubFullImageName);
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${githubFullImageName} .`, {
+      maxBuffer: maxBufferSize
+    });
+  });
+});
+
+describe('Create & push Docker image to GitHub Registry - default repo', () => {
+  test('Valid Docker inputs', () => {
+    const image = 'image-name';
+    const registry = 'docker.pkg.github.com';
+    const tag = 'latest';
+    const buildArgs = '';
+    const dockerfile = 'Dockerfile';
+    const githubFullImageName = `${registry}/${mockOwner}/${mockRepoName}/${image}:${tag}`;
+
+    docker.login = jest.fn();
+    docker.createTag = jest.fn().mockReturnValueOnce(tag);
+    mockInputs(image, registry, null, buildArgs, dockerfile);
+    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
+    cp.execSync = jest.fn();
+
+    main.run();
+
+    expect(docker.createTag).toHaveBeenCalledTimes(1);
+    expect(core.getInput).toHaveBeenCalledTimes(5);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', githubFullImageName);
     expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${githubFullImageName} .`, {
       maxBuffer: maxBufferSize
@@ -59,7 +84,7 @@ describe('Create & push Docker image', () => {
   test('Valid Docker inputs', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
-    const tag = 'dev-1234567';
+    const tag = 'dev-1234667';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
 
@@ -69,7 +94,7 @@ describe('Create & push Docker image', () => {
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
     cp.execSync = jest.fn();
 
-    run();
+    main.run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
@@ -94,7 +119,7 @@ describe('Create & push Docker image with build args', () => {
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
     cp.execSync = jest.fn();
 
-    run();
+    main.run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
@@ -110,7 +135,7 @@ describe('Create & push Docker image with build args', () => {
 
 describe('Create Docker image causing an error', () => {
   test('Docker login error', () => {
-    docker.createTag = jest.fn().mockRejectedValue('some-tag');
+    docker.createTag = jest.fn().mockReturnValueOnce('some-tag');
     docker.build = jest.fn();
     const error = 'Error: Cannot perform an interactive login from a non TTY device';
     docker.login = jest.fn().mockImplementation(() => {
@@ -118,7 +143,7 @@ describe('Create Docker image causing an error', () => {
     });
     core.setFailed = jest.fn();
 
-    run();
+    main.run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.setFailed).toHaveBeenCalledWith(error);

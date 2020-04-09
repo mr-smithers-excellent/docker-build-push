@@ -1,5 +1,5 @@
-const run = require('./docker-build-push');
+const main = require('./docker-build-push');
 
 if (require.main === module) {
-  run();
+  main.run();
 }
