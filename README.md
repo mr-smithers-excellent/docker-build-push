@@ -1,5 +1,6 @@
 # Docker Build & Push Action
 [![Tests](https://github.com/mr-smithers-excellent/docker-build-push/workflows/Tests/badge.svg?branch=master&event=push)](https://github.com/mr-smithers-excellent/docker-build-push/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/maintainability)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/maintainability)
 
 Builds a Docker image and pushes it to the private registry of your choosing.
 
@@ -97,7 +98,7 @@ env:
 
 * It is assumed you'll be pushing the image to a repo inside your GitHub organization, unless you set `githubOrg`
 * Provider the image name in `github-repo-name/image-name` format  
-* Provide either the `github.actor` or an alternate username for Docker login
+* Provide either the `${{ github.actor }}` or an alternate username for Docker login (with associated token below)
 * Pass the default GitHub Actions token or custom secret with [proper push permissions](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token)
 
 ```yaml
