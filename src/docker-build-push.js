@@ -25,7 +25,7 @@ const processInputs = () => {
   registry = core.getInput('registry', { required: true });
   tag = core.getInput('tag') || docker.createTag();
   buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
-  githubOwner = core.getInput('githubOwner') || github.getDefaultOwner();
+  githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
 };
 
 // Create the full Docker image name with registry prefix
