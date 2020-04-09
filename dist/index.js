@@ -567,6 +567,8 @@ const createTag = () => {
 };
 
 const build = (imageName, buildArgs) => {
+  core.info('---------------------------------------');
+  core.info('Docker Build');
   const dockerfile = core.getInput('dockerfile');
 
   if (!fs.existsSync(dockerfile)) {
@@ -582,8 +584,8 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
 const login = () => {
-  core.info('Docker Login');
   core.info('---------------------------------------');
+  core.info('Docker Login');
   const registry = core.getInput('registry', { required: true });
   const username = core.getInput('username');
   const password = core.getInput('password');
@@ -599,10 +601,11 @@ const login = () => {
       input: password
     });
   }
-  core.info('---------------------------------------');
 };
 
 const push = imageName => {
+  core.info('---------------------------------------');
+  core.info('Docker Push');
   core.info(`Pushing Docker image ${imageName}`);
   cp.execSync(`docker push ${imageName}`);
 };
