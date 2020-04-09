@@ -1,19 +1,19 @@
 const { context } = require('@actions/github');
 const core = require('@actions/core');
 
-// Returns the repo name where the Action is run in owner/repo format
-const getDefaultRepoName = () => {
-  let githubRepo;
+// Returns owning organization of the repo where the Action is run
+const getDefaultOwner = () => {
+  let owner;
   try {
-    const { owner, repo } = context.repo;
-    githubRepo = `${owner}/${repo}`;
+    const { repo } = context;
+    owner = repo.owner;
   } catch (error) {
     core.setFailed(`Action failed with error ${error}`);
   }
 
-  return githubRepo;
+  return owner;
 };
 
 module.exports = {
-  getDefaultRepoName
+  getDefaultOwner
 };

@@ -19,71 +19,69 @@ afterAll(() => {
   delete process.env.GITHUB_REPOSITORY;
 });
 
-const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubRepo) => {
+const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubOrg) => {
   core.getInput = jest
     .fn()
     .mockReturnValueOnce(image)
     .mockReturnValueOnce(registry)
     .mockReturnValueOnce(tag)
     .mockReturnValueOnce(buildArgs)
-    .mockReturnValueOnce(githubRepo)
+    .mockReturnValueOnce(githubOrg)
     .mockReturnValueOnce(dockerfile);
 };
 
-describe('Create & push Docker image to GitHub Registry - override repo', () => {
-  test('Valid Docker inputs', () => {
-    const image = 'image-name';
+describe('Create & push Docker image to GitHub Registry', () => {
+  test('Override GitHub organization', () => {
+    const image = 'repo-name/image-name';
     const registry = 'docker.pkg.github.com';
     const tag = 'latest';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
-    const githubRepo = 'owner/override-repo';
-    const githubFullImageName = `${registry}/${githubRepo}/${image}:${tag}`;
+    const githubOrg = 'override-org';
+    const imageFullName = `${registry}/${githubOrg}/${image}:${tag}`;
 
     docker.login = jest.fn();
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
-    mockInputs(image, registry, null, buildArgs, dockerfile, githubRepo);
-    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
+    mockInputs(image, registry, null, buildArgs, dockerfile, githubOrg);
+    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', imageFullName);
     cp.execSync = jest.fn();
 
     run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
-    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', githubFullImageName);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${githubFullImageName} .`, {
+    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${imageFullName} .`, {
       maxBuffer: maxBufferSize
     });
   });
-});
 
-describe('Create & push Docker image to GitHub Registry - default repo', () => {
-  test('Valid Docker inputs', () => {
-    const image = 'image-name';
+  test('Keep default GitHub organization', () => {
+    const image = `${mockRepoName}/image-name`;
     const registry = 'docker.pkg.github.com';
     const tag = 'latest';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
-    const githubFullImageName = `${registry}/${mockOwner}/${mockRepoName}/${image}:${tag}`;
+    const fullImageName = `${registry}/${mockOwner}/${image}:${tag}`;
 
     docker.login = jest.fn();
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
-    mockInputs(image, registry, null, buildArgs, dockerfile);
-    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
+    mockInputs(image, registry, null, buildArgs, dockerfile, null);
+    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', fullImageName);
     cp.execSync = jest.fn();
 
     run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
-    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', githubFullImageName);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${githubFullImageName} .`, {
+    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', fullImageName);
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${fullImageName} .`, {
       maxBuffer: maxBufferSize
     });
   });
 });
 
-describe('Create & push Docker image', () => {
+describe('Create & push Docker image to GCR', () => {
   test('Valid Docker inputs', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
