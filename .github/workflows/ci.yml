@@ -11,11 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: npm ci
+      - name: Build
+        run: npm ci
       - name: Run tests & submit coverage report
         uses: paambaati/codeclimate-action@v2.5.6
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          coverageCommand: npm test
+          coverageCommand: npm run test
           coverageLocations: "coverage/lcov.info:lcov"
