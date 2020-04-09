@@ -10,6 +10,11 @@
     "test": "eslint 'src/**.js' 'tests/**.js' && jest --coverage",
     "test:watch": "npm run test -- --watchAll"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mr-smithers-excellent/docker-build-push-action.git"
@@ -41,7 +46,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.19.0",
-    "husky": "^4.2.3",
+    "husky": "^4.2.5",
     "jest": "^25.3.0",
     "prettier": "^2.0.4"
   }
