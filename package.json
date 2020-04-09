@@ -1,6 +1,6 @@
 {
   "name": "docker-build-push-action",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "description": "Docker Build & Push Action",
   "main": "src/index.js",
   "scripts": {
