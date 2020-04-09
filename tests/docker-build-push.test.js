@@ -1,11 +1,10 @@
 jest.mock('@actions/core');
-jest.mock('@actions/github');
 jest.mock('child_process');
 
 const core = require('@actions/core');
 const cp = require('child_process');
 const docker = require('../src/docker');
-const main = require('../src/docker-build-push');
+const run = require('../src/docker-build-push');
 const maxBufferSize = require('../src/settings');
 
 const mockOwner = 'owner';
@@ -13,7 +12,11 @@ const mockRepoName = 'some-repo';
 
 beforeAll(() => {
   docker.push = jest.fn();
-  main.getRepoName = jest.fn().mockReturnValue(`${mockOwner}/${mockRepoName}`);
+  process.env.GITHUB_REPOSITORY = `${mockOwner}/${mockRepoName}`;
+});
+
+afterAll(() => {
+  delete process.env.GITHUB_REPOSITORY;
 });
 
 const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubRepo) => {
@@ -43,7 +46,7 @@ describe('Create & push Docker image to GitHub Registry - override repo', () => 
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
     cp.execSync = jest.fn();
 
-    main.run();
+    run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
@@ -69,10 +72,10 @@ describe('Create & push Docker image to GitHub Registry - default repo', () => {
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', githubFullImageName);
     cp.execSync = jest.fn();
 
-    main.run();
+    run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(5);
+    expect(core.getInput).toHaveBeenCalledTimes(6);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', githubFullImageName);
     expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${githubFullImageName} .`, {
       maxBuffer: maxBufferSize
@@ -94,7 +97,7 @@ describe('Create & push Docker image', () => {
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
     cp.execSync = jest.fn();
 
-    main.run();
+    run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
@@ -119,7 +122,7 @@ describe('Create & push Docker image with build args', () => {
     core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
     cp.execSync = jest.fn();
 
-    main.run();
+    run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
@@ -143,7 +146,7 @@ describe('Create Docker image causing an error', () => {
     });
     core.setFailed = jest.fn();
 
-    main.run();
+    run();
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.setFailed).toHaveBeenCalledWith(error);

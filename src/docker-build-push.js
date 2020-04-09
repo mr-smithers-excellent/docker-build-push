@@ -1,6 +1,6 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 const docker = require('./docker');
+const github = require('./github');
 
 const GITHUB_REGISTRY = 'docker.pkg.github.com';
 
@@ -18,15 +18,6 @@ const isGitHubRegistry = registry => {
   return registry === GITHUB_REGISTRY;
 };
 
-const getRepoName = () => {
-  let githubRepo;
-  const { repo } = github.context.repo;
-  if (repo) {
-    githubRepo = `${repo.owner}/${repo.repo}`;
-  }
-  return githubRepo;
-};
-
 const run = () => {
   try {
     // Get GitHub Action inputs
@@ -34,7 +25,7 @@ const run = () => {
     const registry = core.getInput('registry', { required: true });
     const tag = core.getInput('tag') || docker.createTag();
     const buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
-    const githubRepo = core.getInput('githubRepo') || getRepoName();
+    const githubRepo = core.getInput('githubRepo') || github.getDefaultRepoName();
 
     // Create the full Docker image name
     let imageName;
@@ -54,7 +45,4 @@ const run = () => {
   }
 };
 
-module.exports = {
-  run,
-  getRepoName
-};
+module.exports = run;
