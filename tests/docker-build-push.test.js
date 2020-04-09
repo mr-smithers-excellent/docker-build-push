@@ -37,7 +37,7 @@ describe('Create & push Docker image to GitHub Registry - override repo', () => 
     const tag = 'latest';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
-    const githubRepo = 'override-repo';
+    const githubRepo = 'owner/override-repo';
     const githubFullImageName = `${registry}/${githubRepo}/${image}:${tag}`;
 
     docker.login = jest.fn();
