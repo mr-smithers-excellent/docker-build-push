@@ -18,9 +18,9 @@ const isGitHubRegistry = registry => {
   return registry === GITHUB_REGISTRY;
 };
 
-const getGitHubRepo = () => {
+const getGithubRepo = () => {
   let githubRepo;
-  const { repo } = github.context;
+  const { repo } = github.context.repo;
   if (repo) {
     githubRepo = `${repo.owner}/${repo.repo}`;
   }
@@ -34,7 +34,7 @@ const run = () => {
     const registry = core.getInput('registry', { required: true });
     const tag = core.getInput('tag') || docker.createTag();
     const buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
-    const githubRepo = core.getInput('githubRepo') || getGitHubRepo();
+    const githubRepo = core.getInput('githubRepo') || getGithubRepo();
 
     // Create the full Docker image name
     let imageName;
