@@ -32,6 +32,7 @@ const processInputs = () => {
 const createFullImageName = () => {
   let imageFullName;
   if (registry === GITHUB_REGISTRY) {
+    core.info(`githubOwner: ${githubOwner}`)
     imageFullName = `${GITHUB_REGISTRY}/${githubOwner}/${image}:${tag}`;
   } else {
     imageFullName = `${registry}/${image}:${tag}`;
@@ -44,6 +45,7 @@ const run = () => {
     processInputs();
 
     const imageFullName = createFullImageName();
+    core.info(`Docker image name created: ${imageFullName}`)
 
     docker.login();
     docker.build(imageFullName, buildArgs);
