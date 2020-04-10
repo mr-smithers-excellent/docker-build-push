@@ -5,7 +5,7 @@ const core = require('@actions/core');
 const cp = require('child_process');
 const docker = require('../src/docker');
 const run = require('../src/docker-build-push');
-const maxBufferSize = require('../src/settings');
+const cpOptions = require('../src/settings');
 
 const mockOwner = 'owner';
 const mockRepoName = 'some-repo';
@@ -51,9 +51,7 @@ describe('Create & push Docker image to GitHub Registry', () => {
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${imageFullName} .`, {
-      maxBuffer: maxBufferSize
-    });
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${imageFullName} .`, cpOptions);
   });
 
   test('Keep default GitHub organization', () => {
@@ -75,9 +73,7 @@ describe('Create & push Docker image to GitHub Registry', () => {
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', fullImageName);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${fullImageName} .`, {
-      maxBuffer: maxBufferSize
-    });
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${fullImageName} .`, cpOptions);
   });
 });
 
@@ -100,9 +96,10 @@ describe('Create & push Docker image to GCR', () => {
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${registry}/${image}:${tag} .`, {
-      maxBuffer: maxBufferSize
-    });
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} .`,
+      cpOptions
+    );
   });
 });
 
@@ -127,9 +124,7 @@ describe('Create & push Docker image with build args', () => {
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
     expect(cp.execSync).toHaveBeenCalledWith(
       `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 .`,
-      {
-        maxBuffer: maxBufferSize
-      }
+      cpOptions
     );
   });
 });

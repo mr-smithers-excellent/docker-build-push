@@ -5,7 +5,7 @@ const core = require('@actions/core');
 const cp = require('child_process');
 const fs = require('fs');
 const docker = require('../src/docker.js');
-const maxBufferSize = require('../src/settings');
+const cpOptions = require('../src/settings');
 
 describe('Create Docker image tag from git ref', () => {
   test('Create from tag push', () => {
@@ -102,9 +102,7 @@ describe('core and cp methods', () => {
 
       docker.build(image);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, {
-        maxBuffer: maxBufferSize
-      });
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, cpOptions);
     });
 
     test('Build with build args', () => {
@@ -117,9 +115,7 @@ describe('core and cp methods', () => {
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
         `docker build -f Dockerfile -t ${image} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
-        {
-          maxBuffer: maxBufferSize
-        }
+        cpOptions
       );
     });
   });
