@@ -11,7 +11,8 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Check out code
+        uses: actions/checkout@v1
       - name: Build
         run: npm ci
       - name: Run tests & submit coverage report
