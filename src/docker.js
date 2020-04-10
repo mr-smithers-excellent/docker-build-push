@@ -77,7 +77,8 @@ const login = () => {
   } else if (username && password) {
     core.info(`Logging into Docker registry ${registry}...`);
     cp.execSync(`docker login -u ${username} --password-stdin ${registry}`, {
-      input: password
+      input: password,
+      stdio: 'inherit'
     });
   }
 };
