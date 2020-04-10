@@ -601,7 +601,7 @@ const login = () => {
 
 const push = imageName => {
   core.info(`Pushing Docker image ${imageName}`);
-  cp.execSync(`docker push ${imageName}`);
+  cp.execSync(`docker push ${imageName}`, cpOptions);
 };
 
 module.exports = {
