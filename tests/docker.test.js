@@ -160,7 +160,7 @@ describe('core and cp methods', () => {
 
       docker.push(imageName);
 
-      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`, cpOptions);
     });
   });
 });
