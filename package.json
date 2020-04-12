@@ -1,6 +1,6 @@
 {
   "name": "docker-build-push-action",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "description": "Docker Build & Push Action",
   "main": "src/index.js",
   "scripts": {
@@ -9,6 +9,11 @@
     "lint": "eslint 'src/**.js' 'tests/**.js' --fix",
     "test": "eslint 'src/**.js' 'tests/**.js' && jest --coverage",
     "test:watch": "npm run test -- --watchAll"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
   },
   "repository": {
     "type": "git",
@@ -29,20 +34,20 @@
   },
   "homepage": "https://github.com/mr-smithers-excellent/docker-build-push-action#readme",
   "dependencies": {
-    "@actions/core": "^1.1.1",
-    "@actions/github": "^1.1.0"
+    "@actions/core": "^1.2.3",
+    "@actions/github": "^2.1.1"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.20.5",
-    "eslint": "^6.3.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-config-prettier": "^6.4.0",
-    "eslint-plugin-import": "^2.18.2",
+    "@zeit/ncc": "^0.22.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-react": "^7.16.0",
-    "husky": "^3.0.9",
-    "jest": "^24.9.0",
-    "prettier": "^1.18.2"
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.19.0",
+    "husky": "^4.2.5",
+    "jest": "^25.3.0",
+    "prettier": "^2.0.4"
   }
 }

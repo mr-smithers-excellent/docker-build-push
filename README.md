@@ -1,7 +1,16 @@
 # Docker Build & Push Action
-![Tests](https://github.com/mr-smithers-excellent/docker-build-push/workflows/Tests/badge.svg?branch=master&event=push)
+[![Tests](https://github.com/mr-smithers-excellent/docker-build-push/workflows/Tests/badge.svg?branch=master&event=push)](https://github.com/mr-smithers-excellent/docker-build-push/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/maintainability)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/test_coverage)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/test_coverage)
 
 Builds a Docker image and pushes it to the private registry of your choosing.
+
+## Supported Docker registries
+
+* Docker Hub
+* Google Container Registry (GCR)
+* AWS Elastic Container Registry (ECR)
+* GitHub Docker Registry
 
 ## Basic usage
 
@@ -10,8 +19,10 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 ```yaml
 steps:
   - uses: actions/checkout@v1.0
+    name: Check out code
 
-  - uses: mr-smithers-excellent/docker-build-push@v2
+  - uses: mr-smithers-excellent/docker-build-push@v3
+    name: Build & push Docker image
     with:
       image: repo/image
       tag: latest
@@ -32,6 +43,15 @@ steps:
 | buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
 | username   | Docker registry username                                                                | No       |
 | password   | Docker registry password or token                                                       | No       |
+| githubOrg  | GitHub organization to push image to (if not current)                                   | No       |
+
+## Outputs
+
+| Name          | Description                                                       | Format                     |
+|---------------|-------------------------------------------------------------------|----------------------------|
+| imageFullName | Full name of the Docker image with registry prefix and tag suffix | `registry/owner/image:tag` |
+| imageName     | Name of the Docker image with owner prefix                        | `owner/image`              |
+| tag           | Tag for the Docker image                                          | `tag`                      |
 
 ## Examples
 
@@ -41,7 +61,7 @@ steps:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v2
+uses: mr-smithers-excellent/docker-build-push@v3
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -58,7 +78,7 @@ with:
 * Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v2
+uses: mr-smithers-excellent/docker-build-push@v3
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -74,13 +94,30 @@ with:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v2
+uses: mr-smithers-excellent/docker-build-push@v3
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
+### GitHub Docker Registry
+
+* It is assumed you'll be pushing the image to a repo inside your GitHub organization, unless you set `githubOrg`
+* Provide the image name in `github-repo-name/image-name` format  
+* Provide either the `${{ github.actor }}` or an alternate username for Docker login (with associated token below)
+* Pass the default GitHub Actions token or custom secret with [proper push permissions](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token)
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v3
+with:
+  image: github-repo/image-name
+  registry: docker.pkg.github.com
+  githubOrg: override-org # optional
+  username: ${{ github.actor }}
+  password: ${{ secrets.GITHUB_TOKEN }} 
 ```
 
 ## Tagging the image using GitOps
