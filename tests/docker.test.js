@@ -5,7 +5,7 @@ const core = require('@actions/core');
 const cp = require('child_process');
 const fs = require('fs');
 const docker = require('../src/docker.js');
-const maxBufferSize = require('../src/settings');
+const cpOptions = require('../src/settings');
 
 describe('Create Docker image tag from git ref', () => {
   test('Create from tag push', () => {
@@ -102,9 +102,7 @@ describe('core and cp methods', () => {
 
       docker.build(image);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, {
-        maxBuffer: maxBufferSize
-      });
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, cpOptions);
     });
 
     test('Build with build args', () => {
@@ -117,9 +115,7 @@ describe('core and cp methods', () => {
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
         `docker build -f Dockerfile -t ${image} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
-        {
-          maxBuffer: maxBufferSize
-        }
+        cpOptions
       );
     });
   });
@@ -130,10 +126,7 @@ describe('core and cp methods', () => {
       const username = 'mrsmithers';
       const password = 'areallysecurepassword';
 
-      core.getInput
-        .mockReturnValueOnce(registry)
-        .mockReturnValueOnce(username)
-        .mockReturnValueOnce(password);
+      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce(username).mockReturnValueOnce(password);
 
       docker.login();
 
@@ -145,10 +138,7 @@ describe('core and cp methods', () => {
     test('ECR login', () => {
       const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
 
-      core.getInput
-        .mockReturnValueOnce(registry)
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('');
+      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce('').mockReturnValueOnce('');
 
       docker.login();
 
@@ -156,10 +146,7 @@ describe('core and cp methods', () => {
     });
 
     test("returns undefined if empty login and doesn't execute command", () => {
-      core.getInput
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('');
+      core.getInput.mockReturnValueOnce('').mockReturnValueOnce('').mockReturnValueOnce('');
 
       docker.login();
 
@@ -173,7 +160,7 @@ describe('core and cp methods', () => {
 
       docker.push(imageName);
 
-      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`, cpOptions);
     });
   });
 });

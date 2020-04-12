@@ -2,7 +2,7 @@ const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
 const { context } = require('@actions/github');
-const maxBufferSize = require('./settings');
+const cpOptions = require('./settings');
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
@@ -57,7 +57,7 @@ const build = (imageName, buildArgs) => {
   }
 
   core.info(`Building Docker image: ${imageName}`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), { maxBuffer: maxBufferSize });
+  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
@@ -84,7 +84,7 @@ const login = () => {
 
 const push = imageName => {
   core.info(`Pushing Docker image ${imageName}`);
-  cp.execSync(`docker push ${imageName}`);
+  cp.execSync(`docker push ${imageName}`, cpOptions);
 };
 
 module.exports = {
