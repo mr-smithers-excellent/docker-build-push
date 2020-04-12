@@ -30,6 +30,43 @@ const mockInputs = (image, registry, tag, buildArgs, dockerfile, githubOrg) => {
     .mockReturnValueOnce(dockerfile);
 };
 
+const mockOutputs = (imageFullName, image, tag) => {
+  core.setOutput = jest.fn().mockReturnValue('imageFullName', imageFullName);
+  core.setOutput = jest.fn().mockReturnValue('imageName', image);
+  core.setOutput = jest.fn().mockReturnValue('tag', tag);
+};
+
+const convertBuildArgs = buildArgs => {
+  const output = buildArgs.split(',');
+  return output.map(arg => `--build-arg ${arg}`).join(' ');
+};
+
+const runAssertions = (imageFullName, image, tag, dockerfile, buildArgs) => {
+  expect(docker.createTag).toHaveBeenCalledTimes(1);
+  expect(core.getInput).toHaveBeenCalledTimes(6);
+  expect(core.setOutput).toHaveBeenCalledTimes(3);
+  expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
+  expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
+  expect(core.setOutput).toHaveBeenCalledWith('tag', tag);
+
+  if (buildArgs) {
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${dockerfile} -t ${imageFullName} ${convertBuildArgs(buildArgs)} .`,
+      cpOptions
+    );
+  } else {
+    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${imageFullName} .`, cpOptions);
+  }
+};
+
+const createFullImageName = (registry, image, tag) => {
+  return `${registry}/${image}:${tag}`;
+};
+
+const createGitHubImageName = (registry, githubOrg, image, tag) => {
+  return `${registry}/${githubOrg}/${image}:${tag}`;
+};
+
 describe('Create & push Docker image to GitHub Registry', () => {
   test('Override GitHub organization', () => {
     const image = 'repo-name/image-name';
@@ -38,20 +75,17 @@ describe('Create & push Docker image to GitHub Registry', () => {
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
     const githubOrg = 'override-org';
-    const imageFullName = `${registry}/${githubOrg}/${image}:${tag}`;
+    const imageFullName = createGitHubImageName(registry, githubOrg, image, tag);
 
     docker.login = jest.fn();
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
     mockInputs(image, registry, null, buildArgs, dockerfile, githubOrg);
-    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', imageFullName);
+    mockOutputs(imageFullName, image, tag);
     cp.execSync = jest.fn();
 
     run();
 
-    expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(6);
-    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${imageFullName} .`, cpOptions);
+    runAssertions(imageFullName, image, tag, dockerfile);
   });
 
   test('Keep default GitHub organization', () => {
@@ -60,20 +94,17 @@ describe('Create & push Docker image to GitHub Registry', () => {
     const tag = 'latest';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
-    const fullImageName = `${registry}/${mockOwner}/${image}:${tag}`;
+    const imageFullName = createGitHubImageName(registry, mockOwner, image, tag);
 
     docker.login = jest.fn();
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
     mockInputs(image, registry, null, buildArgs, dockerfile, null);
-    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', fullImageName);
+    mockOutputs(imageFullName, image, tag);
     cp.execSync = jest.fn();
 
     run();
 
-    expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(6);
-    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', fullImageName);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${fullImageName} .`, cpOptions);
+    runAssertions(imageFullName, image, tag, dockerfile);
   });
 });
 
@@ -84,22 +115,17 @@ describe('Create & push Docker image to GCR', () => {
     const tag = 'dev-1234667';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
+    const imageFullName = createFullImageName(registry, image, tag);
 
     docker.login = jest.fn();
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
     mockInputs(image, registry, null, buildArgs, dockerfile);
-    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
+    mockOutputs(imageFullName, image, tag);
     cp.execSync = jest.fn();
 
     run();
 
-    expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(6);
-    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} .`,
-      cpOptions
-    );
+    runAssertions(imageFullName, image, tag, dockerfile);
   });
 });
 
@@ -110,18 +136,24 @@ describe('Create & push Docker image with build args', () => {
     const tag = 'latest';
     const buildArgs = 'VERSION=1.1.1,BUILD_DATE=2020-01-14';
     const dockerfile = 'Dockerfile.custom';
+    const imageFullName = createFullImageName(registry, image, tag);
 
     docker.login = jest.fn();
     docker.createTag = jest.fn().mockReturnValueOnce(tag);
     mockInputs(image, registry, null, buildArgs, dockerfile);
-    core.setOutput = jest.fn().mockReturnValueOnce('imageFullName', `${registry}/${image}:${tag}`);
+    mockOutputs(imageFullName, image, tag);
     cp.execSync = jest.fn();
 
     run();
 
+    runAssertions(imageFullName, image, tag, dockerfile, buildArgs);
+
     expect(docker.createTag).toHaveBeenCalledTimes(1);
     expect(core.getInput).toHaveBeenCalledTimes(6);
-    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', `${registry}/${image}:${tag}`);
+    expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
+    expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
+    expect(core.setOutput).toHaveBeenCalledWith('tag', tag);
+
     expect(cp.execSync).toHaveBeenCalledWith(
       `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 .`,
       cpOptions

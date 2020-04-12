@@ -44,6 +44,14 @@ steps:
 | password   | Docker registry password or token                                                       | No       |
 | githubOrg  | GitHub organization to push image to (if not current)                                   | No       |
 
+## Outputs
+
+| Name          | Description                                                       | Format                     |
+|---------------|-------------------------------------------------------------------|----------------------------|
+| imageFullName | Full name of the Docker image with registry prefix and tag suffix | `registry/owner/image:tag` |
+| imageName     | Name of the Docker image with owner prefix                        | `owner/image`              |
+| tag           | Tag for the Docker image                                          | `tag`                      |
+
 ## Examples
 
 ### Docker Hub

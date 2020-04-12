@@ -29,7 +29,11 @@ inputs:
     required: false
 outputs:
   imageFullName:
-    description: 'Full name of the Docker image'
+    description: 'Full name of the Docker image with registry prefix and tag suffix'
+  imageName:
+    description: 'Name of the Docker image with owner prefix'
+  tag:
+    description: 'Tag for the Docker image'
 runs:
   using: 'node12'
   main: 'dist/index.js'
