@@ -118,6 +118,19 @@ describe('core and cp methods', () => {
         cpOptions
       );
     });
+
+    test('Build in different directory', () => {
+      core.getInput.mockReturnValueOnce('Dockerfile');
+      fs.existsSync.mockReturnValueOnce(true);
+      const directory = 'working-dir';
+      core.getInput.mockReturnValueOnce(directory);
+      const image = 'gcr.io/some-project/image:v1';
+
+      docker.build(image);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(`cd ${directory}`);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, cpOptions);
+    });
   });
 
   describe('Registry login', () => {

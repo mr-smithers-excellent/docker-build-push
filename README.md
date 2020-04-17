@@ -40,6 +40,7 @@ steps:
 | tag        | Docker image tag (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
 | registry   | Docker registry host                                                                    | Yes      |
 | dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                       | No       |
+| directory  | Directory to run `docker build` from, if not project root                               | No       |
 | buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
 | username   | Docker registry username                                                                | No       |
 | password   | Docker registry password or token                                                       | No       |

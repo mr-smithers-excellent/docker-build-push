@@ -57,6 +57,13 @@ const build = (imageName, buildArgs) => {
   }
 
   core.info(`Building Docker image: ${imageName}`);
+
+  // Change directory if directory supplied as input
+  const workingDir = core.getInput('directory');
+  if (workingDir) {
+    cp.execSync(`cd ${workingDir}`);
+  }
+
   cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), cpOptions);
 };
 
