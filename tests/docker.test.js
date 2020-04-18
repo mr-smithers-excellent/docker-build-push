@@ -96,7 +96,7 @@ describe('core and cp methods', () => {
     });
 
     test('Dockerfile exists', () => {
-      core.getInput.mockReturnValue('Dockerfile');
+      core.getInput.mockReturnValueOnce('Dockerfile');
       fs.existsSync.mockReturnValueOnce(true);
       const image = 'gcr.io/some-project/image:v1';
 
@@ -106,7 +106,8 @@ describe('core and cp methods', () => {
     });
 
     test('Build with build args', () => {
-      core.getInput.mockReturnValue('Dockerfile');
+      core.getInput.mockReturnValueOnce('Dockerfile');
+      core.getInput.mockReturnValueOnce('.');
       fs.existsSync.mockReturnValueOnce(true);
       const image = 'docker.io/this-project/that-image:latest';
       const buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
@@ -121,15 +122,14 @@ describe('core and cp methods', () => {
 
     test('Build in different directory', () => {
       core.getInput.mockReturnValueOnce('Dockerfile');
-      fs.existsSync.mockReturnValueOnce(true);
       const directory = 'working-dir';
       core.getInput.mockReturnValueOnce(directory);
+      fs.existsSync.mockReturnValueOnce(true);
       const image = 'gcr.io/some-project/image:v1';
 
       docker.build(image);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`cd ${directory}`);
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} ${directory}`, cpOptions);
     });
   });
 

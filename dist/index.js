@@ -527,16 +527,6 @@ const isMasterBranch = ref => ref && ref === 'refs/heads/master';
 
 const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
 
-const createBuildCommand = (dockerfile, imageName, buildArgs) => {
-  let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}`;
-  if (buildArgs) {
-    const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
-    buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
-  }
-
-  return `${buildCommandPrefix} .`;
-};
-
 const createTag = () => {
   core.info('Creating Docker image tag...');
   const { sha } = context;
@@ -566,22 +556,26 @@ const createTag = () => {
   return dockerTag;
 };
 
+const createBuildCommand = (dockerfile, imageName, buildDir, buildArgs) => {
+  let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}`;
+  if (buildArgs) {
+    const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
+  }
+
+  return `${buildCommandPrefix} ${buildDir}`;
+};
+
 const build = (imageName, buildArgs) => {
   const dockerfile = core.getInput('dockerfile');
+  const buildDir = core.getInput('directory') || '.';
 
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
   core.info(`Building Docker image: ${imageName}`);
-
-  // Change directory if directory supplied as input
-  const workingDir = core.getInput('directory');
-  if (workingDir) {
-    cp.execSync(`cd ${workingDir}`);
-  }
-
-  cp.execSync(createBuildCommand(dockerfile, imageName, buildArgs), cpOptions);
+  cp.execSync(createBuildCommand(dockerfile, imageName, buildDir, buildArgs), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
