@@ -15,6 +15,9 @@ inputs:
     description: 'Location of Dockerfile, if not Dockerfile in root directory'
     required: false
     default: 'Dockerfile'
+  directory:
+    description: 'Directory to run `docker build` from, if not project root'
+    required: false
   buildArgs:
     description: 'Docker build arguments in format KEY=VALUE,KEY=VALUE'
     required: false

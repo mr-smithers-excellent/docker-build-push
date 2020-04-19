@@ -43,7 +43,7 @@ const convertBuildArgs = buildArgs => {
 
 const runAssertions = (imageFullName, image, tag, dockerfile, buildArgs) => {
   expect(docker.createTag).toHaveBeenCalledTimes(1);
-  expect(core.getInput).toHaveBeenCalledTimes(6);
+  expect(core.getInput).toHaveBeenCalledTimes(7);
   expect(core.setOutput).toHaveBeenCalledTimes(3);
   expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
   expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
@@ -149,7 +149,7 @@ describe('Create & push Docker image with build args', () => {
     runAssertions(imageFullName, image, tag, dockerfile, buildArgs);
 
     expect(docker.createTag).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(6);
+    expect(core.getInput).toHaveBeenCalledTimes(7);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
     expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
     expect(core.setOutput).toHaveBeenCalledWith('tag', tag);
