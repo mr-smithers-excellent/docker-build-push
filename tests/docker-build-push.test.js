@@ -106,6 +106,27 @@ describe('Create & push Docker image to GitHub Registry', () => {
 
     runAssertions(imageFullName, image, tag, dockerfile);
   });
+
+  test('Converts owner name to lowercase', () => {
+    const image = `${mockRepoName}/image-name`;
+    const registry = 'docker.pkg.github.com';
+    const tag = 'latest';
+    const buildArgs = '';
+    const dockerfile = 'Dockerfile';
+    const imageFullName = createGitHubImageName(registry, 'mockuser', image, tag);
+
+    docker.login = jest.fn();
+    docker.createTag = jest.fn().mockReturnValueOnce(tag);
+    mockInputs(image, registry, null, buildArgs, dockerfile, null);
+    mockOutputs(imageFullName, image, tag);
+    cp.execSync = jest.fn();
+
+    process.env.GITHUB_REPOSITORY = `MockUser/${mockRepoName}`;
+
+    run();
+
+    runAssertions(imageFullName, image, tag, dockerfile);
+  });
 });
 
 describe('Create & push Docker image to GCR', () => {
