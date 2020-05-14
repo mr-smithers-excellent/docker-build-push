@@ -32,7 +32,7 @@ const processInputs = () => {
 const createFullImageName = () => {
   let imageFullName;
   if (registry === GITHUB_REGISTRY) {
-    imageFullName = `${GITHUB_REGISTRY}/${githubOwner}/${image}:${tag}`;
+    imageFullName = `${GITHUB_REGISTRY}/${githubOwner.toLowerCase()}/${image}:${tag}`;
   } else {
     imageFullName = `${registry}/${image}:${tag}`;
   }
