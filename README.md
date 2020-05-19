@@ -92,6 +92,7 @@ with:
 * Create an IAM user with the ability to push to ECR (see [example policies](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ecr_managed_policies.html))
 * Create and download access keys
 * Save `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as secrets in your GitHub repo
+* Ensure the repo you are trying to push to already exists, if not create with `aws ecr create-repository` before pushing
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
