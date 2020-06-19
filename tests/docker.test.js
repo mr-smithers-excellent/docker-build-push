@@ -90,7 +90,7 @@ describe('core and cp methods', () => {
       core.getInput.mockReturnValue(dockerfile);
       fs.existsSync.mockReturnValueOnce(false);
 
-      docker.build('gcr.io/some-project/image:v1');
+      docker.build('gcr.io/some-project/image', 'v1');
       expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
       expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
     });
@@ -98,24 +98,26 @@ describe('core and cp methods', () => {
     test('Dockerfile exists', () => {
       core.getInput.mockReturnValueOnce('Dockerfile');
       fs.existsSync.mockReturnValueOnce(true);
-      const image = 'gcr.io/some-project/image:v1';
+      const image = 'gcr.io/some-project/image';
+      const tag = 'v1';
 
-      docker.build(image);
+      docker.build(image, tag);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} .`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tag} .`, cpOptions);
     });
 
     test('Build with build args', () => {
       core.getInput.mockReturnValueOnce('Dockerfile');
       core.getInput.mockReturnValueOnce('.');
       fs.existsSync.mockReturnValueOnce(true);
-      const image = 'docker.io/this-project/that-image:latest';
+      const image = 'docker.io/this-project/that-image';
+      const tag = 'latest';
       const buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
 
-      docker.build(image, buildArgs);
+      docker.build(image, tag, buildArgs);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
-        `docker build -f Dockerfile -t ${image} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
+        `docker build -f Dockerfile -t ${image}:${tag} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
         cpOptions
       );
     });
@@ -125,11 +127,12 @@ describe('core and cp methods', () => {
       const directory = 'working-dir';
       core.getInput.mockReturnValueOnce(directory);
       fs.existsSync.mockReturnValueOnce(true);
-      const image = 'gcr.io/some-project/image:v1';
+      const image = 'gcr.io/some-project/image';
+      const tag = 'v1';
 
-      docker.build(image);
+      docker.build(image, tag);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image} ${directory}`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tag} ${directory}`, cpOptions);
     });
   });
 
@@ -182,11 +185,12 @@ describe('core and cp methods', () => {
 
   describe('Docker push', () => {
     test('Docker Hub push', () => {
-      const imageName = 'gcr.io/my-project/image:v1';
+      const imageName = 'gcr.io/my-project/image';
+      const tag = 'v1';
 
-      docker.push(imageName);
+      docker.push(imageName, tag);
 
-      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}:${tag}`, cpOptions);
     });
   });
 });

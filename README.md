@@ -25,7 +25,7 @@ steps:
     name: Build & push Docker image
     with:
       image: repo/image
-      tag: latest
+      tags: v1, latest
       registry: registry-url.io
       dockerfile: Dockerfile.ci
       username: ${{ secrets.DOCKER_USERNAME }}
@@ -34,25 +34,25 @@ steps:
 
 ## Inputs
 
-| Name       | Description                                                                             | Required |
-|------------|-----------------------------------------------------------------------------------------|----------|
-| image      | Docker image name                                                                       | Yes      |
-| tag        | Docker image tag (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
-| registry   | Docker registry host                                                                    | Yes      |
-| dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                       | No       |
-| directory  | Directory to pass to `docker build` command, if not project root                        | No       |
-| buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                  | No       |
-| username   | Docker registry username                                                                | No       |
-| password   | Docker registry password or token                                                       | No       |
-| githubOrg  | GitHub organization to push image to (if not current)                                   | No       |
+| Name       | Description                                                                                              | Required |
+|------------|----------------------------------------------------------------------------------------------------------|----------|
+| image      | Docker image name                                                                                        | Yes      |
+| tags       | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
+| registry   | Docker registry host                                                                                     | Yes      |
+| dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       |
+| directory  | Directory to pass to `docker build` command, if not project root                                         | No       |
+| buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                                   | No       |
+| username   | Docker registry username                                                                                 | No       |
+| password   | Docker registry password or token                                                                        | No       |
+| githubOrg  | GitHub organization to push image to (if not current)                                                    | No       |
 
 ## Outputs
 
 | Name          | Description                                                       | Format                     |
 |---------------|-------------------------------------------------------------------|----------------------------|
-| imageFullName | Full name of the Docker image with registry prefix and tag suffix | `registry/owner/image:tag` |
+| imageFullName | Full name of the Docker image with registry prefix                | `registry/owner/image`     |
 | imageName     | Name of the Docker image with owner prefix                        | `owner/image`              |
-| tag           | Tag for the Docker image                                          | `tag`                      |
+| tags          | Tags for the Docker image                                         | `v1,latest`                |
 
 ## Examples
 
@@ -124,7 +124,7 @@ with:
 
 ## Tagging the image using GitOps
 
-By default, if you do not pass a `tag` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
+By default, if you do not pass a `tags` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
 
 | Trigger                  | Commit SHA | Docker Tag           |
 |--------------------------|------------|----------------------|
