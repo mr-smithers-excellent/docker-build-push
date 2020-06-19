@@ -20,7 +20,7 @@ const processBuildArgsInput = buildArgsInput => {
 };
 
 const splitTags = stringTags =>
-  stringTags === null || stringTags === undefined ? undefined : tags.split(',').map(tag => tag.trim());
+  stringTags === null || stringTags === undefined ? undefined : stringTags.split(',').map(tag => tag.trim());
 
 // Get GitHub Action inputs
 const processInputs = () => {
@@ -59,7 +59,7 @@ const run = () => {
     core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
 
     tagsCopy.forEach(tag => {
-      docker.tag(imageFullName, tag, buildArgs);
+      docker.tag(imageFullName, firstTag, tag);
       docker.push(imageFullName, tag);
       core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
     });
