@@ -21,7 +21,7 @@ steps:
   - uses: actions/checkout@v1.0
     name: Check out code
 
-  - uses: mr-smithers-excellent/docker-build-push@v3
+  - uses: mr-smithers-excellent/docker-build-push@v4
     name: Build & push Docker image
     with:
       image: repo/image
@@ -62,7 +62,7 @@ steps:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file 
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v3
+uses: mr-smithers-excellent/docker-build-push@v4
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -79,7 +79,7 @@ with:
 * Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v3
+uses: mr-smithers-excellent/docker-build-push@v4
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -96,7 +96,7 @@ with:
 * Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v3
+uses: mr-smithers-excellent/docker-build-push@v4
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
@@ -113,7 +113,7 @@ env:
 * Pass the default GitHub Actions token or custom secret with [proper push permissions](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token)
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v3
+uses: mr-smithers-excellent/docker-build-push@v4
 with:
   image: github-repo/image-name
   registry: docker.pkg.github.com
@@ -129,5 +129,6 @@ By default, if you do not pass a `tag` input this action will use an algorithm b
 | Trigger                  | Commit SHA | Docker Tag           |
 |--------------------------|------------|----------------------|
 | /refs/tags/v1.0          | N/A        | v1.0                 |
-| /refs/heads/master       | 1234567    | dev-1234567          |
+| /refs/heads/dev          | 1234567    | dev-1234567          |
+| /refs/heads/master       | 1234567    | master-1234567       |
 | /refs/heads/SOME-feature | 1234567    | some-feature-1234567 | 

@@ -523,9 +523,7 @@ const cpOptions = __webpack_require__(535);
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
-const isMasterBranch = ref => ref && ref === 'refs/heads/master';
-
-const isNotMasterBranch = ref => ref && ref.includes('refs/heads/') && ref !== 'refs/heads/master';
+const isBranch = ref => ref && ref.includes('refs/heads/');
 
 const createTag = () => {
   core.info('Creating Docker image tag...');
@@ -537,11 +535,8 @@ const createTag = () => {
   if (isGitHubTag(ref)) {
     // If GitHub tag exists, use it as the Docker tag
     dockerTag = ref.replace('refs/tags/', '');
-  } else if (isMasterBranch(ref)) {
-    // If we're on the master branch, use dev-{GIT_SHORT_SHA} as the Docker tag
-    dockerTag = `dev-${shortSha}`;
-  } else if (isNotMasterBranch(ref)) {
-    // If we're on a non-master branch, use branch-prefix-{GIT_SHORT_SHA) as the Docker tag
+  } else if (isBranch(ref)) {
+    // If we're not building a tag, use branch-prefix-{GIT_SHORT_SHA) as the Docker tag
     // refs/heads/jira-123/feature/something
     const branchName = ref.replace('refs/heads/', '');
     const branchPrefix = branchName.includes('/') ? branchName.substring(0, branchName.indexOf('/')) : branchName;

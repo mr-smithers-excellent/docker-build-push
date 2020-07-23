@@ -26,6 +26,13 @@ describe('Create Docker image tag from git ref', () => {
     context.ref = 'refs/heads/master';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
 
+    expect(docker.createTag()).toBe('master-79d9bbb');
+  });
+
+  test('Create from dev branch push', () => {
+    context.ref = 'refs/heads/dev';
+    context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+
     expect(docker.createTag()).toBe('dev-79d9bbb');
   });
 
