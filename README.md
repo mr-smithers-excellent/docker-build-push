@@ -18,7 +18,7 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 * Add the following to a workflow `.yml` file in the `/.github` directory of your repo
 ```yaml
 steps:
-  - uses: actions/checkout@v1.0
+  - uses: actions/checkout@v2.3.2
     name: Check out code
 
   - uses: mr-smithers-excellent/docker-build-push@v4
@@ -116,7 +116,7 @@ env:
 uses: mr-smithers-excellent/docker-build-push@v4
 with:
   image: github-repo/image-name
-  registry: docker.pkg.github.com
+  registry: ghcr.io
   githubOrg: override-org # optional
   username: ${{ github.actor }}
   password: ${{ secrets.GITHUB_TOKEN }} 
