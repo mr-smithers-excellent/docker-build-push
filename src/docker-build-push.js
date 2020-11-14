@@ -6,7 +6,7 @@ const GITHUB_REGISTRY = 'docker.pkg.github.com';
 
 let image;
 let registry;
-let tag;
+let tags;
 let buildArgs;
 let githubOwner;
 
@@ -19,22 +19,25 @@ const processBuildArgsInput = buildArgsInput => {
   return buildArgs;
 };
 
+const splitTags = stringTags =>
+  stringTags === null || stringTags === undefined ? undefined : stringTags.split(',').map(tag => tag.trim());
+
 // Get GitHub Action inputs
 const processInputs = () => {
   image = core.getInput('image', { required: true });
   registry = core.getInput('registry', { required: true });
-  tag = core.getInput('tag') || docker.createTag();
+  tags = splitTags(core.getInput('tags')) || [docker.createTag()];
   buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
   githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
 };
 
-// Create the full Docker image name with registry prefix
+// Create the full Docker image name with registry prefix (without tag)
 const createFullImageName = () => {
   let imageFullName;
   if (registry === GITHUB_REGISTRY) {
-    imageFullName = `${GITHUB_REGISTRY}/${githubOwner.toLowerCase()}/${image}:${tag}`;
+    imageFullName = `${GITHUB_REGISTRY}/${githubOwner.toLowerCase()}/${image}`;
   } else {
-    imageFullName = `${registry}/${image}:${tag}`;
+    imageFullName = `${registry}/${image}`;
   }
   return imageFullName;
 };
@@ -46,13 +49,24 @@ const run = () => {
     const imageFullName = createFullImageName();
     core.info(`Docker image name created: ${imageFullName}`);
 
+    const tagsCopy = tags.slice();
+    const firstTag = tagsCopy.shift();
+
     docker.login();
-    docker.build(imageFullName, buildArgs);
-    docker.push(imageFullName);
+    docker.build(imageFullName, firstTag, buildArgs);
+    docker.push(imageFullName, firstTag);
+
+    core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
+
+    tagsCopy.forEach(tag => {
+      docker.tag(imageFullName, firstTag, tag);
+      docker.push(imageFullName, tag);
+      core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
+    });
 
     core.setOutput('imageFullName', imageFullName);
     core.setOutput('imageName', image);
-    core.setOutput('tag', tag);
+    core.setOutput('tags', tags.join(','));
   } catch (error) {
     core.setFailed(error.message);
   }

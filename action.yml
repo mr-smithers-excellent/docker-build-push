@@ -1,12 +1,12 @@
-name: 'Docker Build & Push'
-description: 'Builds a Docker image and pushes to a private registry'
+name: 'Docker Build, Tag & Push'
+description: 'Builds a Docker image and pushes to a private registry with support for multiple tags'
 author: 'Sean Smith'
 inputs:
   image:
     description: 'Name of the Docker image'
     required: true
-  tag:
-    description: 'Tag override for Docker image'
+  tags:
+    description: 'Tags override for Docker image'
     required: false
   registry:
     description: 'Target Docker registry'
@@ -35,8 +35,8 @@ outputs:
     description: 'Full name of the Docker image with registry prefix and tag suffix'
   imageName:
     description: 'Name of the Docker image with owner prefix'
-  tag:
-    description: 'Tag for the Docker image'
+  tags:
+    description: 'Tags for the Docker image'
 runs:
   using: 'node12'
   main: 'dist/index.js'
