@@ -1,4 +1,4 @@
-name: 'Docker Build, Tag & Push'
+name: 'Docker Build & Push Action'
 description: 'Builds a Docker image and pushes to a private registry with support for multiple tags'
 author: 'Sean Smith'
 inputs:
