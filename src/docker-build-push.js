@@ -20,7 +20,9 @@ const processBuildArgsInput = buildArgsInput => {
 };
 
 const splitTags = stringTags =>
-  stringTags === null || stringTags === undefined ? undefined : stringTags.split(',').map(tag => tag.trim());
+  stringTags === null || stringTags === undefined || stringTags === ''
+    ? undefined
+    : stringTags.split(',').map(tag => tag.trim());
 
 // Get GitHub Action inputs
 const processInputs = () => {
