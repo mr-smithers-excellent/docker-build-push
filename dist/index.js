@@ -565,8 +565,11 @@ const createTag = () => {
     // If we're not building a tag, use branch-prefix-{GIT_SHORT_SHA) as the Docker tag
     // refs/heads/jira-123/feature/something
     const branchName = ref.replace('refs/heads/', '');
-    const branchPrefix = branchName.includes('/') ? branchName.substring(0, branchName.indexOf('/')) : branchName;
-    dockerTag = `${branchPrefix}-${shortSha}`;
+    const safeBranchName = branchName
+      .replace(/[^\w.-]+/g, '-')
+      .replace(/^[^\w]+/, '')
+      .substring(0, 120);
+    dockerTag = `${safeBranchName}-${shortSha}`;
   } else {
     core.setFailed(
       'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push-event-push'
