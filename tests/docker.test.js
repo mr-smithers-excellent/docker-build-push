@@ -40,7 +40,7 @@ describe('Create Docker image tag from git ref', () => {
     context.ref = 'refs/heads/jira-123/feature/some-cool-feature';
     context.sha = 'f427b0b731ed7664ce4a9fba291ab25fa2e57bd3';
 
-    expect(docker.createTag()).toBe('jira-123-f427b0b');
+    expect(docker.createTag()).toBe('jira-123-feature-some-cool-feature-f427b0b');
   });
 
   test('Create from feature branch without Jira number', () => {
