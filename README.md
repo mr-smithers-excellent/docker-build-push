@@ -12,13 +12,17 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 * AWS Elastic Container Registry (ECR)
 * GitHub Docker Registry
 
+## Breaking changes
+
+If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v5). The AWS ECR login command became deprecated between v4 and v5. Additionally, support for multiple tags was added between v4 and v5.
+
 ## Basic usage
 
 * Ensure you run the [checkout action](https://github.com/actions/checkout) before using this action
 * Add the following to a workflow `.yml` file in the `/.github` directory of your repo
 ```yaml
 steps:
-  - uses: actions/checkout@v2.3.2
+  - uses: actions/checkout@v2
     name: Check out code
 
   - uses: mr-smithers-excellent/docker-build-push@v5
