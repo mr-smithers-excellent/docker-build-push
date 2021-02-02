@@ -69,8 +69,6 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
-const isWindows = () => process.env.RUNNER_OS === 'Windows';
-
 const login = () => {
   const registry = core.getInput('registry', { required: true });
   const username = core.getInput('username');
@@ -80,15 +78,9 @@ const login = () => {
   if (isEcr(registry)) {
     const region = getRegion(registry);
     core.info(`Logging into ECR region ${region}...`);
-
-    // Determine whether to run bash or PowerShell version of login command
-    if (isWindows()) {
-      cp.execSync(
-        `aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${registry}`
-      );
-    } else {
-      cp.execSync(`$(aws ecr get-login --region ${region} --no-include-email)`);
-    }
+    cp.execSync(
+      `aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${registry}`
+    );
   } else if (username && password) {
     core.info(`Logging into Docker registry ${registry}...`);
     cp.execSync(`docker login -u ${username} --password-stdin ${registry}`, {
