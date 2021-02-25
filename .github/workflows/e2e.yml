@@ -26,9 +26,9 @@ jobs:
             username: GCR_USERNAME
             password: GCR_PASSWORD
 
-          - image: mr-smithers-excellent/docker-build-push/hello-world
+          - image: docker-build-push/hello-world
             registry: ghcr.io
-            #organization: mr-smithers-excellent
+            githubOrg: mr-smithers-excellent
             username: ${{ github.actor }}
             password: GITHUB_TOKEN
 
