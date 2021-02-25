@@ -28,8 +28,6 @@ jobs:
 
           - image: hello-world
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
-#            username: GCR_USERNAME
-#            password: GCR_PASSWORD
 
           - image: docker-build-push/hello-world
             registry: docker.pkg.github.com
@@ -41,7 +39,6 @@ jobs:
             githubOrg: mr-smithers-excellent
             username: GHCR_USERNAME
             password: GITHUB_TOKEN
-
 
     steps:
       - name: Check out code
