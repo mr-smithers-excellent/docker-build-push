@@ -28,8 +28,8 @@ jobs:
 
           - image: docker-build-push/hello-world
             registry: docker.pkg.github.com # ghcr.io
-            username: ${{ github.actor }}
-            password: GITHUB_TOKEN
+            username: GHCR_USERNAME
+            password: GHCR_TOKEN
 
 #              image: github-repo/image-name
 #              registry: ghcr.io
