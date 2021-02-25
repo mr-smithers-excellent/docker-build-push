@@ -35,10 +35,12 @@ jobs:
         with:
           dockerfile: ./e2e/Dockerfile
           image: ${{ matrix.image }}
-          tags: latest, $GITHUB_ACTION
+          tags: latest, {{ $GITHUB_ACTION }}
           registry: ${{ matrix.registry }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
 
+      - name: Verify Docker image
+        run: ''
 
 
