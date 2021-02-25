@@ -32,7 +32,7 @@ jobs:
             password: GHCR_TOKEN
 
           - image: docker-build-push/hello-world-alt
-            registry: ghcr.io
+            registry: docker.pkg.github.com #ghcr.io
             username: ${{ github.actor }}
             password: GITHUB_TOKEN
 
