@@ -33,7 +33,7 @@ jobs:
       - name: Build and push Docker image
         uses: ./
         with:
-          directory: ./e2e
+          dockerfile: ./e2e/Dockerfile
           image: ${{ matrix.image }}
           registry: ${{ matrix.registry }}
           username: ${{ secrets[matrix.username] }}
