@@ -44,7 +44,7 @@ jobs:
             registry: ghcr.io
             githubOrg: docker-action-e2e
             username: GHCR_USERNAME
-            password: GHCR_TOKEN
+            password: GHCR_TOKENZ
 
     steps:
       - name: Check out code
