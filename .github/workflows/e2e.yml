@@ -32,7 +32,8 @@ jobs:
             password: GHCR_TOKEN
 
           - image: docker-build-push/hello-world-alt
-            registry: docker.pkg.github.com #ghcr.io
+            registry: ghcr.io
+            githubOrg: mr-smithers-excellent
             username: GHCR_USERNAME
             password: GITHUB_TOKEN
 
