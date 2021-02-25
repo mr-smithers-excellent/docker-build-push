@@ -28,6 +28,7 @@ jobs:
 
           - image: docker-build-push/hello-world
             registry: docker.pkg.github.com # ghcr.io
+            githubOrg: mr-smithers-excellent
             username: GHCR_USERNAME
             password: GHCR_TOKEN
 
