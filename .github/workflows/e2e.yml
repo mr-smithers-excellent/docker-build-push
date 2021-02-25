@@ -1,0 +1,43 @@
+name: 'e2e Tests'
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # everyday at 8am UTC
+  push:
+    branches:
+      - add-e2e-tests # TODO: Remove, temporary
+      - master
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: mrsmithers/hello-world
+            registry: docker.io
+            username: DOCKERHUB_USERNAME
+            password: DOCKERHUB_USERNAME
+
+#          - image:
+#            registry:
+#            username:
+#            password:
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build and push Docker image
+        uses: ./
+        with:
+          directory: ./e2e
+          image: ${{ matrix.image }}
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets[matrix.username] }}
+          password: ${{ secrets[matrix.password] }}
+
+
+
