@@ -21,10 +21,10 @@ jobs:
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
 
-          - image:
-            registry:
-            username:
-            password:
+          - image: orbital-bank-301021/hello-world
+            registry: gcr.io
+            username: GCR_USERNAME
+            password: GCR_PASSWORD
 
 #          - image:
 #            registry:
