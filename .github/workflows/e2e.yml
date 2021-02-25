@@ -54,6 +54,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build and push Docker image
+        id: docker
         uses: ./
         with:
           dockerfile: ./e2e/Dockerfile
@@ -66,8 +67,8 @@ jobs:
 
       - name: Verify Docker image
         run: |
-          docker pull ${{ matrix.registry }}/${{ matrix.image}}:${{ github.run_id }}
-          docker image inspect ${{ matrix.registry }}/${{ matrix.image}}:${{ github.run_id }}
+          docker pull ${{ steps.docker.fullImageName }}
+          docker image inspect ${{ steps.docker.fullImageName }}
 
       - name: Dump context
         if: always()
