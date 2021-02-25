@@ -67,8 +67,8 @@ jobs:
 
       - name: Verify Docker image
         run: |
-          docker pull ${{ steps.docker.outputs.fullImageName }}
-          docker image inspect ${{ steps.docker.outputs.fullImageName }}
+          docker pull ${{ steps.docker.outputs.imageFullName }}
+          docker image inspect ${{ steps.docker.outputs.imageFullName }}
 
       - name: Dump context
         if: always()
