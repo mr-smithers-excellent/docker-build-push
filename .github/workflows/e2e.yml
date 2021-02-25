@@ -35,7 +35,7 @@ jobs:
         with:
           dockerfile: ./e2e/Dockerfile
           image: ${{ matrix.image }}
-          tags: latest, ${{ github.action }}
+          tags: latest, ${{ github.job }}
           registry: ${{ matrix.registry }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
