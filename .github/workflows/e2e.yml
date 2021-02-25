@@ -44,7 +44,7 @@ jobs:
             registry: ghcr.io
             githubOrg: docker-action-e2e
             username: GHCR_USERNAME
-            password: GHCR_TOKENZ
+            password: GHCR_TOKEN
 
     steps:
       - name: Check out code
@@ -80,7 +80,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'e2e test failure',
-              body: 'Tests failed in run:' + `https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
+              body: 'Tests failed in run ' `https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
               labels: ['Triage']
             })
 
