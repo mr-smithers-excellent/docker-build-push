@@ -35,12 +35,13 @@ jobs:
         with:
           dockerfile: ./e2e/Dockerfile
           image: ${{ matrix.image }}
-          tags: latest, ${{ github.job }}
+          tags: latest, ${{ github.run_id }}
           registry: ${{ matrix.registry }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
 
-#      - name: Verify Docker image
-#        run: ''
+      - name: Verify Docker image
+        run: |
+          docker pull ${{ matrix.registry }}/${{ matrix.image}}:${{ github.run_id }}
 
 
