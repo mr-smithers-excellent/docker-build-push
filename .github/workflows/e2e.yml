@@ -26,6 +26,11 @@ jobs:
             username: GCR_USERNAME
             password: GCR_PASSWORD
 
+          - image: hello-world
+            registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
+#            username: GCR_USERNAME
+#            password: GCR_PASSWORD
+
           - image: docker-build-push/hello-world
             registry: docker.pkg.github.com
             username: GHCR_USERNAME
@@ -37,18 +42,6 @@ jobs:
             username: GHCR_USERNAME
             password: GITHUB_TOKEN
 
-            #docker pull docker.pkg.github.com/mr-smithers-excellent/github-actions-poc/hello-world:latest
-
-#              image: github-repo/image-name
-#              registry: ghcr.io
-#              githubOrg: override-org # optional
-#              username: ${{ github.actor }}
-#              password: ${{ secrets.GITHUB_TOKEN }}
-
-    #          - image:
-#            registry:
-#            username:
-#            password:
 
     steps:
       - name: Check out code
@@ -65,6 +58,9 @@ jobs:
           githubOrg: ${{ matrix.githubOrg }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Verify Docker image
         run: |
