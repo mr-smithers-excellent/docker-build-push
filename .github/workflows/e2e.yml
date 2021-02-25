@@ -80,7 +80,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'e2e test failure',
-              body: context.github.run_id,
+              body: `https://github.com/mr-smithers-excellent/docker-build-push/runs/${context.runId}`,
               labels: ['Triage']
             })
 
