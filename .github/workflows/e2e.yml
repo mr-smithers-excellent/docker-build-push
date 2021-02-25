@@ -42,7 +42,7 @@ jobs:
           - name: GHCR
             image: hello-world
             registry: ghcr.io
-            githubOrg: docker-actions-e2e
+            githubOrg: docker-action-e2e
             username: GHCR_USERNAME
             password: GHCR_TOKEN
 
