@@ -27,8 +27,7 @@ jobs:
             password: GCR_PASSWORD
 
           - image: docker-build-push/hello-world
-            registry: docker.pkg.github.com # ghcr.io
-            #githubOrg: mr-smithers-excellent
+            registry: docker.pkg.github.com
             username: GHCR_USERNAME
             password: GHCR_TOKEN
 
