@@ -54,6 +54,7 @@ jobs:
           image: ${{ matrix.image }}
           tags: latest, ${{ github.run_id }}
           registry: ${{ matrix.registry }}
+          githubOrg: ${{ matrix.githubOrg }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
 
