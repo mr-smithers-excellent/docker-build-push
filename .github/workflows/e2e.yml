@@ -33,7 +33,7 @@ jobs:
 
           - image: docker-build-push/hello-world-alt
             registry: docker.pkg.github.com #ghcr.io
-            username: ${{ github.actor }}
+            username: GHCR_USERNAME
             password: GITHUB_TOKEN
 
             #docker pull docker.pkg.github.com/mr-smithers-excellent/github-actions-poc/hello-world:latest
