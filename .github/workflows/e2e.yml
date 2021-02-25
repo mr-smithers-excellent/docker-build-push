@@ -11,30 +11,36 @@ on:
 
 jobs:
   e2e:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - image: mrsmithers/hello-world
+            name: Docker Hub
             registry: docker.io
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
 
           - image: orbital-bank-301021/hello-world
+            name: GCR
             registry: gcr.io
             username: GCR_USERNAME
             password: GCR_PASSWORD
 
           - image: hello-world
+            name: ECR
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
 
           - image: docker-build-push/hello-world
+            name: GHCR Legacy
             registry: docker.pkg.github.com
             username: GHCR_USERNAME
             password: GITHUB_TOKEN
 
           - image: hello-world-ghcr
+            name: GHCR
             registry: ghcr.io
             githubOrg: mr-smithers-excellent
             username: GHCR_USERNAME
