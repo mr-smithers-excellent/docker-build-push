@@ -109,21 +109,36 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
 
-### GitHub Docker Registry
+### GitHub Container Registry
 
+* GitHub recently [migrated their container registry](https://docs.github.com/en/packages/guides/migrating-to-github-container-registry-for-docker-images) from docker.pkg.github.com to ghcr.io
 * It is assumed you'll be pushing the image to a repo inside your GitHub organization, unless you set `githubOrg`
-* Provide the image name in `github-repo-name/image-name` format  
+* If using ghcr.io, provide the image name in `ghcr.io/OWNER/IMAGE_NAME` format
+* If using docker.pkg.github.com, provide the image name in `docker.pkg.github.com/OWNER/REPOSITORY/IMAGE_NAME` format
 * Provide either the `${{ github.actor }}` or an alternate username for Docker login (with associated token below)
-* Pass the default GitHub Actions token or custom secret with [proper push permissions](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token)
+* Pass the default GitHub Actions token or custom secret with [proper push permissions](https://docs.github.com/en/packages/guides/pushing-and-pulling-docker-images#authenticating-to-github-container-registry)
+
+#### New ghcr.io
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v5
+with:
+  image: image-name
+  registry: ghcr.io
+  githubOrg: override-org # optional
+  username: ${{ secrets.GHCR_USERNAME }}
+  password: ${{ secrets.GHCR_TOKEN }} 
+```
+
+#### Legacy docker.pkg.github.com
 
 ```yaml
 uses: mr-smithers-excellent/docker-build-push@v5
 with:
   image: github-repo/image-name
-  registry: ghcr.io
-  githubOrg: override-org # optional
+  registry: docker.pkg.github.com
   username: ${{ github.actor }}
-  password: ${{ secrets.GITHUB_TOKEN }} 
+  password: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Tagging the image using GitOps

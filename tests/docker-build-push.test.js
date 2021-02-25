@@ -94,7 +94,7 @@ describe('Create & push Docker image to GitHub Registry', () => {
 
   test('Keep default GitHub organization', () => {
     const image = `${mockRepoName}/image-name`;
-    const registry = 'docker.pkg.github.com';
+    const registry = 'ghcr.io';
     const tag = 'latest';
     const buildArgs = '';
     const dockerfile = 'Dockerfile';

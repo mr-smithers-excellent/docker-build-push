@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const docker = require('./docker');
 const github = require('./github');
 
-const GITHUB_REGISTRY = 'docker.pkg.github.com';
+const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
 let image;
 let registry;
@@ -33,11 +33,15 @@ const processInputs = () => {
   githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
 };
 
+const isGithubRegistry = () => {
+  return GITHUB_REGISTRY_URLS.includes(registry);
+};
+
 // Create the full Docker image name with registry prefix (without tag)
 const createFullImageName = () => {
   let imageFullName;
-  if (registry === GITHUB_REGISTRY) {
-    imageFullName = `${GITHUB_REGISTRY}/${githubOwner.toLowerCase()}/${image}`;
+  if (isGithubRegistry()) {
+    imageFullName = `${registry}/${githubOwner.toLowerCase()}/${image}`;
   } else {
     imageFullName = `${registry}/${image}`;
   }

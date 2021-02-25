@@ -1,0 +1,88 @@
+name: 'e2e Tests'
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # everyday at 8am UTC
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  e2e:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Docker Hub
+            image: mrsmithers/hello-world
+            registry: docker.io
+            username: DOCKERHUB_USERNAME
+            password: DOCKERHUB_PASSWORD
+
+          - name: GCR
+            image: orbital-bank-301021/hello-world
+            registry: gcr.io
+            username: GCR_USERNAME
+            password: GCR_PASSWORD
+
+          - name: ECR
+            image: hello-world
+            registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
+
+          - name: GHCR Legacy
+            image: docker-build-push/hello-world
+            registry: docker.pkg.github.com
+            username: GH_USERNAME
+            password: GITHUB_TOKEN
+
+          - name: GHCR
+            image: hello-world
+            registry: ghcr.io
+            githubOrg: docker-action-e2e
+            username: GHCR_USERNAME
+            password: GHCR_TOKEN
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build and push Docker image
+        id: docker
+        uses: ./
+        with:
+          dockerfile: ./e2e/Dockerfile
+          image: ${{ matrix.image }}
+          tags: latest, ${{ github.run_id }}
+          registry: ${{ matrix.registry }}
+          githubOrg: ${{ matrix.githubOrg }}
+          username: ${{ secrets[matrix.username] }}
+          password: ${{ secrets[matrix.password] }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Verify Docker image
+        run: |
+          docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
+          docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
+
+      - name: Raise issue on failure
+        if: failure()
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'e2e test failure',
+              body: 'Tests failed in run ' `https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
+              labels: ['Triage']
+            })
+
+      - name: Dump context
+        if: always()
+        uses: crazy-max/ghaction-dump-context@v1
