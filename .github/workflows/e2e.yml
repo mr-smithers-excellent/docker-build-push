@@ -21,6 +21,11 @@ jobs:
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
 
+          - image:
+            registry:
+            username:
+            password:
+
 #          - image:
 #            registry:
 #            username:
@@ -43,5 +48,8 @@ jobs:
       - name: Verify Docker image
         run: |
           docker pull ${{ matrix.registry }}/${{ matrix.image}}:${{ github.run_id }}
+          docker image inspect ${{ matrix.registry }}/${{ matrix.image}}:${{ github.run_id }}
 
-
+      - name: Dump context
+        if: always()
+        uses: crazy-max/ghaction-dump-context@v1
