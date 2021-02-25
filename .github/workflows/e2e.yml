@@ -36,13 +36,13 @@ jobs:
           - name: GHCR Legacy
             image: docker-build-push/hello-world
             registry: docker.pkg.github.com
-            githubOrg: mr-smithers-excellent
-            username: GITHUB_USERNAME
+            username: GH_USERNAME
             password: GITHUB_TOKEN
 
           - name: GHCR
             image: hello-world
             registry: ghcr.io
+            githubOrg: docker-actions-e2e
             username: GHCR_USERNAME
             password: GHCR_TOKEN
 
