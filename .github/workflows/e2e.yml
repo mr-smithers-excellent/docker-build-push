@@ -38,7 +38,7 @@ jobs:
             registry: ghcr.io
             githubOrg: mr-smithers-excellent
             username: GHCR_USERNAME
-            password: GITHUB_TOKEN
+            password: GHCR_PASSWORD
 
     steps:
       - name: Check out code
