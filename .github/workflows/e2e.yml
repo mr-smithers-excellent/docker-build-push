@@ -37,11 +37,11 @@ jobs:
             image: docker-build-push/hello-world
             registry: docker.pkg.github.com
             githubOrg: mr-smithers-excellent
-            username: GHCR_USERNAME
+            username: GITHUB_USERNAME
             password: GITHUB_TOKEN
 
           - name: GHCR
-            image: hello-world-ghcr
+            image: hello-world
             registry: ghcr.io
             username: GHCR_USERNAME
             password: GHCR_TOKEN
