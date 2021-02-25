@@ -19,7 +19,7 @@ jobs:
           - image: mrsmithers/hello-world
             registry: docker.io
             username: DOCKERHUB_USERNAME
-            password: DOCKERHUB_USERNAME
+            password: DOCKERHUB_PASSWORD
 
 #          - image:
 #            registry:
