@@ -44,7 +44,7 @@ jobs:
             image: hello-world-ghcr
             registry: ghcr.io
             username: GHCR_USERNAME
-            password: GHCR_PASSWORD
+            password: GITHUB_TOKEN
 
     steps:
       - name: Check out code
