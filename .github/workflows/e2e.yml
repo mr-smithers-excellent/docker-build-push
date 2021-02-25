@@ -32,7 +32,7 @@ jobs:
           - image: docker-build-push/hello-world
             registry: docker.pkg.github.com
             username: GHCR_USERNAME
-            password: GHCR_TOKEN
+            password: GITHUB_TOKEN
 
           - image: docker-build-push/hello-world-alt
             registry: ghcr.io
@@ -63,6 +63,10 @@ jobs:
         run: |
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
+
+#      - name: Raise issue on failure
+#        if: fail()
+#        run:
 
       - name: Dump context
         if: always()
