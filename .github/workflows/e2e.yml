@@ -32,6 +32,13 @@ jobs:
             username: GHCR_USERNAME
             password: GHCR_TOKEN
 
+          - image: docker-build-push/hello-world-alt
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: GITHUB_TOKEN
+
+            #docker pull docker.pkg.github.com/mr-smithers-excellent/github-actions-poc/hello-world:latest
+
 #              image: github-repo/image-name
 #              registry: ghcr.io
 #              githubOrg: override-org # optional
