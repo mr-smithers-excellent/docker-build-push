@@ -35,10 +35,11 @@ jobs:
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
 
           - name: GHCR Legacy
-            image: docker-build-push/hello-world
+            image: docker-build-push/e2e-image
             registry: docker.pkg.github.com
             username: GH_USERNAME
             password: GITHUB_TOKEN
+            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: GHCR
             image: hello-world
