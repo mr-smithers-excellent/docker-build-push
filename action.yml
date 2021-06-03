@@ -30,6 +30,10 @@ inputs:
   gitHubOrg:
     description: 'GitHub organization to push image to (if not current)'
     required: false
+  addLatest:
+    description: 'Adds latest tag to auto-generated GitOps tag'
+    required: false
+    default: 'false'
 outputs:
   imageFullName:
     description: 'Full name of the Docker image with registry prefix and tag suffix'

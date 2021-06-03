@@ -21,12 +21,14 @@ jobs:
             registry: docker.io
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
+            addLatest: true
 
           - name: GCR
             image: orbital-bank-301021/hello-world
             registry: gcr.io
             username: GCR_USERNAME
             password: GCR_PASSWORD
+            addLatest: true
 
           - name: ECR
             image: hello-world

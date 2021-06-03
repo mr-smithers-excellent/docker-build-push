@@ -28,7 +28,7 @@ const splitTags = stringTags =>
 const processInputs = () => {
   image = core.getInput('image', { required: true });
   registry = core.getInput('registry', { required: true });
-  tags = splitTags(core.getInput('tags')) || [docker.createTag()];
+  tags = splitTags(core.getInput('tags')) || docker.createTags();
   buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
   githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
 };

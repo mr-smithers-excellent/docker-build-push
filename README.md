@@ -43,6 +43,7 @@ steps:
 |------------|----------------------------------------------------------------------------------------------------------|----------|
 | image      | Docker image name                                                                                        | Yes      |
 | tags       | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
+| addLatest  | Adds the `latest` tag to the GitOps-generated tags                                                       | No       |
 | registry   | Docker registry host                                                                                     | Yes      |
 | dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       |
 | directory  | Directory to pass to `docker build` command, if not project root                                         | No       |
@@ -144,11 +145,15 @@ with:
 
 ## Tagging the image using GitOps
 
-By default, if you do not pass a `tags` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag. This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag.
+By default, if you do not pass a `tags` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag(s). This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag(s).
 
-| Trigger                  | Commit SHA | Docker Tag           |
-|--------------------------|------------|----------------------|
-| /refs/tags/v1.0          | N/A        | v1.0                 |
-| /refs/heads/dev          | 1234567    | dev-1234567          |
-| /refs/heads/master       | 1234567    | master-1234567       |
-| /refs/heads/SOME-feature | 1234567    | some-feature-1234567 | 
+| Trigger                  | Commit SHA | addLatest | Docker Tag(s)               |
+|--------------------------|------------|-----------|-----------------------------|
+| /refs/tags/v1.0          | N/A        | false     | v1.0                        |
+| /refs/tags/v1.0          | N/A        | true      | v1.0,latest                 |
+| /refs/heads/dev          | 1234567    | false     | dev-1234567                 |
+| /refs/heads/dev          | 1234567    | true      | dev-1234567,latest          |
+| /refs/heads/master       | 1234567    | false     | master-1234567              |
+| /refs/heads/master       | 1234567    | true      | master-1234567,latest       |
+| /refs/heads/SOME-feature | 1234567    | false     | some-feature-1234567        |
+| /refs/heads/SOME-feature | 1234567    | true      | some-feature-1234567,latest |
