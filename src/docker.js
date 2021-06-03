@@ -47,17 +47,22 @@ const createTags = () => {
 const createTagCommand = (imageName, existingTag, newTag) =>
   `docker tag ${imageName}:${existingTag} ${imageName}:${newTag}`;
 
-const createBuildCommand = (dockerfile, imageName, tag, buildDir, buildArgs) => {
+const createBuildCommand = (dockerfile, imageName, tag, buildDir, buildArgs, labels) => {
   let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}:${tag}`;
   if (buildArgs) {
     const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
   }
 
+  if (labels) {
+    const labelsSuffix = labels.map(label => `--label ${label}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
+  }
+
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
-const build = (imageName, tag, buildArgs) => {
+const build = (imageName, tag, buildArgs, labels) => {
   const dockerfile = core.getInput('dockerfile');
   const buildDir = core.getInput('directory') || '.';
 
@@ -66,7 +71,7 @@ const build = (imageName, tag, buildArgs) => {
   }
 
   core.info(`Building Docker image: ${imageName}:${tag}`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tag, buildDir, buildArgs), cpOptions);
+  cp.execSync(createBuildCommand(dockerfile, imageName, tag, buildDir, buildArgs, labels), cpOptions);
 };
 
 const tag = (imageName, existingTag, newTag) =>
