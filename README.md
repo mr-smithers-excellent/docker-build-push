@@ -39,18 +39,19 @@ steps:
 
 ## Inputs
 
-| Name       | Description                                                                                              | Required |
-|------------|----------------------------------------------------------------------------------------------------------|----------|
-| image      | Docker image name                                                                                        | Yes      |
-| tags       | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       |
-| addLatest  | Adds the `latest` tag to the GitOps-generated tags                                                       | No       |
-| registry   | Docker registry host                                                                                     | Yes      |
-| dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       |
-| directory  | Directory to pass to `docker build` command, if not project root                                         | No       |
-| buildArgs  | Docker build arguments in format `KEY=VALUE,KEY=VALUE`                                                   | No       |
-| username   | Docker registry username                                                                                 | No       |
-| password   | Docker registry password or token                                                                        | No       |
-| githubOrg  | GitHub organization to push image to (if not current)                                                    | No       |
+| Name       | Description                                                                                              | Required | Type    |
+|------------|----------------------------------------------------------------------------------------------------------|----------|---------|
+| image      | Docker image name                                                                                        | Yes      | String  |
+| tags       | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
+| addLatest  | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
+| registry   | Docker registry host                                                                                     | Yes      | String  |
+| dockerfile | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       | String  |
+| directory  | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
+| buildArgs  | Docker build arguments passed via `--build-arg`                                                          | No       | List    |
+| labels     | Docker build labels passed via `--label`                                                                 | No       | List    |
+| username   | Docker registry username                                                                                 | No       | String  |
+| password   | Docker registry password or token                                                                        | No       | String  |
+| githubOrg  | GitHub organization to push image to (if not current)                                                    | No       | String  |
 
 ## Outputs
 

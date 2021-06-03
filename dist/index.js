@@ -590,17 +590,22 @@ const createTags = () => {
 const createTagCommand = (imageName, existingTag, newTag) =>
   `docker tag ${imageName}:${existingTag} ${imageName}:${newTag}`;
 
-const createBuildCommand = (dockerfile, imageName, tag, buildDir, buildArgs) => {
+const createBuildCommand = (dockerfile, imageName, tag, buildDir, buildArgs, labels) => {
   let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}:${tag}`;
   if (buildArgs) {
     const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
   }
 
+  if (labels) {
+    const labelsSuffix = labels.map(label => `--label ${label}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
+  }
+
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
-const build = (imageName, tag, buildArgs) => {
+const build = (imageName, tag, buildArgs, labels) => {
   const dockerfile = core.getInput('dockerfile');
   const buildDir = core.getInput('directory') || '.';
 
@@ -609,7 +614,7 @@ const build = (imageName, tag, buildArgs) => {
   }
 
   core.info(`Building Docker image: ${imageName}:${tag}`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tag, buildDir, buildArgs), cpOptions);
+  cp.execSync(createBuildCommand(dockerfile, imageName, tag, buildDir, buildArgs, labels), cpOptions);
 };
 
 const tag = (imageName, existingTag, newTag) =>
@@ -1655,6 +1660,7 @@ let registry;
 let tags;
 let buildArgs;
 let githubOwner;
+let labels;
 
 // Convert buildArgs from String to Array, as GH Actions currently does not support Arrays
 const processBuildArgsInput = buildArgsInput => {
@@ -1665,18 +1671,19 @@ const processBuildArgsInput = buildArgsInput => {
   return buildArgs;
 };
 
-const splitTags = stringTags =>
-  stringTags === null || stringTags === undefined || stringTags === ''
+const split = stringArray =>
+  stringArray === null || stringArray === undefined || stringArray === ''
     ? undefined
-    : stringTags.split(',').map(tag => tag.trim());
+    : stringArray.split(',').map(value => value.trim());
 
 // Get GitHub Action inputs
 const processInputs = () => {
   image = core.getInput('image', { required: true });
   registry = core.getInput('registry', { required: true });
-  tags = splitTags(core.getInput('tags')) || docker.createTags();
+  tags = split(core.getInput('tags')) || docker.createTags();
   buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
   githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
+  labels = split(core.getInput('labels'));
 };
 
 const isGithubRegistry = () => {
@@ -1705,7 +1712,7 @@ const run = () => {
     const firstTag = tagsCopy.shift();
 
     docker.login();
-    docker.build(imageFullName, firstTag, buildArgs);
+    docker.build(imageFullName, firstTag, buildArgs, labels);
     docker.push(imageFullName, firstTag);
 
     core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);

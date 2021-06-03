@@ -34,6 +34,9 @@ inputs:
     description: 'Adds latest tag to auto-generated GitOps tag'
     required: false
     default: 'false'
+  labels:
+    description: 'Docker build labels in format KEY=VALUE,KEY=VALUE'
+    required: false
 outputs:
   imageFullName:
     description: 'Full name of the Docker image with registry prefix and tag suffix'
