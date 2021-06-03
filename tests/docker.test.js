@@ -11,50 +11,87 @@ describe('Create Docker image tag from git ref', () => {
   test('Create from tag push', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    core.getInput.mockReturnValueOnce('false');
 
-    expect(docker.createTags()).toContain('v1.0');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('v1.0');
+    expect(tags.length).toEqual(1);
+  });
+
+  test('Create from tag push with addLatest', () => {
+    context.ref = 'refs/tags/v1.0';
+    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    core.getInput.mockReturnValueOnce('true');
+
+    const tags = docker.createTags();
+
+    expect(tags).toContain('v1.0');
+    expect(tags).toContain('latest');
+    expect(tags.length).toEqual(2);
   });
 
   test('Create from tag push with capital letters', () => {
     context.ref = 'refs/tags/V1.0';
     context.sha = '60336540c3df28b52b1e364a65ff5b8f6ec135b8';
+    core.getInput.mockReturnValueOnce('foo');
 
-    expect(docker.createTags()).toContain('v1.0');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('v1.0');
+    expect(tags.length).toEqual(1);
   });
 
   test('Create from master branch push', () => {
     context.ref = 'refs/heads/master';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
 
-    expect(docker.createTags()).toContain('master-79d9bbb');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('master-79d9bbb');
+    expect(tags.length).toEqual(1);
   });
 
-  test('Create from dev branch push', () => {
+  test('Create from dev branch push with addLatest', () => {
     context.ref = 'refs/heads/dev';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+    core.getInput.mockReturnValueOnce('true');
 
-    expect(docker.createTags()).toContain('dev-79d9bbb');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('dev-79d9bbb');
+    expect(tags).toContain('latest');
+    expect(tags.length).toEqual(2);
   });
 
   test('Create from feature branch pre-pended with Jira ticket number', () => {
     context.ref = 'refs/heads/jira-123/feature/some-cool-feature';
     context.sha = 'f427b0b731ed7664ce4a9fba291ab25fa2e57bd3';
 
-    expect(docker.createTags()).toContain('jira-123-feature-some-cool-feature-f427b0b');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('jira-123-feature-some-cool-feature-f427b0b');
+    expect(tags.length).toEqual(1);
   });
 
   test('Create from feature branch without Jira number', () => {
     context.ref = 'refs/heads/no-jira-number';
     context.sha = 'd3c98d2f50ab48322994ad6f80e460bde166b32f';
 
-    expect(docker.createTags()).toContain('no-jira-number-d3c98d2');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('no-jira-number-d3c98d2');
+    expect(tags.length).toEqual(1);
   });
 
   test('Create from feature branch with capital letters', () => {
     context.ref = 'refs/heads/SOME-mixed-CASE-Branch';
     context.sha = '152568521eb446d7b331a4e7c1215d29605bf884';
 
-    expect(docker.createTags()).toContain('some-mixed-case-branch-1525685');
+    const tags = docker.createTags();
+
+    expect(tags).toContain('some-mixed-case-branch-1525685');
+    expect(tags.length).toEqual(1);
   });
 
   test('Create from pull request push (not supported)', () => {
@@ -94,7 +131,7 @@ describe('core and cp methods', () => {
   describe('Build image', () => {
     test('No Dockerfile', () => {
       const dockerfile = 'Dockerfile.nonexistent';
-      core.getInput.mockReturnValue(dockerfile);
+      core.getInput.mockReturnValueOnce(dockerfile);
       fs.existsSync.mockReturnValueOnce(false);
 
       docker.build('gcr.io/some-project/image', 'v1');

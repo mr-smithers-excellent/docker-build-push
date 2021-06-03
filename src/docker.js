@@ -11,6 +11,7 @@ const isBranch = ref => ref && ref.includes('refs/heads/');
 const createTags = () => {
   core.info('Creating Docker image tags...');
   const { sha } = context;
+  const addLatest = core.getInput('addLatest') === 'true';
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
@@ -33,6 +34,10 @@ const createTags = () => {
     core.setFailed(
       'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push-event-push'
     );
+  }
+
+  if (addLatest) {
+    dockerTags.push('latest');
   }
 
   core.info(`Docker tags created: ${dockerTags}`);
