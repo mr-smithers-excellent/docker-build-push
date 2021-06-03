@@ -58,11 +58,13 @@ jobs:
         with:
           dockerfile: ./e2e/Dockerfile
           image: ${{ matrix.image }}
-          tags: latest, ${{ github.run_id }}
+#          tags: latest, ${{ github.run_id }}
           registry: ${{ matrix.registry }}
           githubOrg: ${{ matrix.githubOrg }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
+          addLatest: ${{ matrix.addLabels }}
+          labels: ${{ matrix.labels }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

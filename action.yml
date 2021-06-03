@@ -19,7 +19,10 @@ inputs:
     description: 'Directory to run `docker build` from, if not project root'
     required: false
   buildArgs:
-    description: 'Docker build arguments in format KEY=VALUE,KEY=VALUE'
+    description: 'Docker build arguments passed via --build-arg'
+    required: false
+  labels:
+    description: 'Docker build labels passed via --label'
     required: false
   username:
     description: 'Docker registry username'
@@ -34,9 +37,6 @@ inputs:
     description: 'Adds latest tag to auto-generated GitOps tag'
     required: false
     default: 'false'
-  labels:
-    description: 'Docker build labels in format KEY=VALUE,KEY=VALUE'
-    required: false
 outputs:
   imageFullName:
     description: 'Full name of the Docker image with registry prefix and tag suffix'
