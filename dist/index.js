@@ -587,7 +587,7 @@ const createTags = () => {
   return dockerTags;
 };
 
-const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels) => {
+const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target) => {
   const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
@@ -601,10 +601,15 @@ const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, la
     buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
   }
 
+  if (target) {
+    const targetSuffix = `--target ${target}`;
+    buildCommandPrefix = `${buildCommandPrefix} ${targetSuffix}`;
+  }
+
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
-const build = (imageName, tags, buildArgs, labels) => {
+const build = (imageName, tags, buildArgs, labels, target) => {
   const dockerfile = core.getInput('dockerfile');
   const buildDir = core.getInput('directory') || '.';
 
@@ -613,7 +618,7 @@ const build = (imageName, tags, buildArgs, labels) => {
   }
 
   core.info(`Building Docker image ${imageName} with tags ${tags}...`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels), cpOptions);
+  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
@@ -1656,6 +1661,7 @@ let tags;
 let buildArgs;
 let githubOwner;
 let labels;
+let target;
 
 // Convert buildArgs from String to Array, as GH Actions currently does not support Arrays
 const processBuildArgsInput = buildArgsInput => {
@@ -1679,6 +1685,7 @@ const processInputs = () => {
   buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
   githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
   labels = split(core.getInput('labels'));
+  target = core.getInput('target');
 };
 
 const isGithubRegistry = () => {
@@ -1703,23 +1710,9 @@ const run = () => {
     const imageFullName = createFullImageName();
     core.info(`Docker image name created: ${imageFullName}`);
 
-    // const tagsCopy = tags.slice();
-    // const firstTag = tagsCopy.shift();
-
     docker.login();
-    // docker.build(imageFullName, firstTag, buildArgs, labels);
-    // docker.push(imageFullName, firstTag);
-    docker.build(imageFullName, tags, buildArgs, labels);
+    docker.build(imageFullName, tags, buildArgs, labels, target);
     docker.push(imageFullName, tags);
-
-    // TODO: Refactor to use commands
-    // docker build -t mrsmithers/e2e-image:latest -t mrsmithers/e2e-image:v1 -f e2e/Dockerfile .
-    // docker push mrsmithers/e2e-image --all-tags
-    // tagsCopy.forEach(tag => {
-    //   docker.tag(imageFullName, firstTag, tag);
-    //   docker.push(imageFullName, tag);
-    //   core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
-    // });
 
     core.setOutput('imageFullName', imageFullName);
     core.setOutput('imageName', image);

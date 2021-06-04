@@ -19,7 +19,7 @@ afterAll(() => {
   delete process.env.GITHUB_REPOSITORY;
 });
 
-const mockInputs = (image, registry, tags, buildArgs, dockerfile, githubOrg, labels) => {
+const mockInputs = (image, registry, tags, buildArgs, dockerfile, githubOrg, labels, target) => {
   core.getInput = jest
     .fn()
     .mockReturnValueOnce(image)
@@ -28,6 +28,7 @@ const mockInputs = (image, registry, tags, buildArgs, dockerfile, githubOrg, lab
     .mockReturnValueOnce(buildArgs)
     .mockReturnValueOnce(githubOrg)
     .mockReturnValueOnce(labels)
+    .mockReturnValueOnce(target)
     .mockReturnValueOnce(dockerfile);
 };
 
@@ -44,7 +45,7 @@ const convertBuildArgs = buildArgs => {
 
 const runAssertions = (imageFullName, image, tags, dockerfile, buildArgs) => {
   expect(docker.createTags).toHaveBeenCalledTimes(1);
-  expect(core.getInput).toHaveBeenCalledTimes(8);
+  expect(core.getInput).toHaveBeenCalledTimes(9);
   expect(core.setOutput).toHaveBeenCalledTimes(3);
   expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
   expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
@@ -154,7 +155,7 @@ describe('Create & push Docker image to GCR', () => {
   });
 });
 
-describe('Create & push Docker image with multiple tags', () => {
+describe('Create & push Docker image with multiple tags and target', () => {
   test('Valid Docker inputs with two tags', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
@@ -165,24 +166,25 @@ describe('Create & push Docker image with multiple tags', () => {
     const buildArgs = '';
     const dockerfile = 'Dockerfile';
     const imageFullName = createFullImageName(registry, image);
+    const target = 'builder';
 
     docker.login = jest.fn();
     docker.createTags = jest.fn().mockReturnValueOnce([tag1]);
-    mockInputs(image, registry, inputTags, buildArgs, dockerfile);
+    mockInputs(image, registry, inputTags, buildArgs, dockerfile, null, null, target);
     mockOutputs(imageFullName, image, outputTags);
     cp.execSync = jest.fn();
 
     run();
 
     expect(docker.createTags).toHaveBeenCalledTimes(0);
-    expect(core.getInput).toHaveBeenCalledTimes(8);
+    expect(core.getInput).toHaveBeenCalledTimes(9);
     expect(core.setOutput).toHaveBeenCalledTimes(3);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
     expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
     expect(core.setOutput).toHaveBeenCalledWith('tags', outputTags);
 
     expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${dockerfile} -t ${imageFullName}:${tag1} -t ${imageFullName}:${tag2} .`,
+      `docker build -f ${dockerfile} -t ${imageFullName}:${tag1} -t ${imageFullName}:${tag2} --target builder .`,
       cpOptions
     );
   });
@@ -207,7 +209,7 @@ describe('Create & push Docker image with build args and labels', () => {
     run();
 
     expect(docker.createTags).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(8);
+    expect(core.getInput).toHaveBeenCalledTimes(9);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
     expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
     expect(core.setOutput).toHaveBeenCalledWith('tags', tag);

@@ -49,6 +49,7 @@ steps:
 | directory  | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
 | buildArgs  | Docker build arguments passed via `--build-arg`                                                          | No       | List    |
 | labels     | Docker build labels passed via `--label`                                                                 | No       | List    |
+| target     | Docker build target passed via `--target`                                                                | No       | String  |
 | username   | Docker registry username                                                                                 | No       | String  |
 | password   | Docker registry password or token                                                                        | No       | String  |
 | githubOrg  | GitHub organization to push image to (if not current)                                                    | No       | String  |

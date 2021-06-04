@@ -44,7 +44,7 @@ const createTags = () => {
   return dockerTags;
 };
 
-const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels) => {
+const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target) => {
   const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
@@ -58,10 +58,15 @@ const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, la
     buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
   }
 
+  if (target) {
+    const targetSuffix = `--target ${target}`;
+    buildCommandPrefix = `${buildCommandPrefix} ${targetSuffix}`;
+  }
+
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
-const build = (imageName, tags, buildArgs, labels) => {
+const build = (imageName, tags, buildArgs, labels, target) => {
   const dockerfile = core.getInput('dockerfile');
   const buildDir = core.getInput('directory') || '.';
 
@@ -70,7 +75,7 @@ const build = (imageName, tags, buildArgs, labels) => {
   }
 
   core.info(`Building Docker image ${imageName} with tags ${tags}...`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels), cpOptions);
+  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
