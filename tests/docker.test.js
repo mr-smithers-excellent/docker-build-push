@@ -134,7 +134,7 @@ describe('core and cp methods', () => {
       core.getInput.mockReturnValueOnce(dockerfile);
       fs.existsSync.mockReturnValueOnce(false);
 
-      docker.build('gcr.io/some-project/image', 'v1');
+      docker.build('gcr.io/some-project/image', ['v1']);
       expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
       expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
     });
@@ -145,7 +145,7 @@ describe('core and cp methods', () => {
       const image = 'gcr.io/some-project/image';
       const tag = 'v1';
 
-      docker.build(image, tag);
+      docker.build(image, [tag]);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tag} .`, cpOptions);
     });
@@ -158,7 +158,7 @@ describe('core and cp methods', () => {
       const tag = 'latest';
       const buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
 
-      docker.build(image, tag, buildArgs);
+      docker.build(image, [tag], buildArgs);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
         `docker build -f Dockerfile -t ${image}:${tag} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
@@ -174,7 +174,7 @@ describe('core and cp methods', () => {
       const image = 'gcr.io/some-project/image';
       const tag = 'v1';
 
-      docker.build(image, tag);
+      docker.build(image, [tag]);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tag} ${directory}`, cpOptions);
     });
@@ -236,7 +236,7 @@ describe('core and cp methods', () => {
 
       docker.push(imageName, tag);
 
-      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}:${tag}`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName} --all-tags`, cpOptions);
     });
   });
 });

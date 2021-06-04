@@ -21,21 +21,21 @@ jobs:
             registry: docker.io
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
-            addLatest: true
+            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: GCR
             image: orbital-bank-301021/hello-world
             registry: gcr.io
             username: GCR_USERNAME
             password: GCR_PASSWORD
-            addLatest: true
+            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: ECR
             image: hello-world
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
 
           - name: GHCR Legacy
-            image: docker-build-push/hello-world
+            image: docker-build-push/e2e-image
             registry: docker.pkg.github.com
             username: GH_USERNAME
             password: GITHUB_TOKEN
@@ -62,6 +62,8 @@ jobs:
           githubOrg: ${{ matrix.githubOrg }}
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
+          addLatest: ${{ matrix.addLatest }}
+          labels: ${{ matrix.labels }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -71,19 +73,19 @@ jobs:
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
 
-      - name: Raise issue on failure
-        if: failure()
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'e2e test failure',
-              body: `Tests failed in run https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
-              labels: ['Triage']
-            })
+#      - name: Raise issue on failure
+#        if: failure()
+#        uses: actions/github-script@v3
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          script: |
+#            github.issues.create({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              title: 'e2e test failure',
+#              body: `Tests failed in run https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
+#              labels: ['Triage']
+#            })
 
       - name: Dump context
         if: always()

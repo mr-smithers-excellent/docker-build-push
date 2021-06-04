@@ -44,20 +44,24 @@ const createTags = () => {
   return dockerTags;
 };
 
-const createTagCommand = (imageName, existingTag, newTag) =>
-  `docker tag ${imageName}:${existingTag} ${imageName}:${newTag}`;
+const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels) => {
+  const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
+  let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
-const createBuildCommand = (dockerfile, imageName, tag, buildDir, buildArgs) => {
-  let buildCommandPrefix = `docker build -f ${dockerfile} -t ${imageName}:${tag}`;
   if (buildArgs) {
     const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
   }
 
+  if (labels) {
+    const labelsSuffix = labels.map(label => `--label ${label}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
+  }
+
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
-const build = (imageName, tag, buildArgs) => {
+const build = (imageName, tags, buildArgs, labels) => {
   const dockerfile = core.getInput('dockerfile');
   const buildDir = core.getInput('directory') || '.';
 
@@ -65,12 +69,9 @@ const build = (imageName, tag, buildArgs) => {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  core.info(`Building Docker image: ${imageName}:${tag}`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tag, buildDir, buildArgs), cpOptions);
+  core.info(`Building Docker image ${imageName} with tags ${tags}...`);
+  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels), cpOptions);
 };
-
-const tag = (imageName, existingTag, newTag) =>
-  cp.execSync(createTagCommand(imageName, existingTag, newTag), cpOptions);
 
 const isEcr = registry => registry && registry.includes('amazonaws');
 
@@ -96,15 +97,14 @@ const login = () => {
   }
 };
 
-const push = (imageName, imageTag) => {
-  core.info(`Pushing Docker image ${imageName}:${imageTag}`);
-  cp.execSync(`docker push ${imageName}:${imageTag}`, cpOptions);
+const push = (imageName, tags) => {
+  core.info(`Pushing tags ${tags} for Docker image ${imageName}...`);
+  cp.execSync(`docker push ${imageName} --all-tags`, cpOptions);
 };
 
 module.exports = {
   createTags,
   build,
-  tag,
   login,
   push
 };

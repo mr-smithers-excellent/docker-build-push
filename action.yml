@@ -19,7 +19,10 @@ inputs:
     description: 'Directory to run `docker build` from, if not project root'
     required: false
   buildArgs:
-    description: 'Docker build arguments in format KEY=VALUE,KEY=VALUE'
+    description: 'Docker build arguments passed via --build-arg'
+    required: false
+  labels:
+    description: 'Docker build labels passed via --label'
     required: false
   username:
     description: 'Docker registry username'
