@@ -30,6 +30,7 @@ jobs:
             username: GCR_USERNAME
             password: GCR_PASSWORD
             addLatest: true
+            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: ECR
             image: hello-world
@@ -40,7 +41,6 @@ jobs:
             registry: docker.pkg.github.com
             username: GH_USERNAME
             password: GITHUB_TOKEN
-            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: GHCR
             image: hello-world
