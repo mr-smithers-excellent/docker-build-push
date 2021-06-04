@@ -166,6 +166,23 @@ describe('core and cp methods', () => {
       );
     });
 
+    test('Build with labels and target', () => {
+      core.getInput.mockReturnValueOnce('Dockerfile');
+      core.getInput.mockReturnValueOnce('.');
+      fs.existsSync.mockReturnValueOnce(true);
+      const image = 'docker.io/this-project/that-image';
+      const tag = 'latest';
+      const labels = ['version=1.0', 'maintainer=mr-smithers-excellent'];
+      const target = 'builder';
+
+      docker.build(image, [tag], null, labels, target);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${tag} --label version=1.0 --label maintainer=mr-smithers-excellent --target builder .`,
+        cpOptions
+      );
+    });
+
     test('Build in different directory', () => {
       core.getInput.mockReturnValueOnce('Dockerfile');
       const directory = 'working-dir';

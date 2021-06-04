@@ -24,6 +24,9 @@ inputs:
   labels:
     description: 'Docker build labels passed via --label'
     required: false
+  target:
+    description: 'Docker build target passed via --target'
+    required: false
   username:
     description: 'Docker registry username'
     required: false
