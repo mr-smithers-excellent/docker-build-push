@@ -22,6 +22,7 @@ jobs:
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
             addLatest: true
+            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: GCR
             image: orbital-bank-301021/hello-world
@@ -58,7 +59,7 @@ jobs:
         with:
           dockerfile: ./e2e/Dockerfile
           image: ${{ matrix.image }}
-          tags: latest, ${{ github.run_id }}
+#          tags: latest, ${{ github.run_id }}
           registry: ${{ matrix.registry }}
           githubOrg: ${{ matrix.githubOrg }}
           username: ${{ secrets[matrix.username] }}
@@ -74,19 +75,19 @@ jobs:
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
 
-      - name: Raise issue on failure
-        if: failure()
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'e2e test failure',
-              body: `Tests failed in run https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
-              labels: ['Triage']
-            })
+#      - name: Raise issue on failure
+#        if: failure()
+#        uses: actions/github-script@v3
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          script: |
+#            github.issues.create({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              title: 'e2e test failure',
+#              body: `Tests failed in run https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
+#              labels: ['Triage']
+#            })
 
       - name: Dump context
         if: always()
