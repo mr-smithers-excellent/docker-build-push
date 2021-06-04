@@ -1717,6 +1717,9 @@ const run = () => {
 
     core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
 
+    // TODO: Refactor to use commands
+    // docker build -t mrsmithers/e2e-image:latest -t mrsmithers/e2e-image:v1 -f e2e/Dockerfile .
+    // docker push mrsmithers/e2e-image --all-tags
     tagsCopy.forEach(tag => {
       docker.tag(imageFullName, firstTag, tag);
       docker.push(imageFullName, tag);

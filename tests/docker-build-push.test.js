@@ -154,7 +154,7 @@ describe('Create & push Docker image to GCR', () => {
   });
 });
 
-describe('Create & push Docker image with many tags', () => {
+describe('Create & push Docker image with multiple tags', () => {
   test('Valid Docker inputs with two tags', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
