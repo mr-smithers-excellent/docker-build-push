@@ -181,8 +181,10 @@ describe('Create & push Docker image with multiple tags', () => {
     expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
     expect(core.setOutput).toHaveBeenCalledWith('tags', outputTags);
 
-    expect(cp.execSync).toHaveBeenCalledWith(`docker build -f ${dockerfile} -t ${imageFullName}:${tag1} .`, cpOptions);
-    expect(cp.execSync).toHaveBeenCalledWith(`docker tag ${imageFullName}:${tag1} ${imageFullName}:${tag2}`, cpOptions);
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${dockerfile} -t ${imageFullName}:${tag1} -t ${imageFullName}:${tag2} .`,
+      cpOptions
+    );
   });
 });
 

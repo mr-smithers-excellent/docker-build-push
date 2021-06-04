@@ -57,23 +57,23 @@ const run = () => {
     const imageFullName = createFullImageName();
     core.info(`Docker image name created: ${imageFullName}`);
 
-    const tagsCopy = tags.slice();
-    const firstTag = tagsCopy.shift();
+    // const tagsCopy = tags.slice();
+    // const firstTag = tagsCopy.shift();
 
     docker.login();
-    docker.build(imageFullName, firstTag, buildArgs, labels);
-    docker.push(imageFullName, firstTag);
-
-    core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
+    // docker.build(imageFullName, firstTag, buildArgs, labels);
+    // docker.push(imageFullName, firstTag);
+    docker.build(imageFullName, tags, buildArgs, labels);
+    docker.push(imageFullName, tags);
 
     // TODO: Refactor to use commands
     // docker build -t mrsmithers/e2e-image:latest -t mrsmithers/e2e-image:v1 -f e2e/Dockerfile .
     // docker push mrsmithers/e2e-image --all-tags
-    tagsCopy.forEach(tag => {
-      docker.tag(imageFullName, firstTag, tag);
-      docker.push(imageFullName, tag);
-      core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
-    });
+    // tagsCopy.forEach(tag => {
+    //   docker.tag(imageFullName, firstTag, tag);
+    //   docker.push(imageFullName, tag);
+    //   core.info(`Docker image ${imageFullName}:${firstTag} pushed to registry`);
+    // });
 
     core.setOutput('imageFullName', imageFullName);
     core.setOutput('imageName', image);
