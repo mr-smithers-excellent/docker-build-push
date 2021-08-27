@@ -35,7 +35,8 @@
   "homepage": "https://github.com/mr-smithers-excellent/docker-build-push-action#readme",
   "dependencies": {
     "@actions/core": "^1.5.0",
-    "@actions/github": "^5.0.0"
+    "@actions/github": "^5.0.0",
+    "dateformat": "^4.5.1"
   },
   "devDependencies": {
     "@zeit/ncc": "^0.22.1",
