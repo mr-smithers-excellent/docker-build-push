@@ -8,7 +8,8 @@
     "precommit": "npm run build && git add dist/",
     "lint": "eslint 'src/**.js' 'tests/**.js' --fix",
     "test": "eslint 'src/**.js' 'tests/**.js' && jest --coverage",
-    "test:watch": "npm run test -- --watchAll"
+    "test:watch": "npm run test -- --watchAll",
+    "prepare": "husky install"
   },
   "husky": {
     "hooks": {
@@ -47,7 +48,7 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-react": "^7.24.0",
-    "husky": "^7.0.2",
+    "husky": "^7.0.0",
     "jest": "^27.1.0",
     "prettier": "^2.3.2"
   }
