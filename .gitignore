@@ -69,3 +69,6 @@ typings/
 # Allure
 allure-report
 allure-results
+
+# husky
+.husky
