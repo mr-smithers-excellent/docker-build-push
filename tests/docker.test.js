@@ -4,7 +4,7 @@ const { context } = require('@actions/github');
 const core = require('@actions/core');
 const cp = require('child_process');
 const fs = require('fs');
-const docker = require('../src/docker.js');
+const docker = require('../src/docker');
 const cpOptions = require('../src/settings');
 
 describe('Create Docker image tag from git ref', () => {
