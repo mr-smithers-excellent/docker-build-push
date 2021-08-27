@@ -40,6 +40,10 @@ inputs:
     description: 'Adds latest tag to auto-generated GitOps tag'
     required: false
     default: 'false'
+  addLatest:
+    description: 'Suffixes a build timestamp to the Docker tag'
+    required: false
+    default: 'false'
 outputs:
   imageFullName:
     description: 'Full name of the Docker image with registry prefix and tag suffix'
