@@ -8,6 +8,11 @@ const docker = require('../src/docker');
 const cpOptions = require('../src/settings');
 
 describe('Create Docker image tag from git ref', () => {
+  beforeEach(() => {
+    // core.getInput.mockReturnValueOnce('false');
+    // core.getInput.mockReturnValueOnce('false');
+  });
+
   test('Create from tag push', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
@@ -20,6 +25,18 @@ describe('Create Docker image tag from git ref', () => {
   });
 
   test('Create from tag push with addLatest', () => {
+    context.ref = 'refs/tags/v1.0';
+    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    core.getInput.mockReturnValueOnce('true');
+
+    const tags = docker.createTags();
+
+    expect(tags).toContain('v1.0');
+    expect(tags).toContain('latest');
+    expect(tags.length).toEqual(2);
+  });
+
+  test('Create from tag push with addTimestamp', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
     core.getInput.mockReturnValueOnce('true');
@@ -62,6 +79,24 @@ describe('Create Docker image tag from git ref', () => {
     expect(tags).toContain('dev-79d9bbb');
     expect(tags).toContain('latest');
     expect(tags.length).toEqual(2);
+  });
+
+  test('Create from dev branch push with addTimestamp', () => {
+    context.ref = 'refs/heads/dev';
+    context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+    core.getInput.mockReturnValueOnce('false');
+    core.getInput.mockReturnValueOnce('true');
+
+    const tags = docker.createTags();
+
+    expect(tags.length).toEqual(1);
+    const tag = tags[0];
+
+    const baseTag = tag.substring(0, 11);
+    expect(baseTag).toEqual('dev-79d9bbb');
+
+    const timestamp = tag.substring(12, tag.length);
+    expect(timestamp).toMatch(/^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$/);
   });
 
   test('Create from feature branch pre-pended with Jira ticket number', () => {
