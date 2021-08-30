@@ -1,59 +1,59 @@
-name: 'Docker Build & Push Action'
-description: 'Builds a Docker image and pushes to a private registry with support for multiple tags'
-author: 'Sean Smith'
+name: "Docker Build & Push Action"
+description: "Builds a Docker image and pushes to a private registry with support for multiple tags"
+author: "Sean Smith"
 inputs:
   image:
-    description: 'Name of the Docker image'
+    description: "Name of the Docker image"
     required: true
   tags:
-    description: 'Tags override for Docker image'
+    description: "Tags override for Docker image"
     required: false
   registry:
-    description: 'Target Docker registry'
+    description: "Target Docker registry"
     required: true
   dockerfile:
-    description: 'Location of Dockerfile, if not Dockerfile in root directory'
+    description: "Location of Dockerfile, if not Dockerfile in root directory"
     required: false
-    default: 'Dockerfile'
+    default: "Dockerfile"
   directory:
-    description: 'Directory to run `docker build` from, if not project root'
+    description: "Directory to run `docker build` from, if not project root"
     required: false
   buildArgs:
-    description: 'Docker build arguments passed via --build-arg'
+    description: "Docker build arguments passed via --build-arg"
     required: false
   labels:
-    description: 'Docker build labels passed via --label'
+    description: "Docker build labels passed via --label"
     required: false
   target:
-    description: 'Docker build target passed via --target'
+    description: "Docker build target passed via --target"
     required: false
   username:
-    description: 'Docker registry username'
+    description: "Docker registry username"
     required: false
   password:
-    description: 'Docker registry password'
+    description: "Docker registry password"
     required: false
   gitHubOrg:
-    description: 'GitHub organization to push image to (if not current)'
+    description: "GitHub organization to push image to (if not current)"
     required: false
   addLatest:
-    description: 'Adds latest tag to auto-generated GitOps tag'
+    description: "Adds latest tag to auto-generated GitOps tag"
     required: false
-    default: 'false'
-  addLatest:
-    description: 'Suffixes a build timestamp to the Docker tag'
+    default: "false"
+  addTimestamp:
+    description: "Suffixes a build timestamp to the Docker tag"
     required: false
-    default: 'false'
+    default: "false"
 outputs:
   imageFullName:
-    description: 'Full name of the Docker image with registry prefix and tag suffix'
+    description: "Full name of the Docker image with registry prefix and tag suffix"
   imageName:
-    description: 'Name of the Docker image with owner prefix'
+    description: "Name of the Docker image with owner prefix"
   tags:
-    description: 'Tags for the Docker image'
+    description: "Tags for the Docker image"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
 branding:
-  icon: 'anchor'
-  color: 'blue'
+  icon: "anchor"
+  color: "blue"
