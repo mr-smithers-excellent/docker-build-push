@@ -152,13 +152,13 @@ with:
 
 By default, if you do not pass a `tags` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag(s). This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag(s).
 
-| Trigger                  | Commit SHA | addLatest | Docker Tag(s)               |
-| ------------------------ | ---------- | --------- | --------------------------- |
-| /refs/tags/v1.0          | N/A        | false     | v1.0                        |
-| /refs/tags/v1.0          | N/A        | true      | v1.0,latest                 |
-| /refs/heads/dev          | 1234567    | false     | dev-1234567                 |
-| /refs/heads/dev          | 1234567    | true      | dev-1234567,latest          |
-| /refs/heads/master       | 1234567    | false     | master-1234567              |
-| /refs/heads/master       | 1234567    | true      | master-1234567,latest       |
-| /refs/heads/SOME-feature | 1234567    | false     | some-feature-1234567        |
-| /refs/heads/SOME-feature | 1234567    | true      | some-feature-1234567,latest |
+| Trigger                  | Commit SHA | addLatest | addTimestamp | Docker Tag(s)                          |
+| ------------------------ | ---------- | --------- | ------------ | -------------------------------------- |
+| /refs/tags/v1.0          | N/A        | false     | N/A          | v1.0                                   |
+| /refs/tags/v1.0          | N/A        | true      | N/A          | v1.0,latest                            |
+| /refs/heads/dev          | 1234567    | false     | true         | dev-1234567-2021-09-01.195027          |
+| /refs/heads/dev          | 1234567    | true      | false        | dev-1234567,latest                     |
+| /refs/heads/main         | 1234567    | false     | true         | main-1234567-2021-09-01.195027         |
+| /refs/heads/main         | 1234567    | true      | false        | main-1234567,latest                    |
+| /refs/heads/SOME-feature | 1234567    | false     | true         | some-feature-1234567-2021-09-01.195027 |
+| /refs/heads/SOME-feature | 1234567    | true      | false        | some-feature-1234567,latest            |
