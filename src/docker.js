@@ -1,6 +1,7 @@
 const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
+const dateFormat = require('dateformat');
 const { context } = require('@actions/github');
 const cpOptions = require('./settings');
 
@@ -8,10 +9,13 @@ const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
 const isBranch = ref => ref && ref.includes('refs/heads/');
 
+const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
+
 const createTags = () => {
   core.info('Creating Docker image tags...');
   const { sha } = context;
   const addLatest = core.getInput('addLatest') === 'true';
+  const addTimestamp = core.getInput('addTimestamp') === 'true';
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
@@ -28,7 +32,8 @@ const createTags = () => {
       .replace(/[^\w.-]+/g, '-')
       .replace(/^[^\w]+/, '')
       .substring(0, 120);
-    const tag = `${safeBranchName}-${shortSha}`;
+    const baseTag = `${safeBranchName}-${shortSha}`;
+    const tag = addTimestamp ? `${baseTag}-${timestamp()}` : baseTag;
     dockerTags.push(tag);
   } else {
     core.setFailed(

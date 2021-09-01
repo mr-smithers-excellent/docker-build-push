@@ -64,13 +64,9 @@ const runAssertions = (imageFullName, image, tags, dockerfile, buildArgs) => {
   }
 };
 
-const createFullImageName = (registry, image) => {
-  return `${registry}/${image}`;
-};
+const createFullImageName = (registry, image) => `${registry}/${image}`;
 
-const createGitHubImageName = (registry, githubOrg, image) => {
-  return `${registry}/${githubOrg}/${image}`;
-};
+const createGitHubImageName = (registry, githubOrg, image) => `${registry}/${githubOrg}/${image}`;
 
 describe('Create & push Docker image to GitHub Registry', () => {
   test('Override GitHub organization', () => {

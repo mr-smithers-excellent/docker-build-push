@@ -37,9 +37,7 @@ const processInputs = () => {
   target = core.getInput('target');
 };
 
-const isGithubRegistry = () => {
-  return GITHUB_REGISTRY_URLS.includes(registry);
-};
+const isGithubRegistry = () => GITHUB_REGISTRY_URLS.includes(registry);
 
 // Create the full Docker image name with registry prefix (without tag)
 const createFullImageName = () => {
