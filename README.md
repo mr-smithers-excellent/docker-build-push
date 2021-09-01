@@ -46,7 +46,7 @@ steps:
 | image        | Docker image name                                                                                        | Yes      | String  |
 | tags         | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
 | addLatest    | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
-| addTimestamp | Suffixes a build timestamp to the Docker tag                                                             | No       | Boolean |
+| addTimestamp | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
 | registry     | Docker registry host                                                                                     | Yes      | String  |
 | dockerfile   | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       | String  |
 | directory    | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
