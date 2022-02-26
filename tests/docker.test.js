@@ -81,6 +81,8 @@ describe('Create Docker image tag from git ref', () => {
     expect(tags.length).toEqual(2);
   });
 
+  
+
   test('Create from dev branch push with addTimestamp', () => {
     context.ref = 'refs/heads/dev';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
@@ -97,6 +99,25 @@ describe('Create Docker image tag from git ref', () => {
 
     const timestamp = tag.substring(12, tag.length);
     expect(timestamp).toMatch(/^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$/);
+  });
+
+  test('Create from dev branch push with addTimestamp and numericTimestamp', () => {
+    context.ref = 'refs/heads/dev';
+    context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+    core.getInput.mockReturnValueOnce('false');
+    core.getInput.mockReturnValueOnce('true');
+    core.getInput.mockReturnValueOnce('true');
+
+    const tags = docker.createTags();
+
+    expect(tags.length).toEqual(1);
+    const tag = tags[0];
+
+    const baseTag = tag.substring(0, 11);
+    expect(baseTag).toEqual('dev-79d9bbb');
+
+    const timestamp = tag.substring(12, tag.length);
+    expect(timestamp).toMatch(/^\d+$/);
   });
 
   test('Create from feature branch pre-pended with Jira ticket number', () => {

@@ -233,12 +233,15 @@ const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 const isBranch = ref => ref && ref.includes('refs/heads/');
 
 const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
+const numericTimestamp = () => new Date().getTime();
 
 const createTags = () => {
   core.info('Creating Docker image tags...');
   const { sha } = context;
   const addLatest = core.getInput('addLatest') === 'true';
   const addTimestamp = core.getInput('addTimestamp') === 'true';
+  const numericTimestamp = core.getInput('numericTimestamp') === 'false';
+  const timestamp = numericTimestamp ? numericTimestamp() : timestamp();
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
@@ -256,7 +259,7 @@ const createTags = () => {
       .replace(/^[^\w]+/, '')
       .substring(0, 120);
     const baseTag = `${safeBranchName}-${shortSha}`;
-    const tag = addTimestamp ? `${baseTag}-${timestamp()}` : baseTag;
+    const tag = addTimestamp ? `${baseTag}-${timestamp}` : baseTag;
     dockerTags.push(tag);
   } else {
     core.setFailed(

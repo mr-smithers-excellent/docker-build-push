@@ -17,8 +17,8 @@ const createTags = () => {
   const { sha } = context;
   const addLatest = core.getInput('addLatest') === 'true';
   const addTimestamp = core.getInput('addTimestamp') === 'true';
-  const numericTimestamp = core.getInput('numericTimestamp') === 'false';
-  const timestamp = numericTimestamp ? numericTimestamp() : timestamp();
+  const useNumericTimestamp = core.getInput('numericTimestamp') === 'true';
+  const localTimestamp = useNumericTimestamp ? numericTimestamp() : timestamp();
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
@@ -36,7 +36,7 @@ const createTags = () => {
       .replace(/^[^\w]+/, '')
       .substring(0, 120);
     const baseTag = `${safeBranchName}-${shortSha}`;
-    const tag = addTimestamp ? `${baseTag}-${timestamp}` : baseTag;
+    const tag = addTimestamp ? `${baseTag}-${localTimestamp}` : baseTag;
     dockerTags.push(tag);
   } else {
     core.setFailed(
