@@ -75,8 +75,8 @@ jobs:
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
 
-      - uses: actions/github-script@v5
-        name: Update check run
+      - name: Update check run
+        uses: actions/github-script@v5
         if: ${{ always() }}
         env:
           number: ${{ github.event.client_payload.pull_request.number }}
@@ -103,6 +103,6 @@ jobs:
             });
             return result;
       
-        - name: Dump context
-          if: always()
-          uses: crazy-max/ghaction-dump-context@v1
+      - name: Dump context
+        if: always()
+        uses: crazy-max/ghaction-dump-context@v1
