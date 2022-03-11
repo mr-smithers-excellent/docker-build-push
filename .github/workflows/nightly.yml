@@ -1,17 +1,13 @@
-name: 'e2e Tests'
+name: 'Nightly Tests'
 
 on:
-  repository_dispatch:
-    types: [ok-to-test-command]
+  schedule:
+    - cron: '0 8 * * *' # everyday at 8am UTC
 
 jobs:
   e2e:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: 
-      github.event_name == 'repository_dispatch' &&
-      github.event.client_payload.slash_command.sha != '' &&
-      contains(github.event.client_payload.pull_request.head.sha, github.event.client_payload.slash_command.sha)
     strategy:
       fail-fast: false
       matrix:
@@ -72,6 +68,20 @@ jobs:
         run: |
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
+
+      - name: Raise issue on failure
+        if: failure()
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'e2e test failure',
+              body: `Tests failed in run https://github.com/mr-smithers-excellent/docker-build-push/actions/runs/${context.runId}`,
+              labels: ['Triage']
+            })
 
       - name: Dump context
         if: always()
