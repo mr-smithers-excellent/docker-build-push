@@ -1,0 +1,17 @@
+name: 'PR Unit Tests'
+
+on: [pull_request]
+
+jobs:
+  run-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: npm ci
+
+      - name: Run unit tests 
+        run: npm run tests
