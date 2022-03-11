@@ -40,7 +40,7 @@
     "dateformat": "^4.6.3"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.33.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.5.0",
