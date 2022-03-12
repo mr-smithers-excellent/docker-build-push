@@ -116,7 +116,7 @@ jobs:
               ...context.repo,
               ref
             });
-            const check = checks.check_runs.filter(c => c.name === process.env.job);
+            const check = checks.check_runs.filter(c => c.name === process.env.image);
             const { data: result } = await github.rest.checks.update({
               ...context.repo,
               check_run_id: check[0].id,
