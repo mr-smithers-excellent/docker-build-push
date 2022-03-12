@@ -57,26 +57,7 @@ jobs:
         uses: actions/github-script@v5
         if: ${{ always() }}
         env:
-          number: ${{ github.event.client_payload.pull_request.number }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { data: pull } = await github.rest.pulls.get({
-              ...context.repo,
-              pull_number: process.env.number
-            });
-            const sha = pull.head.sha;
-            const { data: check } = await github.rest.checks.createSuite({
-              ...context.repo,
-              head_sha: sha
-            });
-            return check;
-            
-      - name: Create check run
-        uses: actions/github-script@v5
-        if: ${{ always() }}
-        env:
-          image: ${{ matrix.image }}
+          name: ${{ matrix.name }}
           number: ${{ github.event.client_payload.pull_request.number }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -88,7 +69,28 @@ jobs:
             const sha = pull.head.sha;
             const { data: check } = await github.rest.checks.create({
               ...context.repo,
-              name: process.env.image,
+              name: process.env.name,
+              head_sha: sha
+            });
+            return check;
+            
+      - name: Create check run
+        uses: actions/github-script@v5
+        if: ${{ always() }}
+        env:
+          name: ${{ matrix.name }}
+          number: ${{ github.event.client_payload.pull_request.number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pull } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: process.env.number
+            });
+            const sha = pull.head.sha;
+            const { data: check } = await github.rest.checks.create({
+              ...context.repo,
+              name: process.env.name,
               head_sha: sha
             });
             return check;
@@ -122,7 +124,7 @@ jobs:
           number: ${{ github.event.client_payload.pull_request.number }}
           job: ${{ github.job }}
           conclusion: ${{ job.status }} 
-          image: ${{ matrix.image }}
+          name: ${{ matrix.name }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -135,7 +137,7 @@ jobs:
               ...context.repo,
               ref
             });
-            const check = checks.check_runs.filter(c => c.name === process.env.image);
+            const check = checks.check_runs.filter(c => c.name === process.env.name);
             const { data: result } = await github.rest.checks.update({
               ...context.repo,
               check_run_id: check[0].id,
