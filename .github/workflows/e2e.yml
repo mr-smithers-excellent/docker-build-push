@@ -53,6 +53,21 @@ jobs:
         with:
           ref: 'refs/pull/${{ github.event.client_payload.pull_request.number }}/merge'
 
+      - name: Create check run
+        uses: actions/github-script@v5
+        if: ${{ always() }}
+        env:
+          number: ${{ github.event.client_payload.pull_request.number }}
+          job: ${{ github.job }}
+          conclusion: ${{ job.status }} 
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: check } = await github.rest.checks.create({
+              ...context.repo
+            });
+            return check;
+
       - name: Build and push Docker image
         id: docker
         uses: ./
