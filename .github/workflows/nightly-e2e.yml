@@ -1,4 +1,4 @@
-name: 'Nightly Tests'
+name: 'e2e Tests'
 
 on:
   schedule:
