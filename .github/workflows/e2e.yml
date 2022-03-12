@@ -63,8 +63,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const { data: pull } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: process.env.number
+            });
+            const sha = pull.head.sha;
             const { data: check } = await github.rest.checks.create({
-              ...context.repo
+              ...context.repo,
+              name: process.env.image,
+              head_sha: sha
             });
             return check;
 
