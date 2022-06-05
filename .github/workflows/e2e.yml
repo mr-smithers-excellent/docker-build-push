@@ -33,6 +33,7 @@ jobs:
 
           - name: ECR e2e
             image: hello-world
+            dockerfile: ./e2e/test-build-dir/Dockerfile
             directory: e2e/test-build-dir
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
             buildArgs: TEST=true
