@@ -61,6 +61,7 @@ jobs:
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
           addLatest: ${{ matrix.addLatest }}
+          addTimestamp: ${{ matrix.addTimestamp }}
           labels: ${{ matrix.labels }}
           enableBuildKit: ${{ matrix.enableBuildKit }}
         env:
