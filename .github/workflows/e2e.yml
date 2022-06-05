@@ -6,7 +6,7 @@ on:
 
 jobs:
   e2e:
-    # name: ${{ matrix.name }}
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     # if:
     #   github.event_name == 'repository_dispatch' &&
@@ -64,6 +64,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
         # with:
         #   ref: 'refs/pull/${{ github.event.client_payload.pull_request.number }}/merge'
 
