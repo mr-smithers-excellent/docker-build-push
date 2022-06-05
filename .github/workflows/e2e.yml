@@ -32,7 +32,7 @@ jobs:
             registry: gcr.io
             username: GCR_USERNAME
             password: GCR_PASSWORD
-            labels: org.opencontainers.image.description="A Hello World image used for e2e testz"
+            labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
             addLatest: false
             addTimestamp: true
             enableBuildKit: false
@@ -64,9 +64,9 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          ref: 'refs/pull/${{ github.event.client_payload.pull_request.number }}/merge'
+        uses: actions/checkout@v3
+        # with:
+        #   ref: 'refs/pull/${{ github.event.client_payload.pull_request.number }}/merge'
 
       - name: Create check run
         uses: actions/github-script@v5
