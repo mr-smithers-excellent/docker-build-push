@@ -9,4 +9,4 @@ jobs:
     uses: ./.github/workflows/e2e-base.yml
     secrets: inherit
     with:
-      pr-trigger: false
+      pr-trigger: true
