@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/e2e-base.yml
     secrets: inherit
     with:
-      trigger: 'not-pr'
+      pr-trigger: false
 
     # name: ${{ matrix.name }}
     # runs-on: ubuntu-latest
