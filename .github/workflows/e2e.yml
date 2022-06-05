@@ -39,7 +39,6 @@ jobs:
             registry: docker.pkg.github.com
             username: GH_USERNAME
             password: GITHUB_TOKEN
-            enableBuildKit: true
 
           - name: GHCR e2e
             image: hello-world
@@ -92,7 +91,6 @@ jobs:
           username: ${{ secrets[matrix.username] }}
           password: ${{ secrets[matrix.password] }}
           githubOrg: ${{ matrix.githubOrg }}
-          enableBuildKit:  ${{ matrix.enableBuildKit }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
