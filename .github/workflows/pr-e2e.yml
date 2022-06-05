@@ -1,8 +1,8 @@
-name: 'Nightly e2e Tests'
+name: 'e2e Tests'
 
 on:
-  schedule:
-    - cron: '0 8 * * *' # everyday at 8am UTC
+  repository_dispatch:
+    types: [ok-to-test-command]
 
 jobs:
   e2e:
