@@ -71,7 +71,6 @@ jobs:
       - name: Create check run
         if: ${{ inputs.pr-trigger }}
         uses: actions/github-script@v5
-        if: ${{ always() }}
         env:
           name: ${{ matrix.name }}
           number: ${{ github.event.client_payload.pull_request.number }}
@@ -119,7 +118,6 @@ jobs:
       - name: Update check run
         if: ${{ inputs.pr-trigger }}
         uses: actions/github-script@v5
-        if: ${{ always() }}
         env:
           number: ${{ github.event.client_payload.pull_request.number }}
           job: ${{ github.job }}
