@@ -8313,66 +8313,35 @@ function wrappy (fn, cb) {
 const core = __nccwpck_require__(2186);
 const docker = __nccwpck_require__(2439);
 const github = __nccwpck_require__(8396);
-
-const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
-
-let image;
-let registry;
-let tags;
-let buildArgs;
-let githubOwner;
-let labels;
-let target;
-
-// Convert buildArgs from String to Array, as GH Actions currently does not support Arrays
-const processBuildArgsInput = buildArgsInput => {
-  if (buildArgsInput) {
-    buildArgs = buildArgsInput.split(',');
-  }
-
-  return buildArgs;
-};
-
-const split = stringArray =>
-  stringArray === null || stringArray === undefined || stringArray === ''
-    ? undefined
-    : stringArray.split(',').map(value => value.trim());
-
-// Get GitHub Action inputs
-const processInputs = () => {
-  image = core.getInput('image', { required: true });
-  registry = core.getInput('registry', { required: true });
-  tags = split(core.getInput('tags')) || docker.createTags();
-  buildArgs = processBuildArgsInput(core.getInput('buildArgs'));
-  githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
-  labels = split(core.getInput('labels'));
-  target = core.getInput('target');
-};
-
-const isGithubRegistry = () => GITHUB_REGISTRY_URLS.includes(registry);
-
-// Create the full Docker image name with registry prefix (without tag)
-const createFullImageName = () => {
-  let imageFullName;
-  if (isGithubRegistry()) {
-    imageFullName = `${registry}/${githubOwner.toLowerCase()}/${image}`;
-  } else {
-    imageFullName = `${registry}/${image}`;
-  }
-  return imageFullName;
-};
+const { parseArray } = __nccwpck_require__(1608);
 
 const run = () => {
   try {
-    processInputs();
+    // Capture action inputs
+    const image = core.getInput('image', { required: true });
+    const registry = core.getInput('registry', { required: true });
+    const username = core.getInput('username');
+    const password = core.getInput('password');
+    const addLatest = core.getInput('addLatest') === 'true';
+    const addTimestamp = core.getInput('addTimestamp') === 'true';
+    const tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
+    const buildArgs = parseArray(core.getInput('buildArgs'));
+    const githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
+    const labels = parseArray(core.getInput('labels'));
+    const target = core.getInput('target');
+    const dockerfile = core.getInput('dockerfile');
+    const buildDir = core.getInput('directory') || '.';
 
-    const imageFullName = createFullImageName();
-    core.info(`Docker image name created: ${imageFullName}`);
+    // Create the Docker image name
+    const imageFullName = docker.createFullImageName(registry, image, githubOwner);
+    core.info(`Docker image name used for this build: ${imageFullName}`);
 
-    docker.login();
-    docker.build(imageFullName, tags, buildArgs, labels, target);
+    // Log in, build & push the Docker image
+    docker.login(username, password, registry);
+    docker.build(imageFullName, tags, buildArgs, labels, target, dockerfile, buildDir);
     docker.push(imageFullName, tags);
 
+    // Capture outputs
     core.setOutput('imageFullName', imageFullName);
     core.setOutput('imageName', image);
     core.setOutput('tags', tags.join(','));
@@ -8392,21 +8361,24 @@ module.exports = run;
 const cp = __nccwpck_require__(2081);
 const core = __nccwpck_require__(2186);
 const fs = __nccwpck_require__(7147);
-const dateFormat = __nccwpck_require__(1512);
 const { context } = __nccwpck_require__(5438);
-const cpOptions = __nccwpck_require__(8723);
+const { isGitHubTag, isBranch } = __nccwpck_require__(8396);
+const { timestamp, cpOptions } = __nccwpck_require__(1608);
 
-const isGitHubTag = ref => ref && ref.includes('refs/tags/');
+const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
-const isBranch = ref => ref && ref.includes('refs/heads/');
+// Create the full Docker image name with registry prefix (without tags)
+const createFullImageName = (registry, image, githubOwner) => {
+  if (GITHUB_REGISTRY_URLS.includes(registry)) {
+    return `${registry}/${githubOwner.toLowerCase()}/${image}`;
+  }
+  return `${registry}/${image}`;
+};
 
-const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
-
-const createTags = () => {
+// Create Docker tags based on input flags & Git branch
+const createTags = (addLatest, addTimestamp) => {
   core.info('Creating Docker image tags...');
   const { sha } = context;
-  const addLatest = core.getInput('addLatest') === 'true';
-  const addTimestamp = core.getInput('addTimestamp') === 'true';
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
@@ -8440,6 +8412,7 @@ const createTags = () => {
   return dockerTags;
 };
 
+// Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target) => {
   const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
@@ -8462,10 +8435,8 @@ const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, la
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
-const build = (imageName, tags, buildArgs, labels, target) => {
-  const dockerfile = core.getInput('dockerfile');
-  const buildDir = core.getInput('directory') || '.';
-
+// Perform 'docker build' command
+const build = (imageName, tags, buildArgs, labels, target, dockerfile, buildDir) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
@@ -8478,11 +8449,8 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
-const login = () => {
-  const registry = core.getInput('registry', { required: true });
-  const username = core.getInput('username');
-  const password = core.getInput('password');
-
+// Log in to provided Docker registry
+const login = (username, password, registry) => {
   // If using ECR, use the AWS CLI login command in favor of docker login
   if (isEcr(registry)) {
     const region = getRegion(registry);
@@ -8498,12 +8466,14 @@ const login = () => {
   }
 };
 
+// Push Docker image & all tags
 const push = (imageName, tags) => {
   core.info(`Pushing tags ${tags} for Docker image ${imageName}...`);
   cp.execSync(`docker push ${imageName} --all-tags`, cpOptions);
 };
 
 module.exports = {
+  createFullImageName,
   createTags,
   build,
   login,
@@ -8519,6 +8489,10 @@ module.exports = {
 const { context } = __nccwpck_require__(5438);
 const core = __nccwpck_require__(2186);
 
+const isGitHubTag = ref => ref && ref.includes('refs/tags/');
+
+const isBranch = ref => ref && ref.includes('refs/heads/');
+
 // Returns owning organization of the repo where the Action is run
 const getDefaultOwner = () => {
   let owner;
@@ -8533,21 +8507,38 @@ const getDefaultOwner = () => {
 };
 
 module.exports = {
+  isGitHubTag,
+  isBranch,
   getDefaultOwner
 };
 
 
 /***/ }),
 
-/***/ 8723:
-/***/ ((module) => {
+/***/ 1608:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const dateFormat = __nccwpck_require__(1512);
+
+const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
+
+const parseArray = stringArray => {
+  if (stringArray) {
+    return stringArray.split(',').map(value => value.trim());
+  }
+  return undefined;
+};
 
 const cpOptions = {
   maxBuffer: 50 * 1024 * 1024,
   stdio: 'inherit'
 };
 
-module.exports = cpOptions;
+module.exports = {
+  timestamp,
+  parseArray,
+  cpOptions
+};
 
 
 /***/ }),
