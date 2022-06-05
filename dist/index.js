@@ -8529,9 +8529,9 @@ const dateFormat = __nccwpck_require__(1512);
 
 const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
 
-const parseArray = stringArray => {
-  if (stringArray) {
-    return stringArray.split(',').map(value => value.trim());
+const parseArray = commaDelimitedString => {
+  if (commaDelimitedString) {
+    return commaDelimitedString.split(',').map(value => value.trim());
   }
   return undefined;
 };
