@@ -25,6 +25,7 @@ jobs:
             username: GCR_USERNAME
             password: GCR_PASSWORD
             labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
+            addTimestamp: true
 
           - name: ECR
             image: hello-world
@@ -42,6 +43,7 @@ jobs:
             githubOrg: docker-action-e2e
             username: GHCR_USERNAME
             password: GHCR_TOKEN
+            enableBuildKit: true
 
     steps:
       - name: Check out code
@@ -60,6 +62,7 @@ jobs:
           password: ${{ secrets[matrix.password] }}
           addLatest: ${{ matrix.addLatest }}
           labels: ${{ matrix.labels }}
+          enableBuildKit: ${{ matrix.enableBuildKit }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
