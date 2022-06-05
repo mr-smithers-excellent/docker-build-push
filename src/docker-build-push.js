@@ -19,6 +19,7 @@ const run = () => {
     const target = core.getInput('target');
     const dockerfile = core.getInput('dockerfile');
     const buildDir = core.getInput('directory') || '.';
+    const enableBuildKit = core.getInput('enableBuildKit') === 'true';
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -26,7 +27,7 @@ const run = () => {
 
     // Log in, build & push the Docker image
     docker.login(username, password, registry);
-    docker.build(imageFullName, tags, buildArgs, labels, target, dockerfile, buildDir);
+    docker.build(imageFullName, tags, buildArgs, labels, target, dockerfile, buildDir, enableBuildKit);
     docker.push(imageFullName, tags);
 
     // Capture outputs

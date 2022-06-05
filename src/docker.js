@@ -53,7 +53,7 @@ const createTags = (addLatest, addTimestamp) => {
 };
 
 // Dynamically create 'docker build' command based on inputs provided
-const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target) => {
+const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target, enableBuildKit) => {
   const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
@@ -68,21 +68,27 @@ const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, la
   }
 
   if (target) {
-    const targetSuffix = `--target ${target}`;
-    buildCommandPrefix = `${buildCommandPrefix} ${targetSuffix}`;
+    buildCommandPrefix = `${buildCommandPrefix} --target ${target}`;
+  }
+
+  if (enableBuildKit) {
+    buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
 
   return `${buildCommandPrefix} ${buildDir}`;
 };
 
 // Perform 'docker build' command
-const build = (imageName, tags, buildArgs, labels, target, dockerfile, buildDir) => {
+const build = (imageName, tags, buildArgs, labels, target, dockerfile, buildDir, enableBuildKit) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
   core.info(`Building Docker image ${imageName} with tags ${tags}...`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target), cpOptions);
+  cp.execSync(
+    createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target, enableBuildKit),
+    cpOptions
+  );
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');

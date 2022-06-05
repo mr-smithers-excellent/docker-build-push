@@ -189,6 +189,7 @@ describe('Docker build, login & push commands', () => {
     test('Dockerfile exists', () => {
       const image = 'gcr.io/some-project/image';
       const tags = ['v1'];
+      fs.existsSync = jest.fn().mockReturnValueOnce(false);
 
       docker.build(image, tags, buildArgs, labels, target, dockerfile, buildDir);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
