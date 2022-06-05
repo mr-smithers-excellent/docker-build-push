@@ -8315,6 +8315,15 @@ const docker = __nccwpck_require__(2439);
 const github = __nccwpck_require__(8396);
 const { parseArray } = __nccwpck_require__(1608);
 
+const buildOpts = {
+  tags: undefined,
+  buildArgs: undefined,
+  labels: undefined,
+  target: undefined,
+  buildDir: undefined,
+  enableBuildKit: false
+};
+
 const run = () => {
   try {
     // Capture action inputs
@@ -8322,16 +8331,16 @@ const run = () => {
     const registry = core.getInput('registry', { required: true });
     const username = core.getInput('username');
     const password = core.getInput('password');
+    const dockerfile = core.getInput('dockerfile');
+    const githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
     const addLatest = core.getInput('addLatest') === 'true';
     const addTimestamp = core.getInput('addTimestamp') === 'true';
-    const tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
-    const buildArgs = parseArray(core.getInput('buildArgs'));
-    const githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
-    const labels = parseArray(core.getInput('labels'));
-    const target = core.getInput('target');
-    const dockerfile = core.getInput('dockerfile');
-    const buildDir = core.getInput('directory') || '.';
-    const enableBuildKit = core.getInput('enableBuildKit') === 'true';
+    buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
+    buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
+    buildOpts.labels = parseArray(core.getInput('labels'));
+    buildOpts.target = core.getInput('target');
+    buildOpts.buildDir = core.getInput('directory') || '.';
+    buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -8339,13 +8348,13 @@ const run = () => {
 
     // Log in, build & push the Docker image
     docker.login(username, password, registry);
-    docker.build(imageFullName, tags, buildArgs, labels, target, dockerfile, buildDir, enableBuildKit);
-    docker.push(imageFullName, tags);
+    docker.build(imageFullName, dockerfile, buildOpts);
+    docker.push(imageFullName, buildOpts.tags);
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);
     core.setOutput('imageName', image);
-    core.setOutput('tags', tags.join(','));
+    core.setOutput('tags', buildOpts.tags.join(','));
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -8414,42 +8423,39 @@ const createTags = (addLatest, addTimestamp) => {
 };
 
 // Dynamically create 'docker build' command based on inputs provided
-const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target, enableBuildKit) => {
-  const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
+const createBuildCommand = (imageName, dockerfile, buildOpts) => {
+  const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
-  if (buildArgs) {
-    const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
+  if (buildOpts.buildArgs) {
+    const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
   }
 
-  if (labels) {
-    const labelsSuffix = labels.map(label => `--label ${label}`).join(' ');
+  if (buildOpts.labels) {
+    const labelsSuffix = buildOpts.labels.map(label => `--label ${label}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
   }
 
-  if (target) {
-    buildCommandPrefix = `${buildCommandPrefix} --target ${target}`;
+  if (buildOpts.target) {
+    buildCommandPrefix = `${buildCommandPrefix} --target ${buildOpts.target}`;
   }
 
-  if (enableBuildKit) {
+  if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
 
-  return `${buildCommandPrefix} ${buildDir}`;
+  return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };
 
 // Perform 'docker build' command
-const build = (imageName, tags, buildArgs, labels, target, dockerfile, buildDir, enableBuildKit) => {
+const build = (imageName, dockerfile, buildOpts) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  core.info(`Building Docker image ${imageName} with tags ${tags}...`);
-  cp.execSync(
-    createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target, enableBuildKit),
-    cpOptions
-  );
+  core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
+  cp.execSync(createBuildCommand(imageName, dockerfile, buildOpts), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');

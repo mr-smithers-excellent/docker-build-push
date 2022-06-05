@@ -162,75 +162,79 @@ describe('Docker build, login & push commands', () => {
   });
 
   describe('Build image', () => {
-    let buildArgs;
-    let labels;
-    let target;
+    let buildOpts;
     let dockerfile;
-    let buildDir;
 
     beforeEach(() => {
-      buildArgs = undefined;
-      labels = undefined;
-      target = undefined;
+      buildOpts = {
+        tags: undefined,
+        buildArgs: undefined,
+        labels: undefined,
+        target: undefined,
+        buildDir: '.',
+        enableBuildKit: false
+      };
       dockerfile = 'Dockerfile';
-      buildDir = '.';
     });
 
     test('No Dockerfile', () => {
       const image = 'gcr.io/some-project/image';
-      const tags = ['v1'];
+      buildOpts.tags = ['v1'];
       dockerfile = 'Dockerfile.nonexistent';
 
-      docker.build(image, tags, buildArgs, labels, target, dockerfile, buildDir);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
       expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
     });
 
     test('Dockerfile exists', () => {
       const image = 'gcr.io/some-project/image';
-      const tags = ['v1'];
+      buildOpts.tags = ['v1'];
       fs.existsSync = jest.fn().mockReturnValueOnce(false);
 
-      docker.build(image, tags, buildArgs, labels, target, dockerfile, buildDir);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tags} .`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${buildOpts.tags} .`, cpOptions);
     });
 
     test('Build with build args', () => {
       const image = 'docker.io/this-project/that-image';
-      const tags = ['latest'];
-      buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
+      buildOpts.tags = ['latest'];
+      buildOpts.buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
 
-      docker.build(image, tags, buildArgs, labels, target, dockerfile, buildDir);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
-        `docker build -f Dockerfile -t ${image}:${tags} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
         cpOptions
       );
     });
 
     test('Build with labels and target', () => {
       const image = 'docker.io/this-project/that-image';
-      const tags = ['latest'];
-      labels = ['version=1.0', 'maintainer=mr-smithers-excellent'];
-      target = 'builder';
+      buildOpts.tags = ['latest'];
+      buildOpts.labels = ['version=1.0', 'maintainer=mr-smithers-excellent'];
+      buildOpts.target = 'builder';
 
-      docker.build(image, tags, buildArgs, labels, target, dockerfile, buildDir);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
-        `docker build -f Dockerfile -t ${image}:${tags} --label version=1.0 --label maintainer=mr-smithers-excellent --target builder .`,
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --label version=1.0 --label maintainer=mr-smithers-excellent --target builder .`,
         cpOptions
       );
     });
 
     test('Build in different directory', () => {
       const image = 'gcr.io/some-project/image';
-      const tags = ['v1'];
-      buildDir = 'working-dir';
+      buildOpts.tags = ['v1'];
+      buildOpts.buildDir = 'working-dir';
 
-      docker.build(image, tags, buildArgs, labels, target, dockerfile, buildDir);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tags} ${buildDir}`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} ${buildOpts.buildDir}`,
+        cpOptions
+      );
     });
   });
 

@@ -53,42 +53,39 @@ const createTags = (addLatest, addTimestamp) => {
 };
 
 // Dynamically create 'docker build' command based on inputs provided
-const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target, enableBuildKit) => {
-  const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
+const createBuildCommand = (imageName, dockerfile, buildOpts) => {
+  const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
-  if (buildArgs) {
-    const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
+  if (buildOpts.buildArgs) {
+    const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
   }
 
-  if (labels) {
-    const labelsSuffix = labels.map(label => `--label ${label}`).join(' ');
+  if (buildOpts.labels) {
+    const labelsSuffix = buildOpts.labels.map(label => `--label ${label}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
   }
 
-  if (target) {
-    buildCommandPrefix = `${buildCommandPrefix} --target ${target}`;
+  if (buildOpts.target) {
+    buildCommandPrefix = `${buildCommandPrefix} --target ${buildOpts.target}`;
   }
 
-  if (enableBuildKit) {
+  if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
 
-  return `${buildCommandPrefix} ${buildDir}`;
+  return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };
 
 // Perform 'docker build' command
-const build = (imageName, tags, buildArgs, labels, target, dockerfile, buildDir, enableBuildKit) => {
+const build = (imageName, dockerfile, buildOpts) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  core.info(`Building Docker image ${imageName} with tags ${tags}...`);
-  cp.execSync(
-    createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target, enableBuildKit),
-    cpOptions
-  );
+  core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
+  cp.execSync(createBuildCommand(imageName, dockerfile, buildOpts), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
