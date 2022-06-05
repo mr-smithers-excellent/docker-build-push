@@ -119,7 +119,6 @@ jobs:
       - name: Update check run
         if: ${{ inputs.pr-trigger }}
         uses: actions/github-script@v5
-        if: ${{ always() }}
         env:
           number: ${{ github.event.client_payload.pull_request.number }}
           job: ${{ github.job }}
