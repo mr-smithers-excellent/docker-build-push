@@ -44,6 +44,10 @@ inputs:
     description: "Suffixes a build timestamp to the branch-based Docker tag"
     required: false
     default: "false"
+  enableBuildKit:
+    description: "Enables Docker BuildKit support"
+    required: false
+    default: "false"
 outputs:
   imageFullName:
     description: "Full name of the Docker image with registry prefix and tag suffix"
