@@ -8,7 +8,7 @@ jobs:
   e2e:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: 
+    if:
       github.event_name == 'repository_dispatch' &&
       github.event.client_payload.slash_command.sha != '' &&
       contains(github.event.client_payload.pull_request.head.sha, github.event.client_payload.slash_command.sha)
@@ -33,6 +33,7 @@ jobs:
           - name: ECR e2e
             image: hello-world
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
+            enableBuildKit: true
 
           - name: GHCR Legacy e2e
             image: docker-build-push/e2e-image
@@ -87,6 +88,7 @@ jobs:
           password: ${{ secrets[matrix.password] }}
           addLatest: ${{ matrix.addLatest }}
           labels: ${{ matrix.labels }}
+          enableBuildKit: ${{ matrix.enableBuildKit }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -102,7 +104,7 @@ jobs:
         env:
           number: ${{ github.event.client_payload.pull_request.number }}
           job: ${{ github.job }}
-          conclusion: ${{ job.status }} 
+          conclusion: ${{ job.status }}
           name: ${{ matrix.name }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -124,7 +126,7 @@ jobs:
               conclusion: process.env.conclusion
             });
             return result;
-      
+
       - name: Dump context
         if: always()
         uses: crazy-max/ghaction-dump-context@v1
