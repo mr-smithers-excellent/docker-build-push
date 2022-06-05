@@ -19,6 +19,7 @@ jobs:
             registry: docker.io
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
+            addLatest: true
             labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
 
           - name: GCR e2e
@@ -32,7 +33,6 @@ jobs:
             image: hello-world
             directory: e2e/test-build-dir
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
-            addTimestamp: true
 
           - name: GHCR Legacy e2e
             image: docker-build-push/e2e-image
@@ -79,7 +79,7 @@ jobs:
         uses: ./
         with:
           image: ${{ matrix.image }}
-          tags: latest, ${{ github.run_id }}
+          tags: ${{ github.run_id }}
           addLatest: ${{ matrix.addLatest }}
           addTimestamp: ${{ matrix.addTimestamp }}
           registry: ${{ matrix.registry }}
