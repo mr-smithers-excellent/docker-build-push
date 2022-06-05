@@ -11,6 +11,7 @@ let buildArgs;
 let githubOwner;
 let labels;
 let target;
+let platform;
 
 // Convert buildArgs from String to Array, as GH Actions currently does not support Arrays
 const processBuildArgsInput = buildArgsInput => {
@@ -35,6 +36,7 @@ const processInputs = () => {
   githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
   labels = split(core.getInput('labels'));
   target = core.getInput('target');
+  platform = core.getInput('platform');
 };
 
 const isGithubRegistry = () => GITHUB_REGISTRY_URLS.includes(registry);
@@ -58,7 +60,7 @@ const run = () => {
     core.info(`Docker image name created: ${imageFullName}`);
 
     docker.login();
-    docker.build(imageFullName, tags, buildArgs, labels, target);
+    docker.build(imageFullName, tags, buildArgs, labels, target, platform);
     docker.push(imageFullName, tags);
 
     core.setOutput('imageFullName', imageFullName);

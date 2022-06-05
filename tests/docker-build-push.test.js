@@ -19,7 +19,7 @@ afterAll(() => {
   delete process.env.GITHUB_REPOSITORY;
 });
 
-const mockInputs = (image, registry, tags, buildArgs, dockerfile, githubOrg, labels, target) => {
+const mockInputs = (image, registry, tags, buildArgs, dockerfile, githubOrg, labels, target, platform) => {
   core.getInput = jest
     .fn()
     .mockReturnValueOnce(image)
@@ -29,6 +29,7 @@ const mockInputs = (image, registry, tags, buildArgs, dockerfile, githubOrg, lab
     .mockReturnValueOnce(githubOrg)
     .mockReturnValueOnce(labels)
     .mockReturnValueOnce(target)
+    .mockReturnValueOnce(platform)
     .mockReturnValueOnce(dockerfile);
 };
 
@@ -45,7 +46,7 @@ const convertBuildArgs = buildArgs => {
 
 const runAssertions = (imageFullName, image, tags, dockerfile, buildArgs) => {
   expect(docker.createTags).toHaveBeenCalledTimes(1);
-  expect(core.getInput).toHaveBeenCalledTimes(9);
+  expect(core.getInput).toHaveBeenCalledTimes(10);
   expect(core.setOutput).toHaveBeenCalledTimes(3);
   expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
   expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
@@ -173,7 +174,7 @@ describe('Create & push Docker image with multiple tags and target', () => {
     run();
 
     expect(docker.createTags).toHaveBeenCalledTimes(0);
-    expect(core.getInput).toHaveBeenCalledTimes(9);
+    expect(core.getInput).toHaveBeenCalledTimes(10);
     expect(core.setOutput).toHaveBeenCalledTimes(3);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
     expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
@@ -186,32 +187,33 @@ describe('Create & push Docker image with multiple tags and target', () => {
   });
 });
 
-describe('Create & push Docker image with build args and labels', () => {
+describe('Create & push Docker image with build args and labels and platform', () => {
   test('Valid Docker inputs with build args', () => {
     const image = 'gcp-project/image';
     const registry = 'gcr.io';
     const tag = 'latest';
     const buildArgs = 'VERSION=1.1.1,BUILD_DATE=2020-01-14';
+    const platform = 'linux/amd64,linux/arm64';
     const dockerfile = 'Dockerfile.custom';
     const imageFullName = createFullImageName(registry, image);
     const labels = 'version=1.0,maintainer=mr-smithers-excellent';
 
     docker.login = jest.fn();
     docker.createTags = jest.fn().mockReturnValueOnce([tag]);
-    mockInputs(image, registry, null, buildArgs, dockerfile, null, labels);
+    mockInputs(image, registry, null, buildArgs, dockerfile, null, labels, null, platform);
     mockOutputs(imageFullName, image, tag);
     cp.execSync = jest.fn();
 
     run();
 
     expect(docker.createTags).toHaveBeenCalledTimes(1);
-    expect(core.getInput).toHaveBeenCalledTimes(9);
+    expect(core.getInput).toHaveBeenCalledTimes(10);
     expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
     expect(core.setOutput).toHaveBeenCalledWith('imageName', image);
     expect(core.setOutput).toHaveBeenCalledWith('tags', tag);
 
     expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 --label version=1.0 --label maintainer=mr-smithers-excellent .`,
+      `docker build -f ${dockerfile} -t ${registry}/${image}:${tag} --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 --label version=1.0 --label maintainer=mr-smithers-excellent --platform linux/amd64,linux/arm64 .`,
       cpOptions
     );
   });

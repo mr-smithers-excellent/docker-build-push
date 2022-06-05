@@ -218,6 +218,22 @@ describe('core and cp methods', () => {
       );
     });
 
+    test('Build with platform', () => {
+      core.getInput.mockReturnValueOnce('Dockerfile');
+      core.getInput.mockReturnValueOnce('.');
+      fs.existsSync.mockReturnValueOnce(true);
+      const image = 'docker.io/this-project/that-image';
+      const tag = 'latest';
+      const platform = 'linux/amd64,linux/arm64';
+
+      docker.build(image, [tag], null, null, null, platform);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${tag} --platform linux/amd64,linux/arm64 .`,
+        cpOptions
+      );
+    });
+
     test('Build in different directory', () => {
       core.getInput.mockReturnValueOnce('Dockerfile');
       const directory = 'working-dir';
