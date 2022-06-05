@@ -16,6 +16,7 @@ jobs:
         include:
           - name: Docker Hub e2e
             image: mrsmithers/hello-world
+            dockerfile: ./e2e/Dockerfile
             registry: docker.io
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
@@ -24,6 +25,7 @@ jobs:
 
           - name: GCR e2e
             image: orbital-bank-301021/hello-world
+            dockerfile: ./e2e/Dockerfile
             registry: gcr.io
             username: GCR_USERNAME
             password: GCR_PASSWORD
@@ -37,12 +39,14 @@ jobs:
 
           - name: GHCR Legacy e2e
             image: docker-build-push/e2e-image
+            dockerfile: ./e2e/Dockerfile
             registry: docker.pkg.github.com
             username: GH_USERNAME
             password: GITHUB_TOKEN
 
           - name: GHCR e2e
             image: hello-world
+            dockerfile: ./e2e/Dockerfile
             registry: ghcr.io
             githubOrg: docker-action-e2e
             username: GHCR_USERNAME
@@ -84,7 +88,7 @@ jobs:
           addLatest: ${{ matrix.addLatest }}
           addTimestamp: ${{ matrix.addTimestamp }}
           registry: ${{ matrix.registry }}
-          dockerfile: ./e2e/Dockerfile
+          dockerfile: ${{ matrix.dockerfile }}
           directory: ${{ matrix.directory }}
           buildArgs: ${{ matrix.buildArgs }}
           labels: ${{ matrix.labels }}
