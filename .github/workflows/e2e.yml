@@ -10,13 +10,8 @@ jobs:
   e2e:
     uses: ./.github/workflows/e2e-base.yml
     secrets: inherit
-      # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      # DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-      # GCR_USERNAME: ${{ secrets.GCR_USERNAME }}
-      # GCR_PASSWORD: ${{ secrets.GCR_PASSWORD }}
-      # GH_USERNAME: ${{ secrets.GH_USERNAME }}
+    with:
+      trigger: 'not-pr'
 
     # name: ${{ matrix.name }}
     # runs-on: ubuntu-latest

@@ -52,10 +52,17 @@ jobs:
             password: GHCR_TOKEN
 
     steps:
-      - name: Check out code
+      - name: Check out code current branch
+        if: ${{ inputs.trigger != 'pr' }}
         uses: actions/checkout@v3
         # with:
         #   ref: 'refs/pull/${{ github.event.client_payload.pull_request.number }}/merge'
+
+      - name: Check out merge code
+        if: ${{ inputs.trigger === 'pr' }}
+        uses: actions/checkout@v3
+        with:
+          ref: 'refs/pull/${{ github.event.client_payload.pull_request.number }}/merge'
 
       # - name: Create check run
       #   uses: actions/github-script@v5
