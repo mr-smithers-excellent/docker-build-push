@@ -5,20 +5,22 @@ const core = require('@actions/core');
 const cp = require('child_process');
 const fs = require('fs');
 const docker = require('../src/docker');
-const cpOptions = require('../src/settings');
+const { cpOptions } = require('../src/utils');
 
-describe('Create Docker image tag from git ref', () => {
+describe('Create Docker image tags', () => {
+  let addLatest;
+  let addTimestamp;
+
   beforeEach(() => {
-    // core.getInput.mockReturnValueOnce('false');
-    // core.getInput.mockReturnValueOnce('false');
+    addLatest = false;
+    addTimestamp = false;
   });
 
   test('Create from tag push', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
-    core.getInput.mockReturnValueOnce('false');
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('v1.0');
     expect(tags.length).toEqual(1);
@@ -27,9 +29,9 @@ describe('Create Docker image tag from git ref', () => {
   test('Create from tag push with addLatest', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
-    core.getInput.mockReturnValueOnce('true');
+    addLatest = true;
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('v1.0');
     expect(tags).toContain('latest');
@@ -39,9 +41,10 @@ describe('Create Docker image tag from git ref', () => {
   test('Create from tag push with addTimestamp', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
-    core.getInput.mockReturnValueOnce('true');
+    addLatest = true;
+    addTimestamp = true;
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('v1.0');
     expect(tags).toContain('latest');
@@ -51,9 +54,8 @@ describe('Create Docker image tag from git ref', () => {
   test('Create from tag push with capital letters', () => {
     context.ref = 'refs/tags/V1.0';
     context.sha = '60336540c3df28b52b1e364a65ff5b8f6ec135b8';
-    core.getInput.mockReturnValueOnce('foo');
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('v1.0');
     expect(tags.length).toEqual(1);
@@ -63,7 +65,7 @@ describe('Create Docker image tag from git ref', () => {
     context.ref = 'refs/heads/master';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('master-79d9bbb');
     expect(tags.length).toEqual(1);
@@ -72,9 +74,9 @@ describe('Create Docker image tag from git ref', () => {
   test('Create from dev branch push with addLatest', () => {
     context.ref = 'refs/heads/dev';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
-    core.getInput.mockReturnValueOnce('true');
+    addLatest = true;
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('dev-79d9bbb');
     expect(tags).toContain('latest');
@@ -84,10 +86,9 @@ describe('Create Docker image tag from git ref', () => {
   test('Create from dev branch push with addTimestamp', () => {
     context.ref = 'refs/heads/dev';
     context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
-    core.getInput.mockReturnValueOnce('false');
-    core.getInput.mockReturnValueOnce('true');
+    addTimestamp = true;
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags.length).toEqual(1);
     const tag = tags[0];
@@ -103,7 +104,7 @@ describe('Create Docker image tag from git ref', () => {
     context.ref = 'refs/heads/jira-123/feature/some-cool-feature';
     context.sha = 'f427b0b731ed7664ce4a9fba291ab25fa2e57bd3';
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('jira-123-feature-some-cool-feature-f427b0b');
     expect(tags.length).toEqual(1);
@@ -113,7 +114,7 @@ describe('Create Docker image tag from git ref', () => {
     context.ref = 'refs/heads/no-jira-number';
     context.sha = 'd3c98d2f50ab48322994ad6f80e460bde166b32f';
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('no-jira-number-d3c98d2');
     expect(tags.length).toEqual(1);
@@ -123,7 +124,7 @@ describe('Create Docker image tag from git ref', () => {
     context.ref = 'refs/heads/SOME-mixed-CASE-Branch';
     context.sha = '152568521eb446d7b331a4e7c1215d29605bf884';
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags).toContain('some-mixed-case-branch-1525685');
     expect(tags.length).toEqual(1);
@@ -134,7 +135,7 @@ describe('Create Docker image tag from git ref', () => {
     context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
     core.setFailed = jest.fn();
 
-    const tags = docker.createTags();
+    const tags = docker.createTags(addLatest, addTimestamp);
 
     expect(tags.length).toEqual(0);
     expect(core.setFailed).toHaveBeenCalledWith(
@@ -143,104 +144,117 @@ describe('Create Docker image tag from git ref', () => {
   });
 });
 
-describe('core and cp methods', () => {
-  core.getInput = jest.fn();
-  core.setFailed = jest.fn();
+describe('Docker build, login & push commands', () => {
   cp.execSync = jest.fn();
   fs.existsSync = jest.fn();
+  core.setFailed = jest.fn();
 
   afterEach(() => {
-    core.getInput.mockReset();
-    core.setFailed.mockReset();
     cp.execSync.mockReset();
     fs.existsSync.mockReset();
+    core.setFailed.mockReset();
   });
 
   afterAll(() => {
-    core.getInput.mockRestore();
-    core.setFailed.mockRestore();
     cp.execSync.mockRestore();
     fs.existsSync.mockRestore();
+    core.setFailed.mockRestore();
   });
 
   describe('Build image', () => {
-    test('No Dockerfile', () => {
-      const dockerfile = 'Dockerfile.nonexistent';
-      core.getInput.mockReturnValueOnce(dockerfile);
-      fs.existsSync.mockReturnValueOnce(false);
+    let buildOpts;
+    let dockerfile;
 
-      docker.build('gcr.io/some-project/image', ['v1']);
+    beforeEach(() => {
+      buildOpts = {
+        tags: undefined,
+        buildArgs: undefined,
+        labels: undefined,
+        target: undefined,
+        buildDir: '.',
+        enableBuildKit: false
+      };
+      dockerfile = 'Dockerfile';
+    });
+
+    test('No Dockerfile', () => {
+      const image = 'gcr.io/some-project/image';
+      buildOpts.tags = ['v1'];
+      dockerfile = 'Dockerfile.nonexistent';
+
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith(dockerfile);
       expect(core.setFailed).toHaveBeenCalledWith(`Dockerfile does not exist in location ${dockerfile}`);
     });
 
     test('Dockerfile exists', () => {
-      core.getInput.mockReturnValueOnce('Dockerfile');
-      fs.existsSync.mockReturnValueOnce(true);
       const image = 'gcr.io/some-project/image';
-      const tag = 'v1';
+      buildOpts.tags = ['v1'];
+      fs.existsSync = jest.fn().mockReturnValueOnce(false);
 
-      docker.build(image, [tag]);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tag} .`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${buildOpts.tags} .`, cpOptions);
     });
 
     test('Build with build args', () => {
-      core.getInput.mockReturnValueOnce('Dockerfile');
-      core.getInput.mockReturnValueOnce('.');
-      fs.existsSync.mockReturnValueOnce(true);
       const image = 'docker.io/this-project/that-image';
-      const tag = 'latest';
-      const buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
+      buildOpts.tags = ['latest'];
+      buildOpts.buildArgs = ['VERSION=latest', 'BUILD_DATE=2020-01-14'];
 
-      docker.build(image, [tag], buildArgs);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
-        `docker build -f Dockerfile -t ${image}:${tag} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --build-arg VERSION=latest --build-arg BUILD_DATE=2020-01-14 .`,
         cpOptions
       );
     });
 
     test('Build with labels and target', () => {
-      core.getInput.mockReturnValueOnce('Dockerfile');
-      core.getInput.mockReturnValueOnce('.');
-      fs.existsSync.mockReturnValueOnce(true);
       const image = 'docker.io/this-project/that-image';
-      const tag = 'latest';
-      const labels = ['version=1.0', 'maintainer=mr-smithers-excellent'];
-      const target = 'builder';
+      buildOpts.tags = ['latest'];
+      buildOpts.labels = ['version=1.0', 'maintainer=mr-smithers-excellent'];
+      buildOpts.target = 'builder';
 
-      docker.build(image, [tag], null, labels, target);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
-        `docker build -f Dockerfile -t ${image}:${tag} --label version=1.0 --label maintainer=mr-smithers-excellent --target builder .`,
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --label version=1.0 --label maintainer=mr-smithers-excellent --target builder .`,
         cpOptions
       );
     });
 
     test('Build in different directory', () => {
-      core.getInput.mockReturnValueOnce('Dockerfile');
-      const directory = 'working-dir';
-      core.getInput.mockReturnValueOnce(directory);
-      fs.existsSync.mockReturnValueOnce(true);
       const image = 'gcr.io/some-project/image';
-      const tag = 'v1';
+      buildOpts.tags = ['v1'];
+      buildOpts.buildDir = 'working-dir';
 
-      docker.build(image, [tag]);
+      docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
-      expect(cp.execSync).toHaveBeenCalledWith(`docker build -f Dockerfile -t ${image}:${tag} ${directory}`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} ${buildOpts.buildDir}`,
+        cpOptions
+      );
     });
   });
 
   describe('Registry login', () => {
+    let username;
+    let password;
+    let registry;
+
+    beforeEach(() => {
+      username = undefined;
+      password = undefined;
+      registry = undefined;
+    });
+
     test('Docker Hub login', () => {
-      const registry = 'docker.io';
-      const username = 'mrsmithers';
-      const password = 'areallysecurepassword';
+      username = 'mrsmithers';
+      password = 'areallysecurepassword';
+      registry = 'docker.io';
 
-      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce(username).mockReturnValueOnce(password);
-
-      docker.login();
+      docker.login(username, password, registry);
 
       expect(cp.execSync).toHaveBeenCalledWith(`docker login -u ${username} --password-stdin ${registry}`, {
         input: password
@@ -248,11 +262,9 @@ describe('core and cp methods', () => {
     });
 
     test('ECR login', () => {
-      const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
+      registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
 
-      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce('').mockReturnValueOnce('');
-
-      docker.login();
+      docker.login(username, password, registry);
 
       expect(cp.execSync).toHaveBeenCalledWith(
         `aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${registry}`
@@ -261,11 +273,9 @@ describe('core and cp methods', () => {
 
     test('ECR Windows login', () => {
       process.env.RUNNER_OS = 'Windows';
-      const registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
+      registry = '123456789123.dkr.ecr.us-east-1.amazonaws.com';
 
-      core.getInput.mockReturnValueOnce(registry).mockReturnValueOnce('').mockReturnValueOnce('');
-
-      docker.login();
+      docker.login(username, password, registry);
 
       expect(cp.execSync).toHaveBeenCalledWith(
         `aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${registry}`
@@ -273,9 +283,7 @@ describe('core and cp methods', () => {
     });
 
     test("returns undefined if empty login and doesn't execute command", () => {
-      core.getInput.mockReturnValueOnce('').mockReturnValueOnce('').mockReturnValueOnce('');
-
-      docker.login();
+      docker.login(username, password, registry);
 
       expect(cp.execSync.mock.calls.length).toEqual(0);
     });

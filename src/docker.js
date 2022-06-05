@@ -1,21 +1,24 @@
 const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
-const dateFormat = require('dateformat');
 const { context } = require('@actions/github');
-const cpOptions = require('./settings');
+const { isGitHubTag, isBranch } = require('./github');
+const { timestamp, cpOptions } = require('./utils');
 
-const isGitHubTag = ref => ref && ref.includes('refs/tags/');
+const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
-const isBranch = ref => ref && ref.includes('refs/heads/');
+// Create the full Docker image name with registry prefix (without tags)
+const createFullImageName = (registry, image, githubOwner) => {
+  if (GITHUB_REGISTRY_URLS.includes(registry)) {
+    return `${registry}/${githubOwner.toLowerCase()}/${image}`;
+  }
+  return `${registry}/${image}`;
+};
 
-const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
-
-const createTags = () => {
+// Create Docker tags based on input flags & Git branch
+const createTags = (addLatest, addTimestamp) => {
   core.info('Creating Docker image tags...');
   const { sha } = context;
-  const addLatest = core.getInput('addLatest') === 'true';
-  const addTimestamp = core.getInput('addTimestamp') === 'true';
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
@@ -49,49 +52,48 @@ const createTags = () => {
   return dockerTags;
 };
 
-const createBuildCommand = (dockerfile, imageName, tags, buildDir, buildArgs, labels, target) => {
-  const tagsSuffix = tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
+// Dynamically create 'docker build' command based on inputs provided
+const createBuildCommand = (imageName, dockerfile, buildOpts) => {
+  const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
   let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
 
-  if (buildArgs) {
-    const argsSuffix = buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
+  if (buildOpts.buildArgs) {
+    const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${argsSuffix}`;
   }
 
-  if (labels) {
-    const labelsSuffix = labels.map(label => `--label ${label}`).join(' ');
+  if (buildOpts.labels) {
+    const labelsSuffix = buildOpts.labels.map(label => `--label ${label}`).join(' ');
     buildCommandPrefix = `${buildCommandPrefix} ${labelsSuffix}`;
   }
 
-  if (target) {
-    const targetSuffix = `--target ${target}`;
-    buildCommandPrefix = `${buildCommandPrefix} ${targetSuffix}`;
+  if (buildOpts.target) {
+    buildCommandPrefix = `${buildCommandPrefix} --target ${buildOpts.target}`;
   }
 
-  return `${buildCommandPrefix} ${buildDir}`;
+  if (buildOpts.enableBuildKit) {
+    buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
+  }
+
+  return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };
 
-const build = (imageName, tags, buildArgs, labels, target) => {
-  const dockerfile = core.getInput('dockerfile');
-  const buildDir = core.getInput('directory') || '.';
-
+// Perform 'docker build' command
+const build = (imageName, dockerfile, buildOpts) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  core.info(`Building Docker image ${imageName} with tags ${tags}...`);
-  cp.execSync(createBuildCommand(dockerfile, imageName, tags, buildDir, buildArgs, labels, target), cpOptions);
+  core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
+  cp.execSync(createBuildCommand(imageName, dockerfile, buildOpts), cpOptions);
 };
 
 const isEcr = registry => registry && registry.includes('amazonaws');
 
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
-const login = () => {
-  const registry = core.getInput('registry', { required: true });
-  const username = core.getInput('username');
-  const password = core.getInput('password');
-
+// Log in to provided Docker registry
+const login = (username, password, registry) => {
   // If using ECR, use the AWS CLI login command in favor of docker login
   if (isEcr(registry)) {
     const region = getRegion(registry);
@@ -107,12 +109,14 @@ const login = () => {
   }
 };
 
+// Push Docker image & all tags
 const push = (imageName, tags) => {
   core.info(`Pushing tags ${tags} for Docker image ${imageName}...`);
   cp.execSync(`docker push ${imageName} --all-tags`, cpOptions);
 };
 
 module.exports = {
+  createFullImageName,
   createTags,
   build,
   login,
