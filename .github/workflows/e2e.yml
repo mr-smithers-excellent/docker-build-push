@@ -46,7 +46,8 @@ jobs:
 
           - name: GHCR e2e
             image: hello-world
-            dockerfile: ./e2e/Dockerfile
+            dockerfile: ./e2e/multi.Dockerfile
+            target: prod
             registry: ghcr.io
             githubOrg: docker-action-e2e
             username: GHCR_USERNAME
