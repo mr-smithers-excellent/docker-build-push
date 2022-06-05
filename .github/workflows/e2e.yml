@@ -22,6 +22,9 @@ jobs:
             username: DOCKERHUB_USERNAME
             password: DOCKERHUB_PASSWORD
             labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
+            addLatest: false
+            addTimestamp: false
+            enableBuildKit: false
 
           - name: GCR e2e
             image: orbital-bank-301021/hello-world
@@ -29,17 +32,24 @@ jobs:
             username: GCR_USERNAME
             password: GCR_PASSWORD
             labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
+            addLatest: false
             addTimestamp: true
+            enableBuildKit: false
 
           - name: ECR e2e
             image: hello-world
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
+            addLatest: false
+            addTimestamp: false
+            enableBuildKit: false
 
           - name: GHCR Legacy e2e
             image: docker-build-push/e2e-image
             registry: docker.pkg.github.com
             username: GH_USERNAME
             password: GITHUB_TOKEN
+            addTimestamp: false
+            enableBuildKit: false
 
           - name: GHCR e2e
             image: hello-world
@@ -47,6 +57,8 @@ jobs:
             githubOrg: docker-action-e2e
             username: GHCR_USERNAME
             password: GHCR_TOKEN
+            addLatest: false
+            addTimestamp: false
             enableBuildKit: true
 
     steps:
