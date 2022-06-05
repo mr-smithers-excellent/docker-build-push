@@ -33,6 +33,7 @@ jobs:
             image: hello-world
             directory: e2e/test-build-dir
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
+            buildArgs: TEST=true
 
           - name: GHCR Legacy e2e
             image: docker-build-push/e2e-image
