@@ -1,0 +1,12 @@
+name: 'e2e Tests'
+
+on:
+  repository_dispatch:
+    types: [ok-to-test-command]
+
+jobs:
+  e2e:
+    uses: ./.github/workflows/e2e-base.yml
+    secrets: inherit
+    with:
+      pr-trigger: true
