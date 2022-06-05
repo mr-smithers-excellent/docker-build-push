@@ -1,5 +1,15 @@
 jest.mock('@actions/core');
-jest.mock('child_process');
+
+jest.mock('child_process', () => ({
+  ...jest.requireActual('child_process'),
+  execSync: jest.fn()
+}));
+
+jest.mock('../src/docker', () => ({
+  ...jest.requireActual('../src/docker'),
+  push: jest.fn(),
+  login: jest.fn()
+}));
 
 const core = require('@actions/core');
 const cp = require('child_process');
@@ -41,9 +51,6 @@ const DEFAULT_INPUTS = {
 };
 
 beforeAll(() => {
-  docker.push = jest.fn();
-  docker.login = jest.fn();
-  cp.execSync = jest.fn();
   process.env.GITHUB_REPOSITORY = `${mockOwner}/${mockRepoName}`;
 });
 
@@ -201,21 +208,19 @@ describe('Create & push Docker image to GCR', () => {
       cpOptions
     );
   });
+
+  test('Docker login error', () => {
+    docker.createTags = jest.fn().mockReturnValueOnce(['some-tag']);
+    docker.build = jest.fn();
+    const error = 'Error: Cannot perform an interactive login from a non TTY device';
+    docker.login = jest.fn().mockImplementation(() => {
+      throw new Error(error);
+    });
+    core.setFailed = jest.fn();
+
+    run();
+
+    expect(docker.createTags).toHaveBeenCalledTimes(1);
+    expect(core.setFailed).toHaveBeenCalledWith(error);
+  });
 });
-
-// describe('Create Docker image causing an error', () => {
-//   test('Docker login error', () => {
-//     docker.createTags = jest.fn().mockReturnValueOnce(['some-tag']);
-//     docker.build = jest.fn();
-//     const error = 'Error: Cannot perform an interactive login from a non TTY device';
-//     docker.login = jest.fn().mockImplementation(() => {
-//       throw new Error(error);
-//     });
-//     core.setFailed = jest.fn();
-
-//     run();
-
-//     expect(docker.createTags).toHaveBeenCalledTimes(1);
-//     expect(core.setFailed).toHaveBeenCalledWith(error);
-//   });
-// });
