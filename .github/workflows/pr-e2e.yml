@@ -1,4 +1,4 @@
-name: 'e2e Tests'
+name: 'PR e2e Tests'
 
 on:
   repository_dispatch:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   e2e:
-    uses: ./.github/workflows/e2e-base.yml
+    uses: ./.github/workflows/e2e.yml
     secrets: inherit
     with:
       pr-trigger: true

@@ -1,4 +1,4 @@
-name: 'Base e2e Tests'
+name: 'e2e Tests'
 
 on:
   workflow_call:
