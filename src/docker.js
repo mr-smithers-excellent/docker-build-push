@@ -71,6 +71,10 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} --target ${buildOpts.target}`;
   }
 
+  if (buildOpts.platform) {
+    buildCommandPrefix = `${buildCommandPrefix} --platform ${buildOpts.platform}`;
+  }
+
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }

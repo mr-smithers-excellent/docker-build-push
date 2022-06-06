@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(14);
+  expect(core.getInput).toHaveBeenCalledTimes(15);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
@@ -61,7 +61,8 @@ beforeEach(() => {
     target: undefined,
     dockerfile: 'Dockerfile',
     buildDir: '.',
-    enableBuildKit: undefined
+    enableBuildKit: undefined,
+    platform: undefined
   };
   imageFullName = undefined;
 });
@@ -194,6 +195,26 @@ describe('Create & push Docker image to GCR', () => {
 
     expect(cp.execSync).toHaveBeenCalledWith(
       `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 --label version=1.0 --label maintainer=mr-smithers-excellent .`,
+      cpOptions
+    );
+  });
+
+  test('Valid Docker inputs with platform', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest,   v1';
+    inputs.platform = 'linux/amd64,linux/arm64';
+    imageFullName = getDefaultImageName();
+
+    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
+    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest -t ${inputs.registry}/${inputs.image}:v1 --platform ${inputs.platform} .`,
       cpOptions
     );
   });

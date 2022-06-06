@@ -172,7 +172,8 @@ describe('Docker build, login & push commands', () => {
         labels: undefined,
         target: undefined,
         buildDir: '.',
-        enableBuildKit: false
+        enableBuildKit: false,
+        platform: undefined
       };
       dockerfile = 'Dockerfile';
     });
@@ -220,6 +221,19 @@ describe('Docker build, login & push commands', () => {
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
         `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --label version=1.0 --label maintainer=mr-smithers-excellent --target builder .`,
+        cpOptions
+      );
+    });
+
+    test('Build with platform', () => {
+      const image = 'docker.io/this-project/that-image';
+      buildOpts.tags = ['latest'];
+      buildOpts.platform = 'linux/amd64,linux/arm64';
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --platform linux/amd64,linux/arm64 .`,
         cpOptions
       );
     });
