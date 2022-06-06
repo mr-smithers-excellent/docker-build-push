@@ -8321,7 +8321,8 @@ const buildOpts = {
   labels: undefined,
   target: undefined,
   buildDir: undefined,
-  enableBuildKit: false
+  enableBuildKit: false,
+  platform: undefined
 };
 
 const run = () => {
@@ -8341,6 +8342,7 @@ const run = () => {
     buildOpts.target = core.getInput('target');
     buildOpts.buildDir = core.getInput('directory') || '.';
     buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
+    buildOpts.platform = core.getInput('platform');
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -8439,6 +8441,10 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
 
   if (buildOpts.target) {
     buildCommandPrefix = `${buildCommandPrefix} --target ${buildOpts.target}`;
+  }
+
+  if (buildOpts.platform) {
+    buildCommandPrefix = `${buildCommandPrefix} --platform ${buildOpts.platform}`;
   }
 
   if (buildOpts.enableBuildKit) {
