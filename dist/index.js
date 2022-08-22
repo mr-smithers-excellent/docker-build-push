@@ -8326,7 +8326,7 @@ const buildOpts = {
 const run = () => {
   try {
     // Capture action inputs
-    const push = core.getBooleanInput('push');
+    const push = core.getBooleanInput('push') || true;
     const image = core.getInput('image', { required: true });
     const registry = core.getInput('registry', { required: push });
     const username = core.getInput('username');
