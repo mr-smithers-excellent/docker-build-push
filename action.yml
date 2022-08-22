@@ -2,6 +2,9 @@ name: "Docker Build & Push Action"
 description: "Builds a Docker image and pushes to a private registry with support for multiple tags"
 author: "Sean Smith"
 inputs:
+  push:
+    description: "Push Docker image to the registry"
+    required: false
   image:
     description: "Name of the Docker image"
     required: true
@@ -10,7 +13,7 @@ inputs:
     required: false
   registry:
     description: "Target Docker registry"
-    required: true
+    required: false
   dockerfile:
     description: "Location of Dockerfile, if not Dockerfile in root directory"
     required: false
@@ -35,9 +38,6 @@ inputs:
     required: false
   password:
     description: "Docker registry password"
-    required: false
-  gitHubOrg:
-    description: "GitHub organization to push image to (if not current)"
     required: false
   addLatest:
     description: "Adds latest tag to auto-generated GitOps tag"

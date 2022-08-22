@@ -5,14 +5,12 @@ const { context } = require('@actions/github');
 const { isGitHubTag, isBranch } = require('./github');
 const { timestamp, cpOptions } = require('./utils');
 
-const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
-
 // Create the full Docker image name with registry prefix (without tags)
-const createFullImageName = (registry, image, githubOwner) => {
-  if (GITHUB_REGISTRY_URLS.includes(registry)) {
-    return `${registry}/${githubOwner.toLowerCase()}/${image}`;
+const createFullImageName = (registry, image) => {
+  if (registry) {
+    return `${registry}/${image}`.toLowerCase();
   }
-  return `${registry}/${image}`;
+  return image.toLowerCase();
 };
 
 // Create Docker tags based on input flags & Git branch
