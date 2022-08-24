@@ -37,7 +37,7 @@ jobs:
           - name: ECR e2e
             image: hello-world
             dockerfile: ./e2e/test-build-dir/Dockerfile
-            directory: e2e/test-build-dir
+            context: e2e/test-build-dir
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
             buildArgs: TEST=true
 
@@ -99,7 +99,7 @@ jobs:
           addTimestamp: ${{ matrix.addTimestamp }}
           registry: ${{ matrix.registry }}
           dockerfile: ${{ matrix.dockerfile }}
-          directory: ${{ matrix.directory }}
+          context: ${{ matrix.context }}
           buildArgs: ${{ matrix.buildArgs }}
           labels: ${{ matrix.labels }}
           target: ${{ matrix.target }}

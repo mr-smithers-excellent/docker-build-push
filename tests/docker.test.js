@@ -171,7 +171,7 @@ describe('Docker build, login & push commands', () => {
         buildArgs: undefined,
         labels: undefined,
         target: undefined,
-        buildDir: '.',
+        context: '.',
         enableBuildKit: false,
         platform: undefined
       };
@@ -241,12 +241,12 @@ describe('Docker build, login & push commands', () => {
     test('Build in different directory', () => {
       const image = 'gcr.io/some-project/image';
       buildOpts.tags = ['v1'];
-      buildOpts.buildDir = 'working-dir';
+      buildOpts.context = 'working-dir';
 
       docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
-        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} ${buildOpts.buildDir}`,
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} ${buildOpts.context}`,
         cpOptions
       );
     });

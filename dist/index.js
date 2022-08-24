@@ -8318,7 +8318,7 @@ const buildOpts = {
   buildArgs: undefined,
   labels: undefined,
   target: undefined,
-  buildDir: undefined,
+  context: undefined,
   enableBuildKit: false,
   platform: undefined
 };
@@ -8338,7 +8338,7 @@ const run = () => {
     buildOpts.buildArgs = core.getMultilineInput('buildArgs');
     buildOpts.labels = core.getMultilineInput('labels')
     buildOpts.target = core.getInput('target');
-    buildOpts.buildDir = core.getInput('directory') || '.';
+    buildOpts.context = core.getInput('directory') || '.';
     buildOpts.enableBuildKit = core.getBooleanInput('enableBuildKit');
     buildOpts.platform = core.getInput('platform');
 
@@ -8451,7 +8451,7 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
 
-  return `${buildCommandPrefix} ${buildOpts.buildDir}`;
+  return `${buildCommandPrefix} ${buildOpts.context}`;
 };
 
 // Perform 'docker build' command

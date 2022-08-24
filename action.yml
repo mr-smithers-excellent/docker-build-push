@@ -3,6 +3,7 @@ description: "Builds a Docker image and pushes to a private registry with suppor
 author: "Sean Smith"
 inputs:
   push:
+    default: "true"
     description: "Push Docker image to the registry"
     required: false
   image:
@@ -18,7 +19,8 @@ inputs:
     description: "Location of Dockerfile, if not Dockerfile in root directory"
     required: false
     default: "Dockerfile"
-  directory:
+  context:
+    default: "."
     description: "Directory to run `docker build` from, if not project root"
     required: false
   buildArgs:

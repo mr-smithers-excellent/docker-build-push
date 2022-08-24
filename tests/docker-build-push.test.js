@@ -60,7 +60,7 @@ beforeEach(() => {
     labels: undefined,
     target: undefined,
     dockerfile: 'Dockerfile',
-    buildDir: '.',
+    context: '.',
     enableBuildKit: undefined,
     platform: undefined
   };
@@ -72,26 +72,6 @@ afterAll(() => {
 });
 
 describe('Create & push Docker image to GitHub Registry', () => {
-  test('Override GitHub organization', () => {
-    inputs.image = 'repo-name/image-name';
-    inputs.registry = 'docker.pkg.github.com';
-    inputs.githubOrg = 'override-org';
-    imageFullName = `${inputs.registry}/${inputs.githubOrg}/${inputs.image}`;
-    const tagOverrides = ['staging-123'];
-
-    docker.createTags = jest.fn().mockReturnValueOnce(tagOverrides);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
-
-    run();
-
-    runAssertions(imageFullName, inputs, tagOverrides);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.githubOrg}/${inputs.image}:${tagOverrides} .`,
-      cpOptions
-    );
-  });
-
   test('Keep default GitHub organization', () => {
     inputs.image = `${mockRepoName}/image-name`;
     inputs.registry = 'ghcr.io';

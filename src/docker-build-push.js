@@ -6,7 +6,7 @@ const buildOpts = {
   buildArgs: undefined,
   labels: undefined,
   target: undefined,
-  buildDir: undefined,
+  context: undefined,
   enableBuildKit: false,
   platform: undefined
 };
@@ -14,7 +14,7 @@ const buildOpts = {
 const run = () => {
   try {
     // Capture action inputs
-    const push = core.getBooleanInput('push') || true;
+    const push = core.getBooleanInput('push');
     const image = core.getInput('image', { required: true });
     const registry = core.getInput('registry', { required: push });
     const username = core.getInput('username');
@@ -24,9 +24,9 @@ const run = () => {
     const addTimestamp = core.getBooleanInput('addTimestamp');
     buildOpts.tags = core.getMultilineInput('tags') || docker.createTags(addLatest, addTimestamp);
     buildOpts.buildArgs = core.getMultilineInput('buildArgs');
-    buildOpts.labels = core.getMultilineInput('labels')
+    buildOpts.labels = core.getMultilineInput('labels');
     buildOpts.target = core.getInput('target');
-    buildOpts.buildDir = core.getInput('directory') || '.';
+    buildOpts.context = core.getInput('context');
     buildOpts.enableBuildKit = core.getBooleanInput('enableBuildKit');
     buildOpts.platform = core.getInput('platform');
 

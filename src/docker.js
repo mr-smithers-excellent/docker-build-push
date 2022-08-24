@@ -77,7 +77,7 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
 
-  return `${buildCommandPrefix} ${buildOpts.buildDir}`;
+  return `${buildCommandPrefix} ${buildOpts.context}`;
 };
 
 // Perform 'docker build' command
