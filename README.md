@@ -67,6 +67,12 @@ steps:
 | imageName     | Name of the Docker image with owner prefix         | `owner/image`          |
 | tags          | Tags for the Docker image                          | `v1,latest`            |
 
+## Storing secrets
+
+It is strongly recommended that you store all Docker credentials as GitHub [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Secrets can be referenced in workflow files using the syntax `${{ secrets.SECRET_NAME }}`.
+
+There is a distinction between secrets at the [repository](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository), [environment](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-an-environment) and [organization](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-an-organization) level. In general, you should store secrets at the repository or organization level, depending on your security posture. It is only recommended that you utilize environment-level secrets if your Docker credentials differ per environment (dev, staging, etc.).
+
 ## Examples
 
 ### Docker Hub
