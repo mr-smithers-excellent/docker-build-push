@@ -63,7 +63,7 @@ outputs:
   tags:
     description: "Tags for the Docker image"
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
 branding:
   icon: "anchor"
