@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(15);
+  expect(core.getInput).toHaveBeenCalledTimes(16);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
@@ -237,6 +237,27 @@ describe('Create & push Docker image to GCR', () => {
       `DOCKER_BUILDKIT=1 docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
       cpOptions
     );
+  });
+
+  test('Bypass Docker push command', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest';
+    inputs.pushImage = 'false';
+    imageFullName = getDefaultImageName();
+
+    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
+    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
+      cpOptions
+    );
+    expect(docker.push).not.toHaveBeenCalled();
   });
 
   test('Docker login error', () => {

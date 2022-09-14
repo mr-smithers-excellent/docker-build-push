@@ -10,7 +10,8 @@ const buildOpts = {
   target: undefined,
   buildDir: undefined,
   enableBuildKit: false,
-  platform: undefined
+  platform: undefined,
+  skipPush: false
 };
 
 const run = () => {
@@ -31,6 +32,7 @@ const run = () => {
     buildOpts.buildDir = core.getInput('directory') || '.';
     buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
     buildOpts.platform = core.getInput('platform');
+    buildOpts.skipPush = core.getInput('pushImage') === 'false';
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -39,7 +41,9 @@ const run = () => {
     // Log in, build & push the Docker image
     docker.login(username, password, registry);
     docker.build(imageFullName, dockerfile, buildOpts);
-    docker.push(imageFullName, buildOpts.tags);
+    if (!buildOpts.skipPush) {
+      docker.push(imageFullName, buildOpts.tags);
+    }
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);
