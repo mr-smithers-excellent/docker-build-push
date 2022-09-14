@@ -51,6 +51,10 @@ inputs:
     description: "Enables Docker BuildKit support"
     required: false
     default: "false"
+  pushImage:
+    description: "Pushes the image to the specified registry"
+    required: false
+    default: "true"
 outputs:
   imageFullName:
     description: "Full name of the Docker image with registry prefix and tag suffix"
