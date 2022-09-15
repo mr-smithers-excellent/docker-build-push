@@ -39,11 +39,9 @@ const run = () => {
     core.info(`Docker image name used for this build: ${imageFullName}`);
 
     // Log in, build & push the Docker image
-    docker.login(username, password, registry);
+    docker.login(username, password, registry, buildOpts.skipPush);
     docker.build(imageFullName, dockerfile, buildOpts);
-    if (!buildOpts.skipPush) {
-      docker.push(imageFullName, buildOpts.tags);
-    }
+    docker.push(imageFullName, buildOpts.tags, buildOpts.skipPush);
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);
