@@ -52,7 +52,7 @@ inputs:
     required: false
     default: "false"
   pushImage:
-    description: "Pushes the image to the specified registry"
+    description: "Flag for disabling the login & push steps, set to true by default"
     required: false
     default: "true"
 outputs:

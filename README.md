@@ -58,7 +58,7 @@ steps:
 | password       | Docker registry password or token                                                                        | No       | String  |
 | githubOrg      | GitHub organization to push image to (if not current)                                                    | No       | String  |
 | enableBuildKit | Enables Docker BuildKit support                                                                          | No       | Boolean |
-| pushImage      | Pushes the image to the specified registry, `true` by default                                            | No       | Boolean |
+| pushImage      | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
 
 ## Outputs
 
