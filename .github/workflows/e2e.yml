@@ -61,7 +61,7 @@ jobs:
             image: hello-world
             dockerfile: ./e2e/multi.Dockerfile
             registry: private-registry.io
-            skipPush: true
+            pushImage: false
 
     steps:
       - name: Check out code current branch
