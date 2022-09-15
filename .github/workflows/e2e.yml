@@ -57,6 +57,12 @@ jobs:
             username: GHCR_USERNAME
             password: GHCR_TOKEN
 
+          - name: Private registry
+            image: hello-world
+            dockerfile: ./e2e/multi.Dockerfile
+            registry: private-registry.io
+            skipPush: true
+
     steps:
       - name: Check out code current branch
         if: ${{ !inputs.pr-trigger }}
