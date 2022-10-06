@@ -97,7 +97,12 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
 // Log in to provided Docker registry
-const login = (username, password, registry) => {
+const login = (username, password, registry, skipPush) => {
+  if (skipPush) {
+    core.info('Input skipPush is set to true, skipping Docker log in step...');
+    return;
+  }
+
   // If using ECR, use the AWS CLI login command in favor of docker login
   if (isEcr(registry)) {
     const region = getRegion(registry);
@@ -110,11 +115,18 @@ const login = (username, password, registry) => {
     cp.execSync(`docker login -u ${username} --password-stdin ${registry}`, {
       input: password
     });
+  } else {
+    core.setFailed('Must supply Docker registry credentials to push image!');
   }
 };
 
 // Push Docker image & all tags
-const push = (imageName, tags) => {
+const push = (imageName, tags, skipPush) => {
+  if (skipPush) {
+    core.info('Input skipPush is set to true, skipping Docker push step...');
+    return;
+  }
+
   core.info(`Pushing tags ${tags} for Docker image ${imageName}...`);
   cp.execSync(`docker push ${imageName} --all-tags`, cpOptions);
 };

@@ -296,7 +296,21 @@ describe('Docker build, login & push commands', () => {
       );
     });
 
-    test("returns undefined if empty login and doesn't execute command", () => {
+    test('Skip login command if skipPush is set to true', () => {
+      const skipPush = true;
+      docker.login(username, password, registry, skipPush);
+
+      expect(cp.execSync.mock.calls.length).toEqual(0);
+    });
+
+    test('Missing username or password should throw an error', () => {
+      docker.login(undefined, undefined, registry);
+
+      expect(cp.execSync.mock.calls.length).toEqual(0);
+      expect(core.setFailed).toHaveBeenCalled();
+    });
+
+    test('returns undefined if empty login and does not execute command', () => {
       docker.login(username, password, registry);
 
       expect(cp.execSync.mock.calls.length).toEqual(0);
@@ -311,6 +325,13 @@ describe('Docker build, login & push commands', () => {
       docker.push(imageName, tag);
 
       expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName} --all-tags`, cpOptions);
+    });
+
+    test('Skip push command if skipPush is set to true', () => {
+      const skipPush = true;
+      docker.push('my-org/my-image', 'latest', skipPush);
+
+      expect(cp.execSync.mock.calls.length).toEqual(0);
     });
   });
 });
