@@ -41,24 +41,25 @@ steps:
 
 ## Inputs
 
-| Name           | Description                                                                                              | Required | Type    |
-| -------------- | -------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| image          | Docker image name                                                                                        | Yes      | String  |
-| tags           | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
-| addLatest      | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
-| addTimestamp   | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
-| registry       | Docker registry host                                                                                     | Yes      | String  |
-| dockerfile     | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       | String  |
-| directory      | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
-| buildArgs      | Docker build arguments passed via `--build-arg`                                                          | No       | List    |
-| labels         | Docker build labels passed via `--label`                                                                 | No       | List    |
-| target         | Docker build target passed via `--target`                                                                | No       | String  |
-| platform       | Docker build platform passed via `--platform`                                                            | No       | String  |
-| username       | Docker registry username                                                                                 | No       | String  |
-| password       | Docker registry password or token                                                                        | No       | String  |
-| githubOrg      | GitHub organization to push image to (if not current)                                                    | No       | String  |
-| enableBuildKit | Enables Docker BuildKit support                                                                          | No       | Boolean |
-| pushImage      | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
+| Name             | Description                                                                                              | Required | Type    |
+|------------------|----------------------------------------------------------------------------------------------------------| -------- | ------- |
+| image            | Docker image name                                                                                        | Yes      | String  |
+| tags             | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
+| addLatest        | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
+| addTimestamp     | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
+| registry         | Docker registry host                                                                                     | Yes      | String  |
+| dockerfile       | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       | String  |
+| directory        | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
+| buildArgs        | Docker build arguments passed via `--build-arg`                                                          | No       | List    |
+| labels           | Docker build labels passed via `--label`                                                                 | No       | List    |
+| target           | Docker build target passed via `--target`                                                                | No       | String  |
+| platform         | Docker build platform passed via `--platform`                                                            | No       | String  |
+| username         | Docker registry username                                                                                 | No       | String  |
+| password         | Docker registry password or token                                                                        | No       | String  |
+| githubOrg        | GitHub organization to push image to (if not current)                                                    | No       | String  |
+| enableBuildKit   | Enables Docker BuildKit support                                                                          | No       | Boolean |
+| enableMultiArch  | Enables Docker buildx support                                                                            | No       | Boolean |
+| pushImage        | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
 
 ## Outputs
 

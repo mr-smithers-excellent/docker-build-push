@@ -26,6 +26,7 @@ const run = () => {
     const addLatest = core.getInput('addLatest') === 'true';
     const addTimestamp = core.getInput('addTimestamp') === 'true';
     buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
+    buildOpts.enableMultiArch = core.getInput('enableMultiArch') === 'true';
     buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
     buildOpts.labels = parseArray(core.getInput('labels'));
     buildOpts.target = core.getInput('target');

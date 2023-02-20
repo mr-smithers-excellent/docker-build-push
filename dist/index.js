@@ -9472,6 +9472,7 @@ const run = () => {
     const addLatest = core.getInput('addLatest') === 'true';
     const addTimestamp = core.getInput('addTimestamp') === 'true';
     buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
+    buildOpts.enableMultiArch = core.getInput('enableMultiArch') === 'true';
     buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
     buildOpts.labels = parseArray(core.getInput('labels'));
     buildOpts.target = core.getInput('target');
@@ -9563,7 +9564,9 @@ const createTags = (addLatest, addTimestamp) => {
 // Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
-  let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
+  const builder = buildOpts.enableMultiArch ? 'buildx build' : 'build';
+
+  let buildCommandPrefix = `docker ${builder} -f ${dockerfile} ${tagsSuffix}`;
 
   if (buildOpts.buildArgs) {
     const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
@@ -9586,6 +9589,7 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
+  core.info(`Calling ${buildCommandPrefix} ${buildOpts.buildDir}`);
 
   return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };

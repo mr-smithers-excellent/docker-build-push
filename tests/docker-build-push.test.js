@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(16);
+  expect(core.getInput).toHaveBeenCalledTimes(17);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
@@ -235,6 +235,27 @@ describe('Create & push Docker image to GCR', () => {
 
     expect(cp.execSync).toHaveBeenCalledWith(
       `DOCKER_BUILDKIT=1 docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
+      cpOptions
+    );
+  });
+
+  test('Enable multiarch', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest';
+    inputs.enableBuildKit = 'true';
+    inputs.enableMultiArch = 'true';
+    imageFullName = getDefaultImageName();
+
+    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
+    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `DOCKER_BUILDKIT=1 docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
       cpOptions
     );
   });

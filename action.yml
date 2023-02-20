@@ -51,6 +51,9 @@ inputs:
     description: "Enables Docker BuildKit support"
     required: false
     default: "false"
+  enableMultiArch:
+    description: "Enables Docker buildx support"
+    required: false
   pushImage:
     description: "Flag for disabling the login & push steps, set to true by default"
     required: false
