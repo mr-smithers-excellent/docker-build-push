@@ -42,7 +42,7 @@ const run = () => {
     // Log in, build & push the Docker image
     docker.login(username, password, registry, buildOpts.skipPush);
     docker.build(imageFullName, dockerfile, buildOpts);
-    docker.push(imageFullName, buildOpts.tags, buildOpts.skipPush);
+    docker.push(imageFullName, buildOpts.tags, buildOpts);
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);

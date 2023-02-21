@@ -255,6 +255,28 @@ describe('Create & push Docker image to GCR', () => {
     runAssertions(imageFullName, inputs);
 
     expect(cp.execSync).toHaveBeenCalledWith(
+      `DOCKER_BUILDKIT=1 docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --push .`,
+      cpOptions
+    );
+  });
+
+  test('Enable multiarch skip push', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest';
+    inputs.enableBuildKit = 'true';
+    inputs.enableMultiArch = 'true';
+    inputs.pushImage = 'false';
+    imageFullName = getDefaultImageName();
+
+    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
+    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+    expect(cp.execSync).toHaveBeenCalledTimes(1);
+    expect(cp.execSync).toHaveBeenCalledWith(
       `DOCKER_BUILDKIT=1 docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
       cpOptions
     );

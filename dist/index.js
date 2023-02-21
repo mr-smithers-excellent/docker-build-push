@@ -9488,7 +9488,7 @@ const run = () => {
     // Log in, build & push the Docker image
     docker.login(username, password, registry, buildOpts.skipPush);
     docker.build(imageFullName, dockerfile, buildOpts);
-    docker.push(imageFullName, buildOpts.tags, buildOpts.skipPush);
+    docker.push(imageFullName, buildOpts.tags, buildOpts);
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);
@@ -9586,10 +9586,14 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} --platform ${buildOpts.platform}`;
   }
 
+  if (buildOpts.enableMultiArch && buildOpts.skipPush !== true) {
+    buildCommandPrefix = `${buildCommandPrefix} --push`;
+  }
+
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
-  core.info(`Calling ${buildCommandPrefix} ${buildOpts.buildDir}`);
+  core.info(`BuildCommand ${buildCommandPrefix} ${buildOpts.buildDir}`);
 
   return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };
@@ -9633,8 +9637,12 @@ const login = (username, password, registry, skipPush) => {
 };
 
 // Push Docker image & all tags
-const push = (imageName, tags, skipPush) => {
-  if (skipPush) {
+const push = (imageName, tags, buildOpts) => {
+  if (buildOpts?.enableMultiArch) {
+    core.info('Input enableMultiArch is set to true, skipping Docker push step...');
+    return;
+  }
+  if (buildOpts?.skipPush) {
     core.info('Input skipPush is set to true, skipping Docker push step...');
     return;
   }
