@@ -25,8 +25,18 @@ If you're experiencing issues, be sure you are using the [latest stable release]
 
 ```yaml
 steps:
-  - uses: actions/checkout@v2
+  - uses: actions/checkout@v3
     name: Check out code
+
+  # Add support for more buildx platforms with QEMU (optional)
+  # https://github.com/docker/setup-qemu-action  
+  - uses: docker/setup-qemu-action@v2
+    name: Set up QEMU
+
+  # For buildx support when using enableMultiArch (optional)
+  # https://github.com/docker/setup-buildx-action  
+  - uses: docker/setup-buildx-action@v2
+    name: Set up Docker Buildx
 
   - uses: mr-smithers-excellent/docker-build-push@v5
     name: Build & push Docker image
