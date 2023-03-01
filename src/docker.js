@@ -55,7 +55,7 @@ const createTags = (addLatest, addTimestamp) => {
 // Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
-  const builder = buildOpts.enableMultiArch ? 'buildx build' : 'build';
+  const builder = buildOpts.multiPlatform ? 'buildx build' : 'build';
 
   let buildCommandPrefix = `docker ${builder} -f ${dockerfile} ${tagsSuffix}`;
 
@@ -77,7 +77,7 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} --platform ${buildOpts.platform}`;
   }
 
-  if (buildOpts.enableMultiArch && buildOpts.skipPush !== true) {
+  if (buildOpts.multiPlatform && !buildOpts.skipPush) {
     buildCommandPrefix = `${buildCommandPrefix} --push`;
   }
 
@@ -129,8 +129,8 @@ const login = (username, password, registry, skipPush) => {
 
 // Push Docker image & all tags
 const push = (imageName, tags, buildOpts) => {
-  if (buildOpts?.enableMultiArch) {
-    core.info('Input enableMultiArch is set to true, skipping Docker push step...');
+  if (buildOpts?.multiPlatform) {
+    core.info('Input multiPlatform is set to true, skipping Docker push step...');
     return;
   }
   if (buildOpts?.skipPush) {
