@@ -96,8 +96,7 @@ const build = (imageName, dockerfile, buildOpts) => {
   }
 
   if (buildOpts.multiPlatform) {
-    cp.execSync('docker buildx create --name builder --driver docker-container --bootstrap builder');
-    cp.execSync('docker buildx use builder');
+    cp.execSync('docker buildx create --name builder --driver docker-container --bootstrap --use');
   }
 
   core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
