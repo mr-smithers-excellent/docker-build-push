@@ -244,7 +244,7 @@ describe('Create & push Docker image to GCR', () => {
     inputs.registry = 'gcr.io';
     inputs.tags = 'latest';
     inputs.enableBuildKit = 'true';
-    inputs.enableMultiArch = 'true';
+    inputs.multiPlatform = 'true';
     imageFullName = getDefaultImageName();
 
     docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
@@ -265,7 +265,7 @@ describe('Create & push Docker image to GCR', () => {
     inputs.registry = 'gcr.io';
     inputs.tags = 'latest';
     inputs.enableBuildKit = 'true';
-    inputs.enableMultiArch = 'true';
+    inputs.multiPlatform = 'true';
     inputs.pushImage = 'false';
     imageFullName = getDefaultImageName();
 

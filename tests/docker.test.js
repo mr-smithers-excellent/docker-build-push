@@ -336,9 +336,9 @@ describe('Docker build, login & push commands', () => {
       expect(cp.execSync.mock.calls.length).toEqual(0);
     });
 
-    test('Skip push command if enableMultiArch is set to true', () => {
+    test('Skip push command if multiPlatform is set to true', () => {
       const buildOpts = {
-        enableMultiArch: true
+        multiPlatform: true
       };
       docker.push('my-org/my-image', 'latest', buildOpts);
 

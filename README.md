@@ -29,12 +29,12 @@ steps:
     name: Check out code
 
   # Add support for more buildx platforms with QEMU (optional)
-  # https://github.com/docker/setup-qemu-action  
+  # https://github.com/docker/setup-qemu-action
   - uses: docker/setup-qemu-action@v2
     name: Set up QEMU
 
   # For buildx support when using enableMultiArch (optional)
-  # https://github.com/docker/setup-buildx-action  
+  # https://github.com/docker/setup-buildx-action
   - uses: docker/setup-buildx-action@v2
     name: Set up Docker Buildx
 
@@ -68,7 +68,7 @@ steps:
 | password         | Docker registry password or token                                                                        | No       | String  |
 | githubOrg        | GitHub organization to push image to (if not current)                                                    | No       | String  |
 | enableBuildKit   | Enables Docker BuildKit support                                                                          | No       | Boolean |
-| enableMultiArch  | Enables Docker buildx support                                                                            | No       | Boolean |
+| multiPlatform  | Enables Docker buildx support                                                                            | No       | Boolean |
 | pushImage        | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
 
 ## Outputs
