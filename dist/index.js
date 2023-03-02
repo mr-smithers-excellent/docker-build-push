@@ -9604,6 +9604,11 @@ const build = (imageName, dockerfile, buildOpts) => {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
+  if (buildOpts.multiPlatform) {
+    cp.execSync('docker buildx create --name builder --driver docker-container --bootstrap builder');
+    cp.execSync('docker buildx use builder');
+  }
+
   core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
   cp.execSync(createBuildCommand(imageName, dockerfile, buildOpts), cpOptions);
 };
