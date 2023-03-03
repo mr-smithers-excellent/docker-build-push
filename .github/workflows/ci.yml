@@ -26,20 +26,20 @@ jobs:
           coverageCommand: npm run test
           coverageLocations: "coverage/lcov.info:lcov"
 
-    dependabot-tests:
-      if: ${{ github.actor == 'dependabot[bot]' }}
-      name: Dependabot Unit Tests
-      runs-on: ubuntu-latest
-      steps:
-        - name: Check out code
-          uses: actions/checkout@v3
+  dependabot-tests:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    name: Dependabot Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
 
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 16
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-        - name: Build
-          run: npm ci
+      - name: Build
+        run: npm ci
 
-        - name: Run tests
-          run: npm run test
+      - name: Run tests
+        run: npm run test
