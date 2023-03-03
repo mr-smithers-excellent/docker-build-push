@@ -9455,6 +9455,8 @@ const buildOpts = {
   labels: undefined,
   target: undefined,
   buildDir: undefined,
+  multiPlatform: false,
+  overrideDriver: false,
   enableBuildKit: false,
   platform: undefined,
   skipPush: false
