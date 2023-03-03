@@ -97,7 +97,6 @@ const build = (imageName, dockerfile, buildOpts) => {
 
   // Setup buildx if multiPlatform is true
   if (buildOpts.multiPlatform && buildOpts.defaultDriver) {
-    core.info('docker buildx ls');
     cp.execSync('docker buildx create --name builder --driver docker-container --bootstrap --use');
   }
 
