@@ -14,9 +14,23 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 - AWS Elastic Container Registry (ECR)
 - GitHub Docker Registry
 
+## Features
+
+- [Auto-tagging with GitOps](#auto-tagging-with-gitops)
+- [BuildKit support](#buildkit-support)
+- [Multi-platform builds](#multi-platform-builds)
+
 ## Breaking changes
 
-If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v5). The AWS ECR login command became deprecated between v4 and v5. Additionally, support for multiple tags was added between v4 and v5.
+If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v6). 
+
+### v5
+- AWS ECR [get-login command](https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html) became deprecated, migrated to [get-login-password command](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/get-login-password.html)
+- Support for multiple tags added
+- BuildKit support added
+
+### v6
+- Multi-platform builds now supported
 
 ## Basic usage
 
@@ -28,17 +42,7 @@ steps:
   - uses: actions/checkout@v3
     name: Check out code
 
-  # Add support for more buildx platforms with QEMU (optional)
-  # https://github.com/docker/setup-qemu-action
-  - uses: docker/setup-qemu-action@v2
-    name: Set up QEMU
-
-  # For buildx support when using enableMultiArch (optional)
-  # https://github.com/docker/setup-buildx-action
-  - uses: docker/setup-buildx-action@v2
-    name: Set up Docker Buildx
-
-  - uses: mr-smithers-excellent/docker-build-push@v5
+  - uses: mr-smithers-excellent/docker-build-push@v6
     name: Build & push Docker image
     with:
       image: repo/image
@@ -51,30 +55,31 @@ steps:
 
 ## Inputs
 
-| Name             | Description                                                                                              | Required | Type    |
-|------------------|----------------------------------------------------------------------------------------------------------| -------- | ------- |
-| image            | Docker image name                                                                                        | Yes      | String  |
-| tags             | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
-| addLatest        | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
-| addTimestamp     | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
-| registry         | Docker registry host                                                                                     | Yes      | String  |
-| dockerfile       | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       | String  |
-| directory        | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
-| buildArgs        | Docker build arguments passed via `--build-arg`                                                          | No       | List    |
-| labels           | Docker build labels passed via `--label`                                                                 | No       | List    |
-| target           | Docker build target passed via `--target`                                                                | No       | String  |
-| platform         | Docker build platform passed via `--platform`                                                            | No       | String  |
-| username         | Docker registry username                                                                                 | No       | String  |
-| password         | Docker registry password or token                                                                        | No       | String  |
-| githubOrg        | GitHub organization to push image to (if not current)                                                    | No       | String  |
-| enableBuildKit   | Enables Docker BuildKit support                                                                          | No       | Boolean |
+| Name           | Description                                                                                              | Required | Type    |
+|----------------|----------------------------------------------------------------------------------------------------------|----------|---------|
+| image          | Docker image name                                                                                        | Yes      | String  |
+| tags           | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
+| addLatest      | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
+| addTimestamp   | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
+| registry       | Docker registry host                                                                                     | Yes      | String  |
+| dockerfile     | Location of Dockerfile (defaults to `Dockerfile`)                                                        | No       | String  |
+| directory      | Directory to pass to `docker build` command, if not project root                                         | No       | String  |
+| buildArgs      | Docker build arguments passed via `--build-arg`                                                          | No       | List    |
+| labels         | Docker build labels passed via `--label`                                                                 | No       | List    |
+| target         | Docker build target passed via `--target`                                                                | No       | String  |
+| platform       | Docker build platform passed via `--platform`                                                            | No       | String  |
+| username       | Docker registry username                                                                                 | No       | String  |
+| password       | Docker registry password or token                                                                        | No       | String  |
+| githubOrg      | GitHub organization to push image to (if not current)                                                    | No       | String  |
+| enableBuildKit | Enables Docker BuildKit support                                                                          | No       | Boolean |
 | multiPlatform  | Enables Docker buildx support                                                                            | No       | Boolean |
-| pushImage        | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
+| overrideDriver | Disables setting up docker-container driver (if `true`, alternative docker driver must be set up)        | No       | Boolean |
+| pushImage      | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
 
 ## Outputs
 
 | Name          | Description                                        | Format                 |
-| ------------- | -------------------------------------------------- | ---------------------- |
+|---------------|----------------------------------------------------|------------------------|
 | imageFullName | Full name of the Docker image with registry prefix | `registry/owner/image` |
 | imageName     | Name of the Docker image with owner prefix         | `owner/image`          |
 | tags          | Tags for the Docker image                          | `v1,latest`            |
@@ -93,7 +98,7 @@ There is a distinction between secrets at the [repository](https://docs.github.c
 - Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v5
+uses: mr-smithers-excellent/docker-build-push@v6
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -110,7 +115,7 @@ with:
 - Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v5
+uses: mr-smithers-excellent/docker-build-push@v6
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -127,7 +132,7 @@ with:
 - Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v5
+uses: mr-smithers-excellent/docker-build-push@v6
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
@@ -148,7 +153,7 @@ env:
 #### New ghcr.io
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v5
+uses: mr-smithers-excellent/docker-build-push@v6
 with:
   image: image-name
   registry: ghcr.io
@@ -160,7 +165,7 @@ with:
 #### Legacy docker.pkg.github.com
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v5
+uses: mr-smithers-excellent/docker-build-push@v6
 with:
   image: github-repo/image-name
   registry: docker.pkg.github.com
@@ -168,12 +173,12 @@ with:
   password: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Tagging the image using GitOps
+## Auto-tagging with GitOps
 
 By default, if you do not pass a `tags` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag(s). This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag(s).
 
 | Trigger                  | Commit SHA | addLatest | addTimestamp | Docker Tag(s)                          |
-| ------------------------ | ---------- | --------- | ------------ | -------------------------------------- |
+|--------------------------|------------|-----------|--------------|----------------------------------------|
 | /refs/tags/v1.0          | N/A        | false     | N/A          | v1.0                                   |
 | /refs/tags/v1.0          | N/A        | true      | N/A          | v1.0,latest                            |
 | /refs/heads/dev          | 1234567    | false     | true         | dev-1234567-2021-09-01.195027          |
@@ -182,3 +187,65 @@ By default, if you do not pass a `tags` input this action will use an algorithm 
 | /refs/heads/main         | 1234567    | true      | false        | main-1234567,latest                    |
 | /refs/heads/SOME-feature | 1234567    | false     | true         | some-feature-1234567-2021-09-01.195027 |
 | /refs/heads/SOME-feature | 1234567    | true      | false        | some-feature-1234567,latest            |
+
+## BuildKit support
+
+Enables [Docker BuildKit](https://docs.docker.com/build/buildkit/)
+
+```yaml
+steps:
+  - uses: actions/checkout@v3
+    name: Check out code
+
+  - uses: mr-smithers-excellent/docker-build-push@v6
+    name: Build & push Docker image
+    with:
+      image: repo/image
+      registry: docker.io
+      enableBuildKit: true
+      username: ${{ secrets.DOCKER_USERNAME }}
+      password: ${{ secrets.DOCKER_PASSWORD }}
+```
+
+## Multi-platform builds
+
+Enables [multi-platform builds](https://docs.docker.com/build/building/multi-platform/) with the default [docker-container driver](https://docs.docker.com/build/drivers/docker-container/)
+
+```yaml
+steps:
+  - uses: actions/checkout@v3
+    name: Check out code
+
+  - uses: mr-smithers-excellent/docker-build-push@v6
+    name: Build & push Docker image
+    with:
+      image: repo/image
+      registry: docker.io
+      multiPlatform: true
+      username: ${{ secrets.DOCKER_USERNAME }}
+      password: ${{ secrets.DOCKER_PASSWORD }}
+```
+
+Enables [multi-platform builds](https://docs.docker.com/build/building/multi-platform/) with custom driver
+
+```yaml
+steps:
+  - uses: actions/checkout@v3
+    name: Check out code
+
+  # Required when overrideDriver is set to true
+  - uses: docker/setup-buildx-action@v2
+    name: Customize Docker driver
+    with:
+      driver-opts: image=moby/buildkit:v0.11.0
+
+  - uses: mr-smithers-excellent/docker-build-push@v6
+    name: Build & push Docker image
+    with:
+      image: repo/image
+      registry: docker.io
+      multiPlatform: true
+      overrideDriver: true
+      username: ${{ secrets.DOCKER_USERNAME }}
+      password: ${{ secrets.DOCKER_PASSWORD }}
+```

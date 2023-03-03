@@ -56,7 +56,7 @@ inputs:
     required: false
     default: "false"
   overrideDriver:
-    description: "Override docker-container builder in preceeding step"
+    description: "Disables setting up docker-container driver"
     required: false
     default: "false"
   pushImage:
