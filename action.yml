@@ -51,6 +51,14 @@ inputs:
     description: "Enables Docker BuildKit support"
     required: false
     default: "false"
+  multiPlatform:
+    description: "Builds image with buildx to support multiple platforms"
+    required: false
+    default: "false"
+  overrideDriver:
+    description: "Disables setting up docker-container driver"
+    required: false
+    default: "false"
   pushImage:
     description: "Flag for disabling the login & push steps, set to true by default"
     required: false

@@ -55,7 +55,9 @@ const createTags = (addLatest, addTimestamp) => {
 // Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
-  let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
+  const builder = buildOpts.multiPlatform ? 'buildx build' : 'build';
+
+  let buildCommandPrefix = `docker ${builder} -f ${dockerfile} ${tagsSuffix}`;
 
   if (buildOpts.buildArgs) {
     const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
@@ -75,9 +77,14 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} --platform ${buildOpts.platform}`;
   }
 
+  if (buildOpts.multiPlatform && !buildOpts.skipPush) {
+    buildCommandPrefix = `${buildCommandPrefix} --push`;
+  }
+
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
+  core.info(`BuildCommand ${buildCommandPrefix} ${buildOpts.buildDir}`);
 
   return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };
@@ -86,6 +93,11 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
 const build = (imageName, dockerfile, buildOpts) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
+  }
+
+  // Setup buildx driver
+  if (buildOpts.multiPlatform && !buildOpts.overrideDriver) {
+    cp.execSync('docker buildx create --use');
   }
 
   core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
@@ -121,8 +133,12 @@ const login = (username, password, registry, skipPush) => {
 };
 
 // Push Docker image & all tags
-const push = (imageName, tags, skipPush) => {
-  if (skipPush) {
+const push = (imageName, tags, buildOpts) => {
+  if (buildOpts?.multiPlatform) {
+    core.info('Input multiPlatform is set to true, skipping Docker push step...');
+    return;
+  }
+  if (buildOpts?.skipPush) {
     core.info('Input skipPush is set to true, skipping Docker push step...');
     return;
   }

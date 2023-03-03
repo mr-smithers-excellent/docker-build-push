@@ -9,9 +9,24 @@ const buildOpts = {
   labels: undefined,
   target: undefined,
   buildDir: undefined,
+  multiPlatform: false,
+  overrideDriver: false,
   enableBuildKit: false,
   platform: undefined,
   skipPush: false
+};
+
+const setBuildOpts = (addLatest, addTimestamp) => {
+  buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
+  buildOpts.multiPlatform = core.getInput('multiPlatform') === 'true';
+  buildOpts.overrideDriver = core.getInput('overrideDriver') === 'true';
+  buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
+  buildOpts.labels = parseArray(core.getInput('labels'));
+  buildOpts.target = core.getInput('target');
+  buildOpts.buildDir = core.getInput('directory') || '.';
+  buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
+  buildOpts.platform = core.getInput('platform');
+  buildOpts.skipPush = core.getInput('pushImage') === 'false';
 };
 
 const run = () => {
@@ -25,14 +40,7 @@ const run = () => {
     const githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
     const addLatest = core.getInput('addLatest') === 'true';
     const addTimestamp = core.getInput('addTimestamp') === 'true';
-    buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
-    buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
-    buildOpts.labels = parseArray(core.getInput('labels'));
-    buildOpts.target = core.getInput('target');
-    buildOpts.buildDir = core.getInput('directory') || '.';
-    buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
-    buildOpts.platform = core.getInput('platform');
-    buildOpts.skipPush = core.getInput('pushImage') === 'false';
+    setBuildOpts(addLatest, addTimestamp);
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -41,7 +49,7 @@ const run = () => {
     // Log in, build & push the Docker image
     docker.login(username, password, registry, buildOpts.skipPush);
     docker.build(imageFullName, dockerfile, buildOpts);
-    docker.push(imageFullName, buildOpts.tags, buildOpts.skipPush);
+    docker.push(imageFullName, buildOpts.tags, buildOpts);
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);

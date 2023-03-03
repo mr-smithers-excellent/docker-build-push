@@ -9455,9 +9455,24 @@ const buildOpts = {
   labels: undefined,
   target: undefined,
   buildDir: undefined,
+  multiPlatform: false,
+  overrideDriver: false,
   enableBuildKit: false,
   platform: undefined,
   skipPush: false
+};
+
+const setBuildOpts = (addLatest, addTimestamp) => {
+  buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
+  buildOpts.multiPlatform = core.getInput('multiPlatform') === 'true';
+  buildOpts.overrideDriver = core.getInput('overrideDriver') === 'true';
+  buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
+  buildOpts.labels = parseArray(core.getInput('labels'));
+  buildOpts.target = core.getInput('target');
+  buildOpts.buildDir = core.getInput('directory') || '.';
+  buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
+  buildOpts.platform = core.getInput('platform');
+  buildOpts.skipPush = core.getInput('pushImage') === 'false';
 };
 
 const run = () => {
@@ -9471,14 +9486,7 @@ const run = () => {
     const githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
     const addLatest = core.getInput('addLatest') === 'true';
     const addTimestamp = core.getInput('addTimestamp') === 'true';
-    buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
-    buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
-    buildOpts.labels = parseArray(core.getInput('labels'));
-    buildOpts.target = core.getInput('target');
-    buildOpts.buildDir = core.getInput('directory') || '.';
-    buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
-    buildOpts.platform = core.getInput('platform');
-    buildOpts.skipPush = core.getInput('pushImage') === 'false';
+    setBuildOpts(addLatest, addTimestamp);
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -9487,7 +9495,7 @@ const run = () => {
     // Log in, build & push the Docker image
     docker.login(username, password, registry, buildOpts.skipPush);
     docker.build(imageFullName, dockerfile, buildOpts);
-    docker.push(imageFullName, buildOpts.tags, buildOpts.skipPush);
+    docker.push(imageFullName, buildOpts.tags, buildOpts);
 
     // Capture outputs
     core.setOutput('imageFullName', imageFullName);
@@ -9563,7 +9571,9 @@ const createTags = (addLatest, addTimestamp) => {
 // Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
-  let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
+  const builder = buildOpts.multiPlatform ? 'buildx build' : 'build';
+
+  let buildCommandPrefix = `docker ${builder} -f ${dockerfile} ${tagsSuffix}`;
 
   if (buildOpts.buildArgs) {
     const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
@@ -9583,9 +9593,14 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} --platform ${buildOpts.platform}`;
   }
 
+  if (buildOpts.multiPlatform && !buildOpts.skipPush) {
+    buildCommandPrefix = `${buildCommandPrefix} --push`;
+  }
+
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
+  core.info(`BuildCommand ${buildCommandPrefix} ${buildOpts.buildDir}`);
 
   return `${buildCommandPrefix} ${buildOpts.buildDir}`;
 };
@@ -9594,6 +9609,11 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
 const build = (imageName, dockerfile, buildOpts) => {
   if (!fs.existsSync(dockerfile)) {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
+  }
+
+  // Setup buildx driver
+  if (buildOpts.multiPlatform && !buildOpts.overrideDriver) {
+    cp.execSync('docker buildx create --use');
   }
 
   core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
@@ -9629,8 +9649,12 @@ const login = (username, password, registry, skipPush) => {
 };
 
 // Push Docker image & all tags
-const push = (imageName, tags, skipPush) => {
-  if (skipPush) {
+const push = (imageName, tags, buildOpts) => {
+  if (buildOpts?.multiPlatform) {
+    core.info('Input multiPlatform is set to true, skipping Docker push step...');
+    return;
+  }
+  if (buildOpts?.skipPush) {
     core.info('Input skipPush is set to true, skipping Docker push step...');
     return;
   }

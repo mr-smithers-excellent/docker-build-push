@@ -328,8 +328,19 @@ describe('Docker build, login & push commands', () => {
     });
 
     test('Skip push command if skipPush is set to true', () => {
-      const skipPush = true;
-      docker.push('my-org/my-image', 'latest', skipPush);
+      const buildOpts = {
+        skipPush: true
+      };
+      docker.push('my-org/my-image', 'latest', buildOpts);
+
+      expect(cp.execSync.mock.calls.length).toEqual(0);
+    });
+
+    test('Skip push command if multiPlatform is set to true', () => {
+      const buildOpts = {
+        multiPlatform: true
+      };
+      docker.push('my-org/my-image', 'latest', buildOpts);
 
       expect(cp.execSync.mock.calls.length).toEqual(0);
     });

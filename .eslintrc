@@ -8,6 +8,9 @@
     "node": true,
     "jest": true
   },
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
   "rules": {
     "prettier/prettier": [
       "error",
