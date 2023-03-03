@@ -24,13 +24,14 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 
 If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v6).
 
+### v6
+- Multi-platform builds now supported
+- `pull_request` trigger added
+
 ### v5
 - AWS ECR [get-login command](https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html) became deprecated, migrated to [get-login-password command](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/get-login-password.html)
 - Support for multiple tags added
 - BuildKit support added
-
-### v6
-- Multi-platform builds now supported
 
 ## Basic usage
 
