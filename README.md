@@ -22,7 +22,7 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 
 ## Breaking changes
 
-If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v6). 
+If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v6).
 
 ### v5
 - AWS ECR [get-login command](https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html) became deprecated, migrated to [get-login-password command](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/get-login-password.html)
@@ -222,6 +222,7 @@ steps:
       image: repo/image
       registry: docker.io
       multiPlatform: true
+      platform: linux/amd64,linux/arm64,linux/arm/v7
       username: ${{ secrets.DOCKER_USERNAME }}
       password: ${{ secrets.DOCKER_PASSWORD }}
 ```
@@ -245,6 +246,7 @@ steps:
       image: repo/image
       registry: docker.io
       multiPlatform: true
+      platform: linux/amd64,linux/arm64,linux/arm/v7
       overrideDriver: true
       username: ${{ secrets.DOCKER_USERNAME }}
       password: ${{ secrets.DOCKER_PASSWORD }}
