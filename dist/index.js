@@ -9473,6 +9473,7 @@ const run = () => {
     const addTimestamp = core.getInput('addTimestamp') === 'true';
     buildOpts.tags = parseArray(core.getInput('tags')) || docker.createTags(addLatest, addTimestamp);
     buildOpts.multiPlatform = core.getInput('multiPlatform') === 'true';
+    buildOpts.defaultDriver = core.getInput('defaultDriver') === 'true';
     buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
     buildOpts.labels = parseArray(core.getInput('labels'));
     buildOpts.target = core.getInput('target');
@@ -9605,9 +9606,9 @@ const build = (imageName, dockerfile, buildOpts) => {
   }
 
   // Setup buildx if multiPlatform is true
-  if (buildOpts.multiPlatform) {
-    cp.execSync('docker buildx ls');
-    cp.execSync('docker buildx create --name builder --driver docker-container --bootstrap --use');
+  if (buildOpts.multiPlatform && buildOpts.defaultDriver) {
+    core.info('docker buildx ls');
+    cp.execSync('docker buildx create --use'); // --name builder --driver docker-container --bootstrap
   }
 
   core.info(`Building Docker image ${imageName} with tags ${buildOpts.tags}...`);
