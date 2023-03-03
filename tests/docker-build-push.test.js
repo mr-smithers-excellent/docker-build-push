@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(17);
+  expect(core.getInput).toHaveBeenCalledTimes(18);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
@@ -239,11 +239,10 @@ describe('Create & push Docker image to GCR', () => {
     );
   });
 
-  test('Enable multiarch', () => {
+  test('Enable multi-platform', () => {
     inputs.image = 'gcp-project/image';
     inputs.registry = 'gcr.io';
     inputs.tags = 'latest';
-    inputs.enableBuildKit = 'true';
     inputs.multiPlatform = 'true';
     imageFullName = getDefaultImageName();
 
@@ -255,16 +254,15 @@ describe('Create & push Docker image to GCR', () => {
     runAssertions(imageFullName, inputs);
 
     expect(cp.execSync).toHaveBeenCalledWith(
-      `DOCKER_BUILDKIT=1 docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --push .`,
+      `docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --push .`,
       cpOptions
     );
   });
 
-  test('Enable multiarch skip push', () => {
+  test('Enable multi-platform skip push', () => {
     inputs.image = 'gcp-project/image';
     inputs.registry = 'gcr.io';
     inputs.tags = 'latest';
-    inputs.enableBuildKit = 'true';
     inputs.multiPlatform = 'true';
     inputs.pushImage = 'false';
     imageFullName = getDefaultImageName();
@@ -275,9 +273,9 @@ describe('Create & push Docker image to GCR', () => {
     run();
 
     runAssertions(imageFullName, inputs);
-    expect(cp.execSync).toHaveBeenCalledTimes(1);
+    expect(cp.execSync).toHaveBeenCalledTimes(2);
     expect(cp.execSync).toHaveBeenCalledWith(
-      `DOCKER_BUILDKIT=1 docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
+      `docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
       cpOptions
     );
   });
