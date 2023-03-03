@@ -55,6 +55,10 @@ inputs:
     description: "Builds image with buildx to support multiple platforms"
     required: false
     default: "false"
+  overrideDriver:
+    description: "Override docker-container builder in preceeding step"
+    required: false
+    default: "false"
   pushImage:
     description: "Flag for disabling the login & push steps, set to true by default"
     required: false
