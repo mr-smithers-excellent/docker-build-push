@@ -26,7 +26,6 @@ If you're experiencing issues, be sure you are using the [latest stable release]
 
 ### v6
 - Multi-platform builds now supported
-- `pull_request` trigger added
 
 ### v5
 - AWS ECR [get-login command](https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html) became deprecated, migrated to [get-login-password command](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/get-login-password.html)
