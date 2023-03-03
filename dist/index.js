@@ -9605,9 +9605,8 @@ const build = (imageName, dockerfile, buildOpts) => {
     core.setFailed(`Dockerfile does not exist in location ${dockerfile}`);
   }
 
-  // Setup buildx if multiPlatform is true
+  // Setup buildx driver
   if (buildOpts.multiPlatform && !buildOpts.overrideDriver) {
-    cp.execSync('docker buildx ls');
     cp.execSync('docker buildx create --use');
   }
 
