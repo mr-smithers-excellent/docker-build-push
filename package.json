@@ -50,6 +50,6 @@
     "eslint-plugin-react": "^7.32.2",
     "husky": "^7.0.4",
     "jest": "^27.5.1",
-    "prettier": "^2.5.1"
+    "prettier": "^2.8.4"
   }
 }
