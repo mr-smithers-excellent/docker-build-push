@@ -1,6 +1,6 @@
-const dateFormat = require('dateformat');
+const dayjs = require('dayjs');
 
-const timestamp = () => dateFormat(new Date(), 'yyyy-mm-dd.HHMMss');
+const timestamp = () => dayjs().format('YYYY-MM-DD.HHMMss');
 
 const parseArray = commaDelimitedString => {
   if (commaDelimitedString) {
