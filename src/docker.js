@@ -2,7 +2,7 @@ const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
 const { context } = require('@actions/github');
-const { isGitHubTag, isBranch } = require('./github');
+const { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } = require('./github');
 const { timestamp, cpOptions } = require('./utils');
 
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
@@ -25,22 +25,24 @@ const createTags = (addLatest, addTimestamp) => {
 
   if (isGitHubTag(ref)) {
     // If GitHub tag exists, use it as the Docker tag
-    const tag = ref.replace('refs/tags/', '');
-    dockerTags.push(tag);
+    dockerTags.push(tagRefToSlug(ref));
   } else if (isBranch(ref)) {
     // If we're not building a tag, use branch-prefix-{GIT_SHORT_SHA) as the Docker tag
     // refs/heads/jira-123/feature/something
-    const branchName = ref.replace('refs/heads/', '');
-    const safeBranchName = branchName
-      .replace(/[^\w.-]+/g, '-')
-      .replace(/^[^\w]+/, '')
-      .substring(0, 120);
+    const safeBranchName = branchRefToSlug(ref);
     const baseTag = `${safeBranchName}-${shortSha}`;
+    const tag = addTimestamp ? `${baseTag}-${timestamp()}` : baseTag;
+    dockerTags.push(tag);
+  } else if (isPullRequest(ref)) {
+    // pull_request event, use pr-{PR_NUMBER)-{GIT_SHORT_SHA) as the Docker tag
+    const safePrRefName = prRefToSlug(ref);
+    const baseTag = `pr-${safePrRefName}-${shortSha}`;
     const tag = addTimestamp ? `${baseTag}-${timestamp()}` : baseTag;
     dockerTags.push(tag);
   } else {
     core.setFailed(
-      'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push-event-push'
+      'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push or' +
+        ' pull https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request'
     );
   }
 

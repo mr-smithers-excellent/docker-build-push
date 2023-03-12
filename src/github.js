@@ -5,6 +5,8 @@ const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
 const isBranch = ref => ref && ref.includes('refs/heads/');
 
+const isPullRequest = ref => ref && ref.includes('refs/pull/');
+
 // Returns owning organization of the repo where the Action is run
 const getDefaultOwner = () => {
   let owner;
@@ -18,8 +20,22 @@ const getDefaultOwner = () => {
   return owner;
 };
 
+const refToSlug = githubRef =>
+  githubRef
+    .replace(/[^\w.-]+/g, '-')
+    .replace(/^[^\w]+/, '')
+    .substring(0, 120);
+
+const tagRefToSlug = githubRef => refToSlug(githubRef.replace('refs/tags/', ''));
+const branchRefToSlug = githubRef => refToSlug(githubRef.replace('refs/heads/', ''));
+const prRefToSlug = githubRef => refToSlug(githubRef.replace('refs/pull/', '').split('/').shift());
+
 module.exports = {
-  isGitHubTag,
+  branchRefToSlug,
+  getDefaultOwner,
   isBranch,
-  getDefaultOwner
+  isGitHubTag,
+  isPullRequest,
+  prRefToSlug,
+  tagRefToSlug
 };

@@ -9517,7 +9517,7 @@ const cp = __nccwpck_require__(2081);
 const core = __nccwpck_require__(2186);
 const fs = __nccwpck_require__(7147);
 const { context } = __nccwpck_require__(5438);
-const { isGitHubTag, isBranch } = __nccwpck_require__(8396);
+const { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } = __nccwpck_require__(8396);
 const { timestamp, cpOptions } = __nccwpck_require__(1608);
 
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
@@ -9537,25 +9537,26 @@ const createTags = (addLatest, addTimestamp) => {
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
-
   if (isGitHubTag(ref)) {
     // If GitHub tag exists, use it as the Docker tag
-    const tag = ref.replace('refs/tags/', '');
-    dockerTags.push(tag);
+    dockerTags.push(tagRefToSlug(ref));
   } else if (isBranch(ref)) {
     // If we're not building a tag, use branch-prefix-{GIT_SHORT_SHA) as the Docker tag
     // refs/heads/jira-123/feature/something
-    const branchName = ref.replace('refs/heads/', '');
-    const safeBranchName = branchName
-      .replace(/[^\w.-]+/g, '-')
-      .replace(/^[^\w]+/, '')
-      .substring(0, 120);
+    const safeBranchName = branchRefToSlug(ref);
     const baseTag = `${safeBranchName}-${shortSha}`;
+    const tag = addTimestamp ? `${baseTag}-${timestamp()}` : baseTag;
+    dockerTags.push(tag);
+  } else if (isPullRequest(ref)) {
+    // pull_request event, use pr-{PR_NUMBER)-{GIT_SHORT_SHA) as the Docker tag
+    const safePrRefName = prRefToSlug(ref);
+    const baseTag = `pr-${safePrRefName}-${shortSha}`;
     const tag = addTimestamp ? `${baseTag}-${timestamp()}` : baseTag;
     dockerTags.push(tag);
   } else {
     core.setFailed(
-      'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push-event-push'
+      'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push or' +
+        ' pull https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request'
     );
   }
 
@@ -9683,6 +9684,8 @@ const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
 const isBranch = ref => ref && ref.includes('refs/heads/');
 
+const isPullRequest = ref => ref && ref.includes('refs/pull/');
+
 // Returns owning organization of the repo where the Action is run
 const getDefaultOwner = () => {
   let owner;
@@ -9696,10 +9699,24 @@ const getDefaultOwner = () => {
   return owner;
 };
 
+const refToSlug = githubRef =>
+  githubRef
+    .replace(/[^\w.-]+/g, '-')
+    .replace(/^[^\w]+/, '')
+    .substring(0, 120);
+
+const tagRefToSlug = githubRef => refToSlug(githubRef.replace('refs/tags/', ''));
+const branchRefToSlug = githubRef => refToSlug(githubRef.replace('refs/heads/', ''));
+const prRefToSlug = githubRef => refToSlug(githubRef.replace('refs/pull/', '').split('/').shift());
+
 module.exports = {
-  isGitHubTag,
+  branchRefToSlug,
+  getDefaultOwner,
   isBranch,
-  getDefaultOwner
+  isGitHubTag,
+  isPullRequest,
+  prRefToSlug,
+  tagRefToSlug
 };
 
 
