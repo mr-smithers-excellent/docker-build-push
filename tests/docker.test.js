@@ -12,9 +12,13 @@ describe('Create Docker image tags', () => {
   let addTimestamp;
 
   beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(new Date('2022-01-01T00:00:00+0000').getTime());
+
     addLatest = false;
     addTimestamp = false;
   });
+
+  afterEach(() => jest.useRealTimers());
 
   test('Create from tag push', () => {
     context.ref = 'refs/tags/v1.0';
@@ -130,8 +134,30 @@ describe('Create Docker image tags', () => {
     expect(tags.length).toEqual(1);
   });
 
-  test('Create from pull request push (not supported)', () => {
-    context.ref = 'refs/pull/1';
+  test('Create from pull request', () => {
+    context.ref = 'refs/pull/1/merge';
+    context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
+    core.setFailed = jest.fn();
+
+    const tags = docker.createTags(addLatest, false);
+
+    expect(tags.length).toEqual(1);
+    expect(tags[0]).toBe('pr-1-89977b7');
+  });
+
+  test('Create from pull request with timestamp', () => {
+    context.ref = 'refs/pull/1/merge';
+    context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
+    core.setFailed = jest.fn();
+
+    const tags = docker.createTags(addLatest, true);
+
+    expect(tags.length).toEqual(1);
+    expect(tags[0]).toBe('pr-1-89977b7-2022-01-01.000100');
+  });
+
+  test('Create from unknown event (not supported)', () => {
+    context.ref = 'refs/unknown/';
     context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
     core.setFailed = jest.fn();
 
@@ -139,7 +165,7 @@ describe('Create Docker image tags', () => {
 
     expect(tags.length).toEqual(0);
     expect(core.setFailed).toHaveBeenCalledWith(
-      'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push-event-push'
+      'Unsupported GitHub event - only supports push https://help.github.com/en/articles/events-that-trigger-workflows#push or pull https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request'
     );
   });
 });
