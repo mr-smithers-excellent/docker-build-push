@@ -9537,6 +9537,7 @@ const createTags = (addLatest, addTimestamp) => {
   const ref = context.ref.toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
+
   if (isGitHubTag(ref)) {
     // If GitHub tag exists, use it as the Docker tag
     dockerTags.push(tagRefToSlug(ref));
