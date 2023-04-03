@@ -9458,7 +9458,8 @@ const buildOpts = {
   overrideDriver: false,
   enableBuildKit: false,
   platform: undefined,
-  skipPush: false
+  skipPush: false,
+  ssh: undefined
 };
 
 const setBuildOpts = (addLatest, addTimestamp) => {
@@ -9472,6 +9473,7 @@ const setBuildOpts = (addLatest, addTimestamp) => {
   buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
   buildOpts.platform = core.getInput('platform');
   buildOpts.skipPush = core.getInput('pushImage') === 'false';
+  buildOpts.ssh = parseArray(core.getInput('ssh'));
 };
 
 const run = () => {
@@ -9596,6 +9598,11 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
 
   if (buildOpts.multiPlatform && !buildOpts.skipPush) {
     buildCommandPrefix = `${buildCommandPrefix} --push`;
+  }
+
+  if (buildOpts.ssh) {
+    const sshSuffix = buildOpts.ssh.map(ssh => `--ssh ${ssh}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${sshSuffix}`;
   }
 
   if (buildOpts.enableBuildKit) {

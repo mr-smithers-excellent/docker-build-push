@@ -83,6 +83,11 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} --push`;
   }
 
+  if (buildOpts.ssh) {
+    const sshSuffix = buildOpts.ssh.map(ssh => `--ssh ${ssh}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${sshSuffix}`;
+  }
+
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
