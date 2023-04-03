@@ -30,6 +30,9 @@ inputs:
   platform:
     description: "Docker build platform passed via --platform"
     required: false
+  ssh:
+    description: "Docker build ssh options passed via --ssh"
+    required: false
   username:
     description: "Docker registry username"
     required: false
