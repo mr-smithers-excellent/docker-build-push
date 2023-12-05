@@ -4,6 +4,7 @@ const { context } = require('@actions/github');
 const core = require('@actions/core');
 const cp = require('child_process');
 const fs = require('fs');
+const MockDate = require('mockdate');
 const docker = require('../src/docker');
 const { cpOptions } = require('../src/utils');
 
@@ -12,13 +13,13 @@ describe('Create Docker image tags', () => {
   let addTimestamp;
 
   beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(new Date('2022-01-01T00:00:00+0000').getTime());
+    MockDate.set(new Date('2023-06-13T00:00:00'));
 
     addLatest = false;
     addTimestamp = false;
   });
 
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => MockDate.reset());
 
   test('Create from tag push', () => {
     context.ref = 'refs/tags/v1.0';
@@ -153,7 +154,7 @@ describe('Create Docker image tags', () => {
     const tags = docker.createTags(addLatest, true);
 
     expect(tags.length).toEqual(1);
-    expect(tags[0]).toBe('pr-1-89977b7-2022-01-01.000100');
+    expect(tags[0]).toBe('pr-1-89977b7-2023-06-13.000600');
   });
 
   test('Create from unknown event (not supported)', () => {
