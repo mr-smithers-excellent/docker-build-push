@@ -1,7 +1,7 @@
 # Docker Build & Push Action
 
 [![Unit Tests](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/ci.yml/badge.svg)](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/ci.yml)
-[![e2e Tests](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/e2e.yml/badge.svg)](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/nightly-e2e.yml)
+[![e2e Tests](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/nightly-e2e.yml/badge.svg)](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/nightly-e2e.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/maintainability)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/test_coverage)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/test_coverage)
 
