@@ -1,6 +1,7 @@
 jest.mock('@actions/core');
 
 const core = require('@actions/core');
+const { context } = require('@actions/github');
 const github = require('../src/github');
 const { branchRefToSlug, prRefToSlug, tagRefToSlug } = require('../src/github');
 
@@ -14,6 +15,9 @@ describe('Get default repo & owner name', () => {
   });
 
   test('No environment variable, throws an error', () => {
+    delete process.env.GITHUB_REPOSITORY;
+    context.payload.repository = undefined;
+
     const error =
       "Action failed with error Error: context.repo requires a GITHUB_REPOSITORY environment variable like 'owner/repo'";
     core.setFailed = jest.fn();
