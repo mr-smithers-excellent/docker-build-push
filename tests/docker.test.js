@@ -330,11 +330,11 @@ describe('Docker build, login & push commands', () => {
       expect(cp.execSync.mock.calls.length).toEqual(0);
     });
 
-    test('Missing username or password should throw an error', () => {
+    test('Missing username or password should not throw an error', () => {
       docker.login(undefined, undefined, registry);
 
       expect(cp.execSync.mock.calls.length).toEqual(0);
-      expect(core.setFailed).toHaveBeenCalled();
+      expect(core.setFailed).not.toHaveBeenCalled();
     });
 
     test('returns undefined if empty login and does not execute command', () => {
