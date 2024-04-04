@@ -14,8 +14,30 @@ const cpOptions = {
   stdio: 'inherit'
 };
 
+/**
+ * Convert a value to a boolean
+ * @param {*} value the value to convert
+ * @returns boolean value
+ */
+const asBool = value => {
+  switch (
+    String(value ?? '')
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'true':
+    case 'y':
+    case 'yes':
+    case '1':
+      return true;
+    default:
+      return false;
+  }
+};
+
 module.exports = {
   timestamp,
   parseArray,
-  cpOptions
+  cpOptions,
+  asBool
 };

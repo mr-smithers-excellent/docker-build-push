@@ -43,6 +43,18 @@ describe('Create Docker image tags', () => {
     expect(tags.length).toEqual(2);
   });
 
+  test('Create from tag push with addLatest passed as string', () => {
+    context.ref = 'refs/tags/v1.0';
+    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    addLatest = 'true';
+
+    const tags = docker.createTags(addLatest, addTimestamp);
+
+    expect(tags).toContain('v1.0');
+    expect(tags).toContain('latest');
+    expect(tags.length).toEqual(2);
+  });
+
   test('Create from tag push with addTimestamp', () => {
     context.ref = 'refs/tags/v1.0';
     context.sha = '8d93430eddafb926c668181c71f579556f68668c';
