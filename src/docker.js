@@ -3,7 +3,7 @@ const core = require('@actions/core');
 const fs = require('fs');
 const { context } = require('@actions/github');
 const { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } = require('./github');
-const { timestamp, cpOptions } = require('./utils');
+const { timestamp, cpOptions, asBool } = require('./utils');
 
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
@@ -46,7 +46,7 @@ const createTags = (addLatest, addTimestamp) => {
     );
   }
 
-  if (addLatest) {
+  if (asBool(addLatest)) {
     dockerTags.push('latest');
   }
 
