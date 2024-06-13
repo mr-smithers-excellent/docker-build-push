@@ -134,8 +134,6 @@ const login = (username, password, registry, skipPush) => {
     cp.execSync(`docker login -u ${username} --password-stdin ${registry}`, {
       input: password
     });
-  } else {
-    core.setFailed('Must supply Docker registry credentials to push image!');
   }
 };
 
