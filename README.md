@@ -59,7 +59,7 @@ steps:
 | Name           | Description                                                                                              | Required | Type    |
 |----------------|----------------------------------------------------------------------------------------------------------|----------|---------|
 | image          | Docker image name                                                                                        | Yes      | String  |
-| tags           | Comma separated docker image tags (see [Tagging the image with GitOps](#tagging-the-image-using-gitops)) | No       | List    |
+| tags           | Comma separated docker image tags (see [Auto-tagging with GitOps](#auto-tagging-with-gitops))            | No       | List    |
 | addLatest      | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
 | addTimestamp   | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
 | registry       | Docker registry host                                                                                     | Yes      | String  |
