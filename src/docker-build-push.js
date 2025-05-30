@@ -17,12 +17,24 @@ const buildOpts = {
   ssh: undefined
 };
 
+const determineTags = (customTags, appendMode, addLatest, addTimestamp) => {
+  if (!customTags) {
+    return docker.createTags(addLatest, addTimestamp);
+  }
+
+  if (appendMode) {
+    return docker.createTags(addLatest, addTimestamp).concat(customTags);
+  }
+
+  return customTags;
+};
+
 const setBuildOpts = (addLatest, addTimestamp) => {
   const customTags = parseArray(core.getInput('tags'));
   const appendMode = core.getInput('appendMode') === 'true';
-  
+
   buildOpts.tags = determineTags(customTags, appendMode, addLatest, addTimestamp);
-  
+
   buildOpts.multiPlatform = core.getInput('multiPlatform') === 'true';
   buildOpts.overrideDriver = core.getInput('overrideDriver') === 'true';
   buildOpts.buildArgs = parseArray(core.getInput('buildArgs'));
@@ -33,18 +45,6 @@ const setBuildOpts = (addLatest, addTimestamp) => {
   buildOpts.platform = core.getInput('platform');
   buildOpts.skipPush = core.getInput('pushImage') === 'false';
   buildOpts.ssh = parseArray(core.getInput('ssh'));
-};
-
-const determineTags = (customTags, appendMode, addLatest, addTimestamp) => {
-  if (!customTags) {
-    return docker.createTags(addLatest, addTimestamp);
-  }
-  
-  if (appendMode) {
-    return docker.createTags(addLatest, addTimestamp).concat(customTags);
-  }
-  
-  return customTags;
 };
 
 const run = () => {
