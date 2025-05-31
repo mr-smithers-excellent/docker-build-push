@@ -1,9 +1,9 @@
-const cp = require('child_process');
-const core = require('@actions/core');
-const fs = require('fs');
-const { context } = require('@actions/github');
-const { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } = require('./github');
-const { timestamp, cpOptions, asBool } = require('./utils');
+import * as cp from 'child_process';
+import * as core from '@actions/core';
+import * as fs from 'fs';
+import { context } from '@actions/github';
+import { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } from './github';
+import { timestamp, cpOptions, asBool } from './utils';
 
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 

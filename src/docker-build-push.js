@@ -1,7 +1,7 @@
-const core = require('@actions/core');
-const docker = require('./docker');
-const github = require('./github');
-const { parseArray } = require('./utils');
+import * as core from '@actions/core';
+import { docker } from './docker.js';
+import { github } from './github.js';
+import { parseArray } from './utils';
 
 const buildOpts = {
   tags: undefined,
