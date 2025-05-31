@@ -7,8 +7,8 @@
   "scripts": {
     "build": "ncc build src/main.js",
     "precommit": "npm run build && git add dist/",
-    "lint": "npx eslint 'src/**.js' 'tests/**.js' --fix",
-    "test": "npx eslint  'src/**.js' 'tests/**.js' && jest --coverage",
+    "lint": "npx eslint --fix",
+    "test": "npx eslint && jest --coverage",
     "test:watch": "npm run test -- --watchAll",
     "prepare": "husky install"
   },
