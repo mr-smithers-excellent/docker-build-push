@@ -35,7 +35,7 @@ jobs:
             multiPlatform: true
             platform: linux/amd64,linux/arm64,linux/arm/v7
 
-          - name: GCR e2e
+          - name: GAR e2e
             image: orbital-bank-301021/hello-world/hello-world
             dockerfile: ./e2e/Dockerfile
             registry: us-west1-docker.pkg.dev
