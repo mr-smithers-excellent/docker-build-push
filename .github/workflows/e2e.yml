@@ -35,10 +35,10 @@ jobs:
             multiPlatform: true
             platform: linux/amd64,linux/arm64,linux/arm/v7
 
-          - name: GCR e2e
-            image: orbital-bank-301021/hello-world
+          - name: GAR e2e
+            image: orbital-bank-301021/hello-world/hello-world
             dockerfile: ./e2e/Dockerfile
-            registry: gcr.io
+            registry: us-west1-docker.pkg.dev
             username: GCR_USERNAME
             password: GCR_PASSWORD
             labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
