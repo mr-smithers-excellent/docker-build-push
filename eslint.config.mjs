@@ -18,10 +18,8 @@ export default [
   {
     ignores: ['**/coverage', '**/dist', '**/e2e', '**/linter', '**/node_modules']
   },
-  ...compat.extends(
-      'prettier'
-    ),
-    {
+  ...compat.extends('prettier'),
+  {
     plugins: {
       prettier
     },
@@ -47,4 +45,4 @@ export default [
       ]
     }
   }
-]
+];
