@@ -13,11 +13,11 @@ jest.mock('../src/docker', () => ({
   login: jest.fn()
 }));
 
-const core = require('@actions/core');
-const cp = require('child_process');
-const docker = require('../src/docker');
-const run = require('../src/docker-build-push');
-const { parseArray, cpOptions } = require('../src/utils');
+import * as core from '@actions/core';
+import * as cp from 'child_process';
+import { docker } from '../src/docker';
+import { run } from '../src/docker-build-push';
+import { parseArray, cpOptions } from '../src/utils';
 
 const mockOwner = 'owner';
 const mockRepoName = 'some-repo';

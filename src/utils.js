@@ -1,4 +1,4 @@
-const dayjs = require('dayjs');
+import * as dayjs from 'dayjs';
 
 const timestamp = () => dayjs().format('YYYY-MM-DD.HHMMss');
 

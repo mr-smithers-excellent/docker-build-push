@@ -1,5 +1,5 @@
-const { context } = require('@actions/github');
-const core = require('@actions/core');
+import { context } from '@actions/github';
+import * as core from '@actions/core';
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
