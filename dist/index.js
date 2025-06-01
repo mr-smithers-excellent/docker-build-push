@@ -29791,7 +29791,7 @@ const core = __nccwpck_require__(2186);
 const fs = __nccwpck_require__(7147);
 const { context } = __nccwpck_require__(5438);
 const { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } = __nccwpck_require__(8396);
-const { timestamp, cpOptions } = __nccwpck_require__(1608);
+const { timestamp, cpOptions, asBool } = __nccwpck_require__(1608);
 
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
@@ -29834,7 +29834,7 @@ const createTags = (addLatest, addTimestamp) => {
     );
   }
 
-  if (addLatest) {
+  if (asBool(addLatest)) {
     dockerTags.push('latest');
   }
 
@@ -30020,10 +30020,32 @@ const cpOptions = {
   stdio: 'inherit'
 };
 
+/**
+ * Convert a value to a boolean
+ * @param {*} value the value to convert
+ * @returns boolean value
+ */
+const asBool = value => {
+  switch (
+    String(value ?? '')
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'true':
+    case 'y':
+    case 'yes':
+    case '1':
+      return true;
+    default:
+      return false;
+  }
+};
+
 module.exports = {
   timestamp,
   parseArray,
-  cpOptions
+  cpOptions,
+  asBool
 };
 
 

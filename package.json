@@ -37,18 +37,18 @@
   "dependencies": {
     "18": "^0.0.0",
     "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.0",
+    "@actions/github": "^6.0.1",
     "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.3",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^10.1.2",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.2.5",
-    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-react": "^7.37.5",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "mockdate": "^3.0.5",
