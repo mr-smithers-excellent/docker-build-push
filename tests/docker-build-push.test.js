@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(19);
+  expect(core.getInput).toHaveBeenCalledTimes(20);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
