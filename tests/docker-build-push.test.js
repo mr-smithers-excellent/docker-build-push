@@ -280,6 +280,28 @@ describe('Create & push Docker image to GCR', () => {
     );
   });
 
+  test('Enable appendMode to combine generated and custom tags', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'custom-tag';
+    inputs.appendMode = 'true';
+    imageFullName = getDefaultImageName();
+
+    const generatedTags = ['auto-tag'];
+    docker.createTags = jest.fn().mockReturnValue(generatedTags);
+    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    const expectedTags = ['auto-tag', 'custom-tag'];
+    expect(core.setOutput).toHaveBeenCalledWith('tags', expectedTags.toString());
+
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:auto-tag -t ${inputs.registry}/${inputs.image}:custom-tag .`,
+      cpOptions
+    );
+  });
+
   test('Docker login error', () => {
     const error = 'Error: Cannot perform an interactive login from a non TTY device';
     docker.login = jest.fn().mockImplementation(() => {
