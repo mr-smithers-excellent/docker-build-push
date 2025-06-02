@@ -60,6 +60,7 @@ steps:
 |----------------|----------------------------------------------------------------------------------------------------------|----------|---------|
 | image          | Docker image name                                                                                        | Yes      | String  |
 | tags           | Comma separated docker image tags (see [Auto-tagging with GitOps](#auto-tagging-with-gitops))            | No       | List    |
+| appendMode     | Append tags to auto-generated GitOps tags instead of replacing them                                      | No       | Boolean |
 | addLatest      | Adds the `latest` tag to the GitOps-generated tags                                                       | No       | Boolean |
 | addTimestamp   | Suffixes a build timestamp to the branch-based Docker tag                                                | No       | Boolean |
 | registry       | Docker registry host                                                                                     | Yes      | String  |
@@ -188,6 +189,23 @@ By default, if you do not pass a `tags` input this action will use an algorithm 
 | /refs/heads/main         | 1234567    | true      | false        | main-1234567,latest                    |
 | /refs/heads/SOME-feature | 1234567    | false     | true         | some-feature-1234567-2021-09-01.195027 |
 | /refs/heads/SOME-feature | 1234567    | true      | false        | some-feature-1234567,latest            |
+
+### Adding custom tags to GitOps tags
+
+The `appendMode` input allows you to add additional tags while keeping the auto-generated GitOps tags:
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v6
+with:
+  image: repo/image
+  registry: docker.io
+  tags: stable,production
+  appendMode: true
+  username: ${{ secrets.DOCKER_USERNAME }}
+  password: ${{ secrets.DOCKER_PASSWORD }}
+```
+
+For a `main` branch build with commit `1234567`, this would produce tags: `main-1234567,stable,production`
 
 ## BuildKit support
 

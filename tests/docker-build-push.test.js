@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(19);
+  expect(core.getInput).toHaveBeenCalledTimes(20);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
@@ -276,6 +276,28 @@ describe('Create & push Docker image to GCR', () => {
     expect(cp.execSync).toHaveBeenCalledTimes(2);
     expect(cp.execSync).toHaveBeenCalledWith(
       `docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
+      cpOptions
+    );
+  });
+
+  test('Enable appendMode to combine generated and custom tags', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'custom-tag';
+    inputs.appendMode = 'true';
+    imageFullName = getDefaultImageName();
+
+    const generatedTags = ['auto-tag'];
+    docker.createTags = jest.fn().mockReturnValue(generatedTags);
+    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    const expectedTags = ['auto-tag', 'custom-tag'];
+    expect(core.setOutput).toHaveBeenCalledWith('tags', expectedTags.toString());
+
+    expect(cp.execSync).toHaveBeenCalledWith(
+      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:auto-tag -t ${inputs.registry}/${inputs.image}:custom-tag .`,
       cpOptions
     );
   });

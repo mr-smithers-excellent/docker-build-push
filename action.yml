@@ -8,6 +8,10 @@ inputs:
   tags:
     description: "Tags override for Docker image"
     required: false
+  appendMode:
+    description: "Append tags to auto-generated tags instead of replacing them"
+    required: false
+    default: "false"
   registry:
     description: "Target Docker registry"
     required: true
