@@ -31579,8 +31579,14 @@ const push = (imageName, tags, buildOpts) => {
     return;
   }
 
-  core.info(`Pushing tags ${tags} for Docker image ${imageName}...`);
-  cp.execSync(`docker push ${imageName} --all-tags`, cpOptions);
+  // Ensure tags is an array
+  const tagArray = Array.isArray(tags) ? tags : [tags];
+  core.info(`Pushing individual tags ${tagArray} for Docker image ${imageName}...`);
+
+  tagArray.forEach(tag => {
+    core.info(`Pushing tag: ${tag}`);
+    cp.execSync(`docker push ${imageName}:${tag}`, cpOptions);
+  });
 };
 
 module.exports = {
