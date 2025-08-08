@@ -76,7 +76,7 @@ steps:
 | enableBuildKit | Enables Docker BuildKit support                                                                          | No       | Boolean |
 | multiPlatform  | Enables Docker buildx support                                                                            | No       | Boolean |
 | overrideDriver | Disables setting up docker-container driver (if `true`, alternative docker driver must be set up)        | No       | Boolean |
-| pushImage      | Flag for disabling the login & push steps, set to `true` by default                                      | No       | Boolean |
+| pushImage      | Flag for disabling the push step, set to `true` by default                                               | No       | Boolean |
 
 ## Outputs
 
