@@ -357,20 +357,30 @@ describe('Docker build, login & push commands', () => {
   });
 
   describe('Docker push', () => {
-    test('Docker Hub push', () => {
+    test('Docker Hub push with single tag', () => {
       const imageName = 'gcr.io/my-project/image';
-      const tag = 'v1';
+      const tags = ['v1'];
 
-      docker.push(imageName, tag);
+      docker.push(imageName, tags);
 
-      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName} --all-tags`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}:v1`, cpOptions);
+    });
+
+    test('Docker Hub push with multiple tags', () => {
+      const imageName = 'gcr.io/my-project/image';
+      const tags = ['v1', 'latest'];
+
+      docker.push(imageName, tags);
+
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}:v1`, cpOptions);
+      expect(cp.execSync).toHaveBeenCalledWith(`docker push ${imageName}:latest`, cpOptions);
     });
 
     test('Skip push command if skipPush is set to true', () => {
       const buildOpts = {
         skipPush: true
       };
-      docker.push('my-org/my-image', 'latest', buildOpts);
+      docker.push('my-org/my-image', ['latest'], buildOpts);
 
       expect(cp.execSync.mock.calls.length).toEqual(0);
     });
@@ -379,7 +389,7 @@ describe('Docker build, login & push commands', () => {
       const buildOpts = {
         multiPlatform: true
       };
-      docker.push('my-org/my-image', 'latest', buildOpts);
+      docker.push('my-org/my-image', ['latest'], buildOpts);
 
       expect(cp.execSync.mock.calls.length).toEqual(0);
     });
