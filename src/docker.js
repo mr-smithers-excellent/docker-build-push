@@ -117,7 +117,6 @@ const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, r
 
 // Log in to provided Docker registry
 const login = (username, password, registry) => {
-
   // If using ECR, use the AWS CLI login command in favor of docker login
   if (isEcr(registry)) {
     const region = getRegion(registry);
