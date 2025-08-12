@@ -92,7 +92,7 @@ jobs:
               tag_name: '${{ steps.version.outputs.tag }}',
               name: '${{ steps.version.outputs.tag }}',
               body: `${{ steps.notes.outputs.result }}`,
-              make_latest: true
+              make_latest: 'true'
             });
             
             console.log(`Created release: ${release.html_url}`);
