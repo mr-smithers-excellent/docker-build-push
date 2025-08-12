@@ -44,16 +44,16 @@ jobs:
               ...context.repo,
               per_page: 1
             });
-            
+
             const previousTag = releases.length > 0 ? releases[0].tag_name : null;
             const currentTag = '${{ steps.version.outputs.tag }}';
-            
+
             let compareUrl = '';
             let commits = [];
-            
+
             if (previousTag) {
               compareUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/compare/${previousTag}...${currentTag}`;
-              
+
               const { data: comparison } = await github.rest.repos.compareCommits({
                 ...context.repo,
                 base: previousTag,
@@ -67,20 +67,20 @@ jobs:
               });
               commits = recentCommits;
             }
-            
+
             let releaseNotes = `## What's Changed\n\n`;
-            
+
             for (const commit of commits) {
               const message = commit.commit.message.split('\n')[0];
               const author = commit.author ? commit.author.login : commit.commit.author.name;
               const sha = commit.sha.substring(0, 7);
               releaseNotes += `* ${message} (${sha}) @${author}\n`;
             }
-            
+
             if (previousTag) {
               releaseNotes += `\n**Full Changelog**: ${compareUrl}`;
             }
-            
+
             return releaseNotes;
 
       - name: Create Release
@@ -92,16 +92,16 @@ jobs:
               tag_name: '${{ steps.version.outputs.tag }}',
               name: '${{ steps.version.outputs.tag }}',
               body: `${{ steps.notes.outputs.result }}`,
-              make_latest: true
+              make_latest: 'true'
             });
-            
+
             console.log(`Created release: ${release.html_url}`);
 
       - name: Update major version tag
         run: |
           MAJOR_TAG="v${{ steps.version.outputs.major }}"
           echo "Updating major version tag: $MAJOR_TAG"
-          
+
           # Check if major version tag exists
           if git ls-remote --tags origin | grep -q "refs/tags/$MAJOR_TAG$"; then
             echo "Major version tag $MAJOR_TAG exists, updating it"
