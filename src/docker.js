@@ -116,12 +116,7 @@ const isEcr = registry => registry && registry.includes('amazonaws');
 const getRegion = registry => registry.substring(registry.indexOf('ecr.') + 4, registry.indexOf('.amazonaws'));
 
 // Log in to provided Docker registry
-const login = (username, password, registry, skipPush) => {
-  if (skipPush) {
-    core.info('Input skipPush is set to true, skipping Docker log in step...');
-    return;
-  }
-
+const login = (username, password, registry) => {
   // If using ECR, use the AWS CLI login command in favor of docker login
   if (isEcr(registry)) {
     const region = getRegion(registry);
