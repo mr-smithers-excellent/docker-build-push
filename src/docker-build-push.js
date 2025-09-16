@@ -67,7 +67,9 @@ const run = () => {
     // Log in, build & push the Docker image
     /* #373: https://github.com/mr-smithers-excellent/docker-build-push/issues/373 */
     if (buildOpts.skipPush && username === '') {
-      core.warning('Skipping docker authentication as no credentials were provided. If your base image is located on a private docker registry, the docker build might fail.');
+      core.warning(
+        'Skipping docker authentication as no credentials were provided. If your base image is located on a private docker registry, the docker build might fail.'
+      );
     } else {
       core.info('Perform docker login with provided credentials, even if pushImage is set to false.');
       docker.login(username, password, registry);
