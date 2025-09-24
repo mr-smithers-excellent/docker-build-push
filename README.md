@@ -2,8 +2,8 @@
 
 [![Unit Tests](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/ci.yml/badge.svg)](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/ci.yml)
 [![e2e Tests](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/nightly-e2e.yml/badge.svg)](https://github.com/mr-smithers-excellent/docker-build-push/actions/workflows/nightly-e2e.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/maintainability)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/ac0bf06dc93ba3110cd3/test_coverage)](https://codeclimate.com/github/mr-smithers-excellent/docker-build-push/test_coverage)
+[![Maintainability](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push/maintainability.svg)](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push)
+[![Test Coverage](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push/coverage.svg)](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push)
 
 Builds a Docker image and pushes it to the private registry of your choosing.
 
