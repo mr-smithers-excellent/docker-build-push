@@ -2,6 +2,10 @@ name: 'Unit Tests'
 
 on: [push]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   run-tests:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -18,13 +22,14 @@ jobs:
       - name: Build
         run: npm ci
 
-      - name: Run tests & submit coverage report
-        uses: paambaati/codeclimate-action@v5.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      - name: Run tests
+        run: npm run test
+
+      - name: Submit coverage report
+        uses: qltysh/qlty-action/coverage@v2
         with:
-          coverageCommand: npm run test
-          coverageLocations: "coverage/lcov.info:lcov"
+          oidc: true
+          files: coverage/lcov.info
 
   dependabot-tests:
     if: ${{ github.actor == 'dependabot[bot]' }}
