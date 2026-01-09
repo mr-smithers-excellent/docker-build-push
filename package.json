@@ -36,7 +36,7 @@
   "homepage": "https://github.com/mr-smithers-excellent/docker-build-push-action#readme",
   "dependencies": {
     "18": "^0.0.0",
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^2.0.2",
     "@actions/github": "^6.0.1",
     "dayjs": "^1.11.19"
   },
