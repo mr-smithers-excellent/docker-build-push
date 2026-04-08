@@ -70,6 +70,8 @@ steps:
 | labels         | Docker build labels passed via `--label`                                                                 | No       | List    |
 | target         | Docker build target passed via `--target`                                                                | No       | String  |
 | platform       | Docker build platform passed via `--platform`                                                            | No       | String  |
+| cacheFrom      | Docker cache source passed via `--cache-from` (e.g. `type=gha` or `type=registry,ref=myimage:cache`)    | No       | String  |
+| cacheTo        | Docker cache destination passed via `--cache-to` (e.g. `type=gha,mode=max`)                              | No       | String  |
 | username       | Docker registry username                                                                                 | No       | String  |
 | password       | Docker registry password or token                                                                        | No       | String  |
 | githubOrg      | GitHub organization to push image to (if not current)                                                    | No       | String  |

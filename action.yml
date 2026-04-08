@@ -58,6 +58,12 @@ inputs:
     description: "Enables Docker BuildKit support"
     required: false
     default: "false"
+  cacheFrom:
+    description: "Docker cache source passed via --cache-from (e.g. type=gha or type=registry,ref=myimage:cache)"
+    required: false
+  cacheTo:
+    description: "Docker cache destination passed via --cache-to (e.g. type=gha,mode=max)"
+    required: false
   multiPlatform:
     description: "Builds image with buildx to support multiple platforms"
     required: false
