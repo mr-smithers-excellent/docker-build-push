@@ -1,4 +1,3 @@
-const { context } = require('@actions/github');
 const core = require('@actions/core');
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
@@ -11,8 +10,11 @@ const isPullRequest = ref => ref && ref.includes('refs/pull/');
 const getDefaultOwner = () => {
   let owner;
   try {
-    const { repo } = context;
-    owner = repo.owner;
+    const repository = process.env.GITHUB_REPOSITORY;
+    if (!repository) {
+      throw new Error("context.repo requires a GITHUB_REPOSITORY environment variable like 'owner/repo'");
+    }
+    [owner] = repository.split('/');
   } catch (error) {
     core.setFailed(`Action failed with error ${error}`);
   }
