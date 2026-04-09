@@ -74,6 +74,8 @@ steps:
 | password       | Docker registry password or token                                                                        | No       | String  |
 | githubOrg      | GitHub organization to push image to (if not current)                                                    | No       | String  |
 | enableBuildKit | Enables Docker BuildKit support                                                                          | No       | Boolean |
+| cacheFrom      | Docker cache source passed via `--cache-from` (e.g. `type=gha` or `type=registry,ref=myimage:cache`). Requires `enableBuildKit: true` for advanced cache types.    | No       | String  |
+| cacheTo        | Docker cache destination passed via `--cache-to` (e.g. `type=gha,mode=max`). Requires `enableBuildKit: true`.                              | No       | String  |
 | multiPlatform  | Enables Docker buildx support                                                                            | No       | Boolean |
 | overrideDriver | Disables setting up docker-container driver (if `true`, alternative docker driver must be set up)        | No       | Boolean |
 | pushImage      | Flag for disabling the push step, set to `true` by default                                               | No       | Boolean |
@@ -210,6 +212,8 @@ For a `main` branch build with commit `1234567`, this would produce tags: `main-
 ## BuildKit support
 
 Enables [Docker BuildKit](https://docs.docker.com/build/buildkit/)
+
+> **Note:** BuildKit is required when using advanced cache types such as `type=gha` or `type=registry` with the `cacheFrom` and `cacheTo` inputs. Set `enableBuildKit: true` to avoid errors like `unknown flag: --cache-to`.
 
 ```yaml
 steps:

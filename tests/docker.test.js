@@ -277,6 +277,46 @@ describe('Docker build, login & push commands', () => {
       );
     });
 
+    test('Build with cache from and cache to', () => {
+      const image = 'docker.io/this-project/that-image';
+      buildOpts.tags = ['latest'];
+      buildOpts.cacheFrom = 'type=gha';
+      buildOpts.cacheTo = 'type=gha,mode=max';
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --cache-from type=gha --cache-to type=gha,mode=max .`,
+        cpOptions
+      );
+    });
+
+    test('Build with only cache from', () => {
+      const image = 'docker.io/this-project/that-image';
+      buildOpts.tags = ['latest'];
+      buildOpts.cacheFrom = 'type=registry,ref=myimage:cache';
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --cache-from type=registry,ref=myimage:cache .`,
+        cpOptions
+      );
+    });
+
+    test('Build with only cache to', () => {
+      const image = 'docker.io/this-project/that-image';
+      buildOpts.tags = ['latest'];
+      buildOpts.cacheTo = 'type=gha,mode=max';
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --cache-to type=gha,mode=max .`,
+        cpOptions
+      );
+    });
+
     test('Build in different directory', () => {
       const image = 'gcr.io/some-project/image';
       buildOpts.tags = ['v1'];

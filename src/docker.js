@@ -88,6 +88,14 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} ${sshSuffix}`;
   }
 
+  if (buildOpts.cacheFrom) {
+    buildCommandPrefix = `${buildCommandPrefix} --cache-from ${buildOpts.cacheFrom}`;
+  }
+
+  if (buildOpts.cacheTo) {
+    buildCommandPrefix = `${buildCommandPrefix} --cache-to ${buildOpts.cacheTo}`;
+  }
+
   if (buildOpts.enableBuildKit) {
     buildCommandPrefix = `DOCKER_BUILDKIT=1 ${buildCommandPrefix}`;
   }
