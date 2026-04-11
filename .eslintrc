@@ -9,9 +9,12 @@
     "jest": true
   },
   "parserOptions": {
-    "ecmaVersion": 2021
+    "ecmaVersion": 2022,
+    "sourceType": "module"
   },
   "rules": {
+    "import/extensions": ["error", "ignorePackages", { "js": "always" }],
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": ["tests/**"] }],
     "prettier/prettier": [
       "error",
       {

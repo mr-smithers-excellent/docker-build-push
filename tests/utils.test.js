@@ -1,4 +1,4 @@
-const { parseArray, asBool } = require('../src/utils');
+import { parseArray, asBool } from '../src/utils.js';
 
 describe('Parse a comma-delimited strings', () => {
   test('Parse string with spaces and return an array', () => {

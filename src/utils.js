@@ -1,4 +1,4 @@
-const dayjs = require('dayjs');
+import dayjs from 'dayjs';
 
 const timestamp = () => dayjs().format('YYYY-MM-DD.HHMMss');
 
@@ -35,9 +35,4 @@ const asBool = value => {
   }
 };
 
-module.exports = {
-  timestamp,
-  parseArray,
-  cpOptions,
-  asBool
-};
+export { timestamp, parseArray, cpOptions, asBool };

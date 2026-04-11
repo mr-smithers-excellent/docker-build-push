@@ -1,4 +1,4 @@
-const core = require('@actions/core');
+import * as core from '@actions/core';
 
 const isGitHubTag = ref => ref && ref.includes('refs/tags/');
 
@@ -32,12 +32,4 @@ const tagRefToSlug = githubRef => refToSlug(githubRef.replace('refs/tags/', ''))
 const branchRefToSlug = githubRef => refToSlug(githubRef.replace('refs/heads/', ''));
 const prRefToSlug = githubRef => refToSlug(githubRef.replace('refs/pull/', '').split('/').shift());
 
-module.exports = {
-  branchRefToSlug,
-  getDefaultOwner,
-  isBranch,
-  isGitHubTag,
-  isPullRequest,
-  prRefToSlug,
-  tagRefToSlug
-};
+export { branchRefToSlug, getDefaultOwner, isBranch, isGitHubTag, isPullRequest, prRefToSlug, tagRefToSlug };

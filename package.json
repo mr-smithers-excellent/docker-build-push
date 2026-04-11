@@ -3,11 +3,12 @@
   "version": "5.7.0",
   "description": "Docker Build & Push Action",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "build": "esbuild src/main.js --bundle --platform=node --outfile=dist/index.js --format=cjs --conditions=import",
     "precommit": "npm run build && git add dist/",
     "lint": "eslint 'src/**.js' 'tests/**.js' --fix",
-    "test": "eslint 'src/**.js' 'tests/**.js' && jest --coverage",
+    "test": "eslint 'src/**.js' 'tests/**.js' && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:watch": "npm run test -- --watchAll",
     "prepare": "husky install"
   },
@@ -41,6 +42,7 @@
     "dayjs": "^1.11.20"
   },
   "devDependencies": {
+    "@jest/globals": "^30.3.0",
     "esbuild": "^0.28.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -53,5 +55,8 @@
     "jest": "^30.3.0",
     "mockdate": "^3.0.5",
     "prettier": "^3.8.2"
+  },
+  "jest": {
+    "transform": {}
   }
 }
