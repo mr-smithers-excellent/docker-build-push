@@ -1,6 +1,5 @@
 jest.mock('@actions/core');
 
-const { context } = require('@actions/github');
 const core = require('@actions/core');
 const cp = require('child_process');
 const fs = require('fs');
@@ -19,11 +18,15 @@ describe('Create Docker image tags', () => {
     addTimestamp = false;
   });
 
-  afterEach(() => MockDate.reset());
+  afterEach(() => {
+    MockDate.reset();
+    delete process.env.GITHUB_REF;
+    delete process.env.GITHUB_SHA;
+  });
 
   test('Create from tag push', () => {
-    context.ref = 'refs/tags/v1.0';
-    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    process.env.GITHUB_REF = 'refs/tags/v1.0';
+    process.env.GITHUB_SHA = '8d93430eddafb926c668181c71f579556f68668c';
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -32,8 +35,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from tag push with addLatest', () => {
-    context.ref = 'refs/tags/v1.0';
-    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    process.env.GITHUB_REF = 'refs/tags/v1.0';
+    process.env.GITHUB_SHA = '8d93430eddafb926c668181c71f579556f68668c';
     addLatest = true;
 
     const tags = docker.createTags(addLatest, addTimestamp);
@@ -44,8 +47,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from tag push with addLatest passed as string', () => {
-    context.ref = 'refs/tags/v1.0';
-    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    process.env.GITHUB_REF = 'refs/tags/v1.0';
+    process.env.GITHUB_SHA = '8d93430eddafb926c668181c71f579556f68668c';
     addLatest = 'true';
 
     const tags = docker.createTags(addLatest, addTimestamp);
@@ -56,8 +59,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from tag push with addTimestamp', () => {
-    context.ref = 'refs/tags/v1.0';
-    context.sha = '8d93430eddafb926c668181c71f579556f68668c';
+    process.env.GITHUB_REF = 'refs/tags/v1.0';
+    process.env.GITHUB_SHA = '8d93430eddafb926c668181c71f579556f68668c';
     addLatest = true;
     addTimestamp = true;
 
@@ -69,8 +72,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from tag push with capital letters', () => {
-    context.ref = 'refs/tags/V1.0';
-    context.sha = '60336540c3df28b52b1e364a65ff5b8f6ec135b8';
+    process.env.GITHUB_REF = 'refs/tags/V1.0';
+    process.env.GITHUB_SHA = '60336540c3df28b52b1e364a65ff5b8f6ec135b8';
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -79,8 +82,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from master branch push', () => {
-    context.ref = 'refs/heads/master';
-    context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+    process.env.GITHUB_REF = 'refs/heads/master';
+    process.env.GITHUB_SHA = '79d9bbba94cdbe372703f184e82c102107c71264';
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -89,8 +92,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from dev branch push with addLatest', () => {
-    context.ref = 'refs/heads/dev';
-    context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+    process.env.GITHUB_REF = 'refs/heads/dev';
+    process.env.GITHUB_SHA = '79d9bbba94cdbe372703f184e82c102107c71264';
     addLatest = true;
 
     const tags = docker.createTags(addLatest, addTimestamp);
@@ -101,8 +104,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from dev branch push with addTimestamp', () => {
-    context.ref = 'refs/heads/dev';
-    context.sha = '79d9bbba94cdbe372703f184e82c102107c71264';
+    process.env.GITHUB_REF = 'refs/heads/dev';
+    process.env.GITHUB_SHA = '79d9bbba94cdbe372703f184e82c102107c71264';
     addTimestamp = true;
 
     const tags = docker.createTags(addLatest, addTimestamp);
@@ -118,8 +121,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from feature branch pre-pended with Jira ticket number', () => {
-    context.ref = 'refs/heads/jira-123/feature/some-cool-feature';
-    context.sha = 'f427b0b731ed7664ce4a9fba291ab25fa2e57bd3';
+    process.env.GITHUB_REF = 'refs/heads/jira-123/feature/some-cool-feature';
+    process.env.GITHUB_SHA = 'f427b0b731ed7664ce4a9fba291ab25fa2e57bd3';
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -128,8 +131,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from feature branch without Jira number', () => {
-    context.ref = 'refs/heads/no-jira-number';
-    context.sha = 'd3c98d2f50ab48322994ad6f80e460bde166b32f';
+    process.env.GITHUB_REF = 'refs/heads/no-jira-number';
+    process.env.GITHUB_SHA = 'd3c98d2f50ab48322994ad6f80e460bde166b32f';
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -138,8 +141,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from feature branch with capital letters', () => {
-    context.ref = 'refs/heads/SOME-mixed-CASE-Branch';
-    context.sha = '152568521eb446d7b331a4e7c1215d29605bf884';
+    process.env.GITHUB_REF = 'refs/heads/SOME-mixed-CASE-Branch';
+    process.env.GITHUB_SHA = '152568521eb446d7b331a4e7c1215d29605bf884';
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -148,8 +151,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from pull request', () => {
-    context.ref = 'refs/pull/1/merge';
-    context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
+    process.env.GITHUB_REF = 'refs/pull/1/merge';
+    process.env.GITHUB_SHA = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
     core.setFailed = jest.fn();
 
     const tags = docker.createTags(addLatest, false);
@@ -159,8 +162,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from pull request with timestamp', () => {
-    context.ref = 'refs/pull/1/merge';
-    context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
+    process.env.GITHUB_REF = 'refs/pull/1/merge';
+    process.env.GITHUB_SHA = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
     core.setFailed = jest.fn();
 
     const tags = docker.createTags(addLatest, true);
@@ -170,8 +173,8 @@ describe('Create Docker image tags', () => {
   });
 
   test('Create from unknown event (not supported)', () => {
-    context.ref = 'refs/unknown/';
-    context.sha = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
+    process.env.GITHUB_REF = 'refs/unknown/';
+    process.env.GITHUB_SHA = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
     core.setFailed = jest.fn();
 
     const tags = docker.createTags(addLatest, addTimestamp);

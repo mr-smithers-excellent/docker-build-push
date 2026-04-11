@@ -1,7 +1,6 @@
 const cp = require('child_process');
 const core = require('@actions/core');
 const fs = require('fs');
-const { context } = require('@actions/github');
 const { isGitHubTag, isBranch, isPullRequest, branchRefToSlug, prRefToSlug, tagRefToSlug } = require('./github');
 const { timestamp, cpOptions, asBool } = require('./utils');
 
@@ -18,8 +17,8 @@ const createFullImageName = (registry, image, githubOwner) => {
 // Create Docker tags based on input flags & Git branch
 const createTags = (addLatest, addTimestamp) => {
   core.info('Creating Docker image tags...');
-  const { sha } = context;
-  const ref = context.ref.toLowerCase();
+  const sha = process.env.GITHUB_SHA || '';
+  const ref = (process.env.GITHUB_REF || '').toLowerCase();
   const shortSha = sha.substring(0, 7);
   const dockerTags = [];
 
