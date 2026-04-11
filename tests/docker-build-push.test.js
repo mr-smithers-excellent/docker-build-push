@@ -1,32 +1,34 @@
-jest.mock('@actions/core');
+import { jest } from '@jest/globals';
 
-jest.mock('child_process', () => ({
-  ...jest.requireActual('child_process'),
-  execSync: jest.fn(),
-  setFailed: jest.fn()
+jest.unstable_mockModule('@actions/core', () => ({
+  getInput: jest.fn(),
+  setOutput: jest.fn(),
+  setFailed: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn()
 }));
 
-jest.mock('../src/docker', () => ({
-  ...jest.requireActual('../src/docker'),
+jest.unstable_mockModule('../src/docker.js', () => ({
+  createFullImageName: jest.fn(),
   createTags: jest.fn(),
-  push: jest.fn(),
-  login: jest.fn()
+  build: jest.fn(),
+  login: jest.fn(),
+  push: jest.fn()
 }));
 
-const core = require('@actions/core');
-const cp = require('child_process');
-const docker = require('../src/docker');
-const run = require('../src/docker-build-push');
-const { parseArray, cpOptions } = require('../src/utils');
+const core = await import('@actions/core');
+const docker = await import('../src/docker.js');
+const { default: run } = await import('../src/docker-build-push.js');
+const { parseArray } = await import('../src/utils.js');
 
 const mockOwner = 'owner';
 const mockRepoName = 'some-repo';
 
+const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
+
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
-  // Inputs
   expect(core.getInput).toHaveBeenCalledTimes(22);
 
-  // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
   expect(core.setOutput).toHaveBeenCalledTimes(3);
   expect(core.setOutput).toHaveBeenCalledWith('imageFullName', imageFullName);
@@ -47,6 +49,13 @@ beforeAll(() => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Restore createFullImageName to its real behaviour so imageFullName is computed correctly
+  docker.createFullImageName.mockImplementation((registry, image, githubOwner) => {
+    if (GITHUB_REGISTRY_URLS.includes(registry)) {
+      return `${registry}/${githubOwner.toLowerCase()}/${image}`;
+    }
+    return `${registry}/${image}`;
+  });
   inputs = {
     image: undefined,
     registry: undefined,
@@ -79,16 +88,16 @@ describe('Create & push Docker image to GitHub Registry', () => {
     imageFullName = `${inputs.registry}/${inputs.githubOrg}/${inputs.image}`;
     const tagOverrides = ['staging-123'];
 
-    docker.createTags = jest.fn().mockReturnValueOnce(tagOverrides);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    docker.createTags.mockReturnValueOnce(tagOverrides);
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs, tagOverrides);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.githubOrg}/${inputs.image}:${tagOverrides} .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ tags: tagOverrides })
     );
   });
 
@@ -98,18 +107,16 @@ describe('Create & push Docker image to GitHub Registry', () => {
     imageFullName = `${inputs.registry}/${mockOwner}/${inputs.image}`;
     const tagOverrides = ['feat-123'];
 
-    docker.createTags = jest.fn().mockReturnValueOnce(tagOverrides);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    docker.createTags.mockReturnValueOnce(tagOverrides);
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs, tagOverrides);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${mockOwner.toLowerCase()}/${
-        inputs.image
-      }:${tagOverrides} .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ tags: tagOverrides })
     );
   });
 
@@ -121,18 +128,15 @@ describe('Create & push Docker image to GitHub Registry', () => {
     process.env.GITHUB_REPOSITORY = `${mockOrg}/${mockRepoName}`;
     imageFullName = `${inputs.registry}/${mockOrg.toLowerCase()}/${inputs.image}`;
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${mockOrg.toLowerCase()}/${inputs.image}:${
-        inputs.tags
-      } .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ tags: ['latest'] })
     );
   });
 });
@@ -144,16 +148,16 @@ describe('Create & push Docker image to GCR', () => {
     const tagOverrides = ['dev-1234667'];
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(tagOverrides);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    docker.createTags.mockReturnValueOnce(tagOverrides);
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs, tagOverrides);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:${tagOverrides} .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ tags: tagOverrides, buildDir: '.' })
     );
   });
 
@@ -164,16 +168,15 @@ describe('Create & push Docker image to GCR', () => {
     inputs.target = 'builder';
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest -t ${inputs.registry}/${inputs.image}:v1 --target ${inputs.target} .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ target: 'builder' })
     );
   });
 
@@ -186,16 +189,18 @@ describe('Create & push Docker image to GCR', () => {
     inputs.labels = 'version=1.0,maintainer=mr-smithers-excellent';
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 --label version=1.0 --label maintainer=mr-smithers-excellent .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({
+        buildArgs: ['VERSION=1.1.1', 'BUILD_DATE=2020-01-14'],
+        labels: ['version=1.0', 'maintainer=mr-smithers-excellent']
+      })
     );
   });
 
@@ -206,16 +211,15 @@ describe('Create & push Docker image to GCR', () => {
     inputs.platform = 'linux/amd64,linux/arm64';
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest -t ${inputs.registry}/${inputs.image}:v1 --platform ${inputs.platform} .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ platform: 'linux/amd64,linux/arm64' })
     );
   });
 
@@ -226,16 +230,15 @@ describe('Create & push Docker image to GCR', () => {
     inputs.enableBuildKit = 'true';
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `DOCKER_BUILDKIT=1 docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ enableBuildKit: true })
     );
   });
 
@@ -246,16 +249,15 @@ describe('Create & push Docker image to GCR', () => {
     inputs.multiPlatform = 'true';
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --push .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ multiPlatform: true })
     );
   });
 
@@ -267,16 +269,15 @@ describe('Create & push Docker image to GCR', () => {
     inputs.pushImage = 'false';
     imageFullName = getDefaultImageName();
 
-    docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     runAssertions(imageFullName, inputs);
-    expect(cp.execSync).toHaveBeenCalledTimes(2);
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ multiPlatform: true, skipPush: true })
     );
   });
 
@@ -288,23 +289,23 @@ describe('Create & push Docker image to GCR', () => {
     imageFullName = getDefaultImageName();
 
     const generatedTags = ['auto-tag'];
-    docker.createTags = jest.fn().mockReturnValue(generatedTags);
-    core.getInput = jest.fn().mockImplementation(mockGetInput(inputs));
+    docker.createTags.mockReturnValue(generatedTags);
+    core.getInput.mockImplementation(mockGetInput(inputs));
 
     run();
 
     const expectedTags = ['auto-tag', 'custom-tag'];
     expect(core.setOutput).toHaveBeenCalledWith('tags', expectedTags.toString());
-
-    expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:auto-tag -t ${inputs.registry}/${inputs.image}:custom-tag .`,
-      cpOptions
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({ tags: expectedTags })
     );
   });
 
   test('Docker login error', () => {
     const error = 'Error: Cannot perform an interactive login from a non TTY device';
-    docker.login = jest.fn().mockImplementation(() => {
+    docker.login.mockImplementation(() => {
       throw new Error(error);
     });
 

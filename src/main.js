@@ -1,5 +1,3 @@
-const run = require('./docker-build-push');
+import run from './docker-build-push.js';
 
-if (require.main === module) {
-  run();
-}
+run();

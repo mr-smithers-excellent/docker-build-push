@@ -1,11 +1,19 @@
-jest.mock('@actions/core');
+import { jest } from '@jest/globals';
 
-const core = require('@actions/core');
-const cp = require('child_process');
-const fs = require('fs');
-const MockDate = require('mockdate');
-const docker = require('../src/docker');
-const { cpOptions } = require('../src/utils');
+jest.unstable_mockModule('@actions/core', () => ({
+  setFailed: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn(),
+  getInput: jest.fn(),
+  setOutput: jest.fn()
+}));
+
+const core = await import('@actions/core');
+const { default: cp } = await import('child_process');
+const { default: fs } = await import('fs');
+const { default: MockDate } = await import('mockdate');
+const docker = await import('../src/docker.js');
+const { cpOptions } = await import('../src/utils.js');
 
 describe('Create Docker image tags', () => {
   let addLatest;
@@ -13,7 +21,6 @@ describe('Create Docker image tags', () => {
 
   beforeEach(() => {
     MockDate.set(new Date('2023-06-13T00:00:00'));
-
     addLatest = false;
     addTimestamp = false;
   });
@@ -22,6 +29,7 @@ describe('Create Docker image tags', () => {
     MockDate.reset();
     delete process.env.GITHUB_REF;
     delete process.env.GITHUB_SHA;
+    core.setFailed.mockClear();
   });
 
   test('Create from tag push', () => {
@@ -153,7 +161,6 @@ describe('Create Docker image tags', () => {
   test('Create from pull request', () => {
     process.env.GITHUB_REF = 'refs/pull/1/merge';
     process.env.GITHUB_SHA = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
-    core.setFailed = jest.fn();
 
     const tags = docker.createTags(addLatest, false);
 
@@ -164,7 +171,6 @@ describe('Create Docker image tags', () => {
   test('Create from pull request with timestamp', () => {
     process.env.GITHUB_REF = 'refs/pull/1/merge';
     process.env.GITHUB_SHA = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
-    core.setFailed = jest.fn();
 
     const tags = docker.createTags(addLatest, true);
 
@@ -175,7 +181,6 @@ describe('Create Docker image tags', () => {
   test('Create from unknown event (not supported)', () => {
     process.env.GITHUB_REF = 'refs/unknown/';
     process.env.GITHUB_SHA = '89977b79ba5102dab6f3687e6c3b9c1cda878d0a';
-    core.setFailed = jest.fn();
 
     const tags = docker.createTags(addLatest, addTimestamp);
 
@@ -189,7 +194,6 @@ describe('Create Docker image tags', () => {
 describe('Docker build, login & push commands', () => {
   cp.execSync = jest.fn();
   fs.existsSync = jest.fn();
-  core.setFailed = jest.fn();
 
   afterEach(() => {
     cp.execSync.mockReset();
@@ -233,7 +237,7 @@ describe('Docker build, login & push commands', () => {
     test('Dockerfile exists', () => {
       const image = 'gcr.io/some-project/image';
       buildOpts.tags = ['v1'];
-      fs.existsSync = jest.fn().mockReturnValueOnce(false);
+      fs.existsSync.mockReturnValueOnce(false);
 
       docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');

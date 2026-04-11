@@ -1,7 +1,7 @@
-const core = require('@actions/core');
-const docker = require('./docker');
-const github = require('./github');
-const { parseArray } = require('./utils');
+import * as core from '@actions/core';
+import * as docker from './docker.js';
+import * as github from './github.js';
+import { parseArray } from './utils.js';
 
 const buildOpts = {
   tags: undefined,
@@ -88,4 +88,4 @@ const run = () => {
   }
 };
 
-module.exports = run;
+export default run;

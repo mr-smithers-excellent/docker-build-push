@@ -1,13 +1,24 @@
-jest.mock('@actions/core');
+import { jest } from '@jest/globals';
 
-const core = require('@actions/core');
-const github = require('../src/github');
-const { branchRefToSlug, prRefToSlug, tagRefToSlug } = require('../src/github');
+jest.unstable_mockModule('@actions/core', () => ({
+  setFailed: jest.fn(),
+  info: jest.fn(),
+  warning: jest.fn(),
+  getInput: jest.fn(),
+  setOutput: jest.fn()
+}));
+
+const core = await import('@actions/core');
+const { getDefaultOwner, branchRefToSlug, prRefToSlug, tagRefToSlug } = await import('../src/github.js');
 
 describe('Get default repo & owner name', () => {
+  afterEach(() => {
+    core.setFailed.mockClear();
+  });
+
   test('Returns the environment variable', () => {
     process.env.GITHUB_REPOSITORY = 'im-the-owner/this-is-my-repo';
-    const owner = github.getDefaultOwner();
+    const owner = getDefaultOwner();
 
     expect(owner).toEqual('im-the-owner');
     delete process.env.GITHUB_REPOSITORY;
@@ -18,9 +29,8 @@ describe('Get default repo & owner name', () => {
 
     const error =
       "Action failed with error Error: context.repo requires a GITHUB_REPOSITORY environment variable like 'owner/repo'";
-    core.setFailed = jest.fn();
 
-    github.getDefaultOwner();
+    getDefaultOwner();
     expect(core.setFailed).toHaveBeenCalledWith(error);
   });
 
