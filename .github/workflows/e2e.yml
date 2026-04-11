@@ -125,7 +125,7 @@ jobs:
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
 
       - name: Update check run
-        if: ${{ inputs.pr-trigger }}
+        if: ${{ inputs.pr-trigger && always() }}
         uses: actions/github-script@v7
         env:
           number: ${{ github.event.client_payload.pull_request.number }}
