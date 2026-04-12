@@ -105,16 +105,29 @@ jobs:
             });
             return check;
 
+      - name: Resolve registry
+        id: resolve
+        env:
+          REGISTRY_SECRET: ${{ matrix.registrySecret && secrets[matrix.registrySecret] || '' }}
+        run: |
+          REGISTRY="${REGISTRY_SECRET:-${{ matrix.registry }}}"
+          if [ -z "$REGISTRY" ]; then
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+            echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Docker image
         id: docker
-        if: ${{ !matrix.registrySecret || secrets[matrix.registrySecret] != '' }}
+        if: steps.resolve.outputs.configured == 'true'
         uses: ./
         with:
           image: ${{ matrix.image }}
           tags: ${{ github.run_id }}
           addLatest: ${{ matrix.addLatest }}
           addTimestamp: ${{ matrix.addTimestamp }}
-          registry: ${{ matrix.registrySecret && secrets[matrix.registrySecret] || matrix.registry }}
+          registry: ${{ steps.resolve.outputs.registry }}
           dockerfile: ${{ matrix.dockerfile }}
           directory: ${{ matrix.directory }}
           buildArgs: ${{ matrix.buildArgs }}
@@ -128,7 +141,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Verify Docker image
-        if: ${{ !matrix.registrySecret || secrets[matrix.registrySecret] != '' }}
+        if: steps.resolve.outputs.configured == 'true'
         run: |
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
