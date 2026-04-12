@@ -15,6 +15,7 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 - AWS Elastic Container Registry (ECR)
 - Azure Container Registry (ACR)
 - GitHub Docker Registry
+- JFrog Artifactory
 
 
 
@@ -219,6 +220,26 @@ with:
   registry: docker.pkg.github.com
   username: ${{ github.actor }}
   password: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### JFrog Artifactory
+
+- Create a Docker repository in Artifactory (see [getting started](https://jfrog.com/help/r/jfrog-artifactory-documentation/getting-started-with-artifactory-as-a-docker-registry))
+- Generate an [API key or identity token](https://jfrog.com/help/r/jfrog-platform-administration-documentation/user-profile) for authentication
+- Save the following as secrets in your GitHub repo:
+  - `JFROG_REGISTRY`: your Artifactory Docker registry host, e.g. `<instance>.jfrog.io` (cloud) or `<hostname>:<port>` (self-hosted)
+  - `JFROG_USERNAME`: your Artifactory username
+  - `JFROG_PASSWORD`: your Artifactory API key or identity token
+- The image path must include the repository name: `<docker-repo>/<image-name>`
+- Modify sample below and include in your workflow `.github/workflows/*.yml` file
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v6
+with:
+  image: docker-repo/image-name
+  registry: ${{ secrets.JFROG_REGISTRY }}
+  username: ${{ secrets.JFROG_USERNAME }}
+  password: ${{ secrets.JFROG_PASSWORD }}
 ```
 
 ## Contributing
