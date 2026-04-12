@@ -50,6 +50,13 @@ jobs:
             registry: 026181534292.dkr.ecr.us-west-2.amazonaws.com
             buildArgs: TEST=true
 
+          - name: ACR e2e
+            image: hello-world
+            dockerfile: ./e2e/Dockerfile
+            registrySecret: ACR_REGISTRY
+            username: ACR_USERNAME
+            password: ACR_PASSWORD
+
           - name: GHCR Legacy e2e
             image: docker-build-push/e2e-image
             dockerfile: ./e2e/Dockerfile
@@ -106,7 +113,7 @@ jobs:
           tags: ${{ github.run_id }}
           addLatest: ${{ matrix.addLatest }}
           addTimestamp: ${{ matrix.addTimestamp }}
-          registry: ${{ matrix.registry }}
+          registry: ${{ matrix.registrySecret && secrets[matrix.registrySecret] || matrix.registry }}
           dockerfile: ${{ matrix.dockerfile }}
           directory: ${{ matrix.directory }}
           buildArgs: ${{ matrix.buildArgs }}
