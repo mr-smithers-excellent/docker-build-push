@@ -12,6 +12,7 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 - Docker Hub
 - Google Container Registry (GCR)
 - AWS Elastic Container Registry (ECR)
+- Azure Container Registry (ACR)
 - GitHub Docker Registry
 
 ## Features
@@ -143,6 +144,25 @@ with:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+```
+
+### Azure Container Registry (ACR)
+
+- Create an Azure Container Registry (see [quickstart](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal))
+- Enable the **Admin user** under your registry's **Settings → Access keys**
+- Save the following as secrets in your GitHub repo:
+  - `ACR_REGISTRY`: your login server, e.g. `yourname.azurecr.io`
+  - `ACR_USERNAME`: the admin username (same as registry name)
+  - `ACR_PASSWORD`: one of the generated passwords
+- Modify sample below and include in your workflow `.github/workflows/*.yml` file
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v6
+with:
+  image: image-name
+  registry: ${{ secrets.ACR_REGISTRY }}
+  username: ${{ secrets.ACR_USERNAME }}
+  password: ${{ secrets.ACR_PASSWORD }}
 ```
 
 ### GitHub Container Registry
