@@ -86,7 +86,7 @@ jobs:
 
       - name: Create check run
         if: ${{ inputs.pr-trigger }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           name: ${{ matrix.name }}
           number: ${{ github.event.client_payload.pull_request.number }}
@@ -107,6 +107,7 @@ jobs:
 
       - name: Build and push Docker image
         id: docker
+        if: ${{ !matrix.registrySecret || secrets[matrix.registrySecret] != '' }}
         uses: ./
         with:
           image: ${{ matrix.image }}
@@ -127,13 +128,14 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Verify Docker image
+        if: ${{ !matrix.registrySecret || secrets[matrix.registrySecret] != '' }}
         run: |
           docker pull ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
           docker image inspect ${{ steps.docker.outputs.imageFullName }}:${{ github.run_id }}
 
       - name: Update check run
         if: ${{ inputs.pr-trigger && always() }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           number: ${{ github.event.client_payload.pull_request.number }}
           job: ${{ github.job }}

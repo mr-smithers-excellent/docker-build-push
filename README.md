@@ -15,6 +15,8 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 - Azure Container Registry (ACR)
 - GitHub Docker Registry
 
+
+
 ## Features
 
 - [Auto-tagging with GitOps](#auto-tagging-with-gitops)
