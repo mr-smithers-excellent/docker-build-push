@@ -72,6 +72,10 @@ inputs:
     description: "Disables setting up docker-container driver"
     required: false
     default: "false"
+  skipLogin:
+    description: "Skip the Docker login step, useful when credentials are pre-configured via a credential helper or OIDC"
+    required: false
+    default: "false"
   pushImage:
     description: "Flag for disabling the login & push steps, set to true by default"
     required: false

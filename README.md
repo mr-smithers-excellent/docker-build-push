@@ -82,6 +82,7 @@ steps:
 | cacheTo        | Docker cache destination passed via `--cache-to` (e.g. `type=gha,mode=max`). Requires `enableBuildKit: true`.                              | No       | String  |
 | multiPlatform  | Enables Docker buildx support                                                                            | No       | Boolean |
 | overrideDriver | Disables setting up docker-container driver (if `true`, alternative docker driver must be set up)        | No       | Boolean |
+| skipLogin      | Skip the Docker login step, useful when credentials are pre-configured via a credential helper or OIDC   | No       | Boolean |
 | pushImage      | Flag for disabling the push step, set to `true` by default                                               | No       | Boolean |
 
 ## Outputs

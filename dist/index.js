@@ -19577,10 +19577,13 @@ var run = () => {
     const githubOwner = getInput("githubOrg") || getDefaultOwner();
     const addLatest = getInput("addLatest") === "true";
     const addTimestamp = getInput("addTimestamp") === "true";
+    const skipLogin = getInput("skipLogin") === "true";
     setBuildOpts(addLatest, addTimestamp);
     const imageFullName = createFullImageName(registry, image, githubOwner);
     info(`Docker image name used for this build: ${imageFullName}`);
-    if (buildOpts.skipPush && username === "") {
+    if (skipLogin) {
+      info("Skipping Docker login as skipLogin is set to true.");
+    } else if (buildOpts.skipPush && username === "") {
       warning(
         "Skipping docker authentication as no credentials were provided. If your base image is located on a private docker registry, the docker build might fail."
       );
