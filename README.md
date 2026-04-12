@@ -177,6 +177,52 @@ with:
   password: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+## Contributing
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v20 or higher
+- npm v8 or higher
+
+### Setup
+
+```bash
+git clone https://github.com/mr-smithers-excellent/docker-build-push.git
+cd docker-build-push
+npm install
+```
+
+> **Note:** `eslint-config-airbnb-base` and `eslint-plugin-import` have not yet formally declared ESLint 10 peer dependency support. A `.npmrc` file in this repo sets `legacy-peer-deps=true` to allow installation without errors. This flag is automatically applied — no extra flags are needed when running `npm install` or `npm ci`.
+
+### Scripts
+
+| Command | Description |
+|---|---|
+| `npm test` | Runs ESLint then the full Jest test suite with coverage |
+| `npm run test:watch` | Runs tests in watch mode |
+| `npm run lint` | Runs ESLint with auto-fix on `src/` and `tests/` |
+| `npm run build` | Bundles `src/main.js` into `dist/index.js` via esbuild |
+
+### Building locally
+
+The action runs from the pre-built `dist/index.js` bundle (committed to the repo). After making changes to any file in `src/`, rebuild before committing:
+
+```bash
+npm run build
+```
+
+A [Husky](https://typicode.com/husky) pre-commit hook runs `npm run build` automatically and stages the updated `dist/` for you, so in normal development you don't need to run this manually.
+
+### Testing
+
+```bash
+npm test
+```
+
+This runs ESLint across `src/` and `tests/`, then Jest with coverage. All 4 test suites must pass before a PR will be accepted.
+
+---
+
 ## Auto-tagging with GitOps
 
 By default, if you do not pass a `tags` input this action will use an algorithm based on the state of your git repo to determine the Docker image tag(s). This is designed to enable developers to more easily use [GitOps](https://www.weave.works/technologies/gitops/) in their CI/CD pipelines. Below is a table detailing how the GitHub trigger (branch or tag) determines the Docker tag(s).
