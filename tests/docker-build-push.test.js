@@ -27,7 +27,7 @@ const mockRepoName = 'some-repo';
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
-  expect(core.getInput).toHaveBeenCalledTimes(22);
+  expect(core.getInput).toHaveBeenCalledTimes(23);
 
   const tags = tagOverrides || parseArray(inputs.tags);
   expect(core.setOutput).toHaveBeenCalledTimes(3);
@@ -71,7 +71,8 @@ beforeEach(() => {
     dockerfile: 'Dockerfile',
     buildDir: '.',
     enableBuildKit: undefined,
-    platform: undefined
+    platform: undefined,
+    skipLogin: undefined
   };
   imageFullName = undefined;
 });
@@ -279,6 +280,39 @@ describe('Create & push Docker image to GCR', () => {
       inputs.dockerfile,
       expect.objectContaining({ multiPlatform: true, skipPush: true })
     );
+  });
+
+  test('Skip login when skipLogin is true', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest';
+    inputs.skipLogin = 'true';
+    imageFullName = getDefaultImageName();
+
+    core.getInput.mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+    expect(docker.login).not.toHaveBeenCalled();
+    expect(docker.build).toHaveBeenCalledWith(imageFullName, inputs.dockerfile, expect.any(Object));
+  });
+
+  test('Skip login warning when pushImage is false and no credentials provided', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest';
+    inputs.pushImage = 'false';
+    inputs.username = '';
+    imageFullName = getDefaultImageName();
+
+    core.getInput.mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+    expect(docker.login).not.toHaveBeenCalled();
+    expect(core.warning).toHaveBeenCalledWith(expect.stringContaining('Skipping docker authentication'));
   });
 
   test('Enable appendMode to combine generated and custom tags', () => {

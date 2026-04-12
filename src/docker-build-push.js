@@ -60,6 +60,7 @@ const run = () => {
     const githubOwner = core.getInput('githubOrg') || github.getDefaultOwner();
     const addLatest = core.getInput('addLatest') === 'true';
     const addTimestamp = core.getInput('addTimestamp') === 'true';
+    const skipLogin = core.getInput('skipLogin') === 'true';
     setBuildOpts(addLatest, addTimestamp);
 
     // Create the Docker image name
@@ -67,8 +68,11 @@ const run = () => {
     core.info(`Docker image name used for this build: ${imageFullName}`);
 
     // Log in, build & push the Docker image
-    /* #373: https://github.com/mr-smithers-excellent/docker-build-push/issues/373 */
-    if (buildOpts.skipPush && username === '') {
+    /* #224: https://github.com/mr-smithers-excellent/docker-build-push/issues/224 */
+    if (skipLogin) {
+      core.info('Skipping Docker login as skipLogin is set to true.');
+      /* #373: https://github.com/mr-smithers-excellent/docker-build-push/issues/373 */
+    } else if (buildOpts.skipPush && username === '') {
       core.warning(
         'Skipping docker authentication as no credentials were provided. If your base image is located on a private docker registry, the docker build might fail.'
       );
