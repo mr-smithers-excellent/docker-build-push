@@ -11,6 +11,7 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 
 - Docker Hub
 - Google Container Registry (GCR)
+- Google Artifact Registry (GAR)
 - AWS Elastic Container Registry (ECR)
 - Azure Container Registry (ACR)
 - GitHub Docker Registry
@@ -128,6 +129,26 @@ with:
   registry: gcr.io
   username: _json_key
   password: ${{ secrets.DOCKER_PASSWORD }}
+```
+
+### Google Artifact Registry (GAR)
+
+- Create a Docker repository in GAR (see [quickstart](https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling))
+- Create a service account with the **Artifact Registry Writer** role (`roles/artifactregistry.writer`)
+- Create and download a JSON key for the service account (**IAM & Admin → Service Accounts → Keys → Add Key → JSON**)
+- Save the following as secrets in your GitHub repo:
+  - `GAR_REGISTRY`: your registry host, e.g. `us-west1-docker.pkg.dev`
+  - `GAR_PASSWORD`: the full contents of the downloaded JSON key file
+- Modify sample below and include in your workflow `.github/workflows/*.yml` file
+- Set the username to `_json_key` when authenticating with a JSON key
+
+```yaml
+uses: mr-smithers-excellent/docker-build-push@v6
+with:
+  image: project-id/repository/image-name
+  registry: ${{ secrets.GAR_REGISTRY }}
+  username: _json_key
+  password: ${{ secrets.GAR_PASSWORD }}
 ```
 
 ### AWS Elastic Container Registry (ECR)
