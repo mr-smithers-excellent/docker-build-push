@@ -19470,6 +19470,10 @@ var createBuildCommand = (imageName, dockerfile, buildOpts2) => {
     const sshSuffix = buildOpts2.ssh.map((ssh) => `--ssh ${ssh}`).join(" ");
     buildCommandPrefix = `${buildCommandPrefix} ${sshSuffix}`;
   }
+  if (buildOpts2.secrets) {
+    const secretsSuffix = buildOpts2.secrets.map((secret) => `--secret ${secret}`).join(" ");
+    buildCommandPrefix = `${buildCommandPrefix} ${secretsSuffix}`;
+  }
   if (buildOpts2.cacheFrom) {
     buildCommandPrefix = `${buildCommandPrefix} --cache-from ${buildOpts2.cacheFrom}`;
   }
@@ -19564,6 +19568,7 @@ var setBuildOpts = (addLatest, addTimestamp) => {
   buildOpts.platform = getInput("platform");
   buildOpts.skipPush = getInput("pushImage") === "false";
   buildOpts.ssh = parseArray(getInput("ssh"));
+  buildOpts.secrets = parseArray(getInput("secrets"));
   buildOpts.cacheFrom = getInput("cacheFrom");
   buildOpts.cacheTo = getInput("cacheTo");
 };

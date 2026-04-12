@@ -45,6 +45,7 @@ const setBuildOpts = (addLatest, addTimestamp) => {
   buildOpts.platform = core.getInput('platform');
   buildOpts.skipPush = core.getInput('pushImage') === 'false';
   buildOpts.ssh = parseArray(core.getInput('ssh'));
+  buildOpts.secrets = parseArray(core.getInput('secrets'));
   buildOpts.cacheFrom = core.getInput('cacheFrom');
   buildOpts.cacheTo = core.getInput('cacheTo');
 };

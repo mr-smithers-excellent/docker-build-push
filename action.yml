@@ -37,6 +37,9 @@ inputs:
   ssh:
     description: "Docker build ssh options passed via --ssh"
     required: false
+  secrets:
+    description: "Docker build secrets passed via --secret (e.g. id=mysecret,src=secret.txt). Requires BuildKit."
+    required: false
   username:
     description: "Docker registry username"
     required: false

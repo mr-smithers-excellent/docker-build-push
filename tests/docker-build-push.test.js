@@ -27,7 +27,7 @@ const mockRepoName = 'some-repo';
 const GITHUB_REGISTRY_URLS = ['docker.pkg.github.com', 'ghcr.io'];
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
-  expect(core.getInput).toHaveBeenCalledTimes(23);
+  expect(core.getInput).toHaveBeenCalledTimes(24);
 
   const tags = tagOverrides || parseArray(inputs.tags);
   expect(core.setOutput).toHaveBeenCalledTimes(3);
@@ -72,7 +72,8 @@ beforeEach(() => {
     buildDir: '.',
     enableBuildKit: undefined,
     platform: undefined,
-    skipLogin: undefined
+    skipLogin: undefined,
+    secrets: undefined
   };
   imageFullName = undefined;
 });
@@ -201,6 +202,27 @@ describe('Create & push Docker image to GCR', () => {
       expect.objectContaining({
         buildArgs: ['VERSION=1.1.1', 'BUILD_DATE=2020-01-14'],
         labels: ['version=1.0', 'maintainer=mr-smithers-excellent']
+      })
+    );
+  });
+
+  test('Valid Docker inputs with build secrets', () => {
+    inputs.image = 'gcp-project/image';
+    inputs.registry = 'gcr.io';
+    inputs.tags = 'latest';
+    inputs.secrets = 'id=mysecret,src=secret.txt,id=npmtoken,env=NPM_TOKEN';
+    imageFullName = getDefaultImageName();
+
+    core.getInput.mockImplementation(mockGetInput(inputs));
+
+    run();
+
+    runAssertions(imageFullName, inputs);
+    expect(docker.build).toHaveBeenCalledWith(
+      imageFullName,
+      inputs.dockerfile,
+      expect.objectContaining({
+        secrets: ['id=mysecret', 'src=secret.txt', 'id=npmtoken', 'env=NPM_TOKEN']
       })
     );
   });

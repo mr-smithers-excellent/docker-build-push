@@ -87,6 +87,11 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
     buildCommandPrefix = `${buildCommandPrefix} ${sshSuffix}`;
   }
 
+  if (buildOpts.secrets) {
+    const secretsSuffix = buildOpts.secrets.map(secret => `--secret ${secret}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${secretsSuffix}`;
+  }
+
   if (buildOpts.cacheFrom) {
     buildCommandPrefix = `${buildCommandPrefix} --cache-from ${buildOpts.cacheFrom}`;
   }
