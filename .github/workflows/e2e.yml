@@ -36,9 +36,9 @@ jobs:
             platform: linux/amd64,linux/arm64,linux/arm/v7
 
           - name: GAR e2e
-            image: orbital-bank-301021/hello-world/hello-world
+            imageSecret: GAR_IMAGE
             dockerfile: ./e2e/Dockerfile
-            registry: us-west1-docker.pkg.dev
+            registrySecret: GAR_REGISTRY
             username: GAR_USERNAME
             password: GAR_PASSWORD
             labels: org.opencontainers.image.description="A Hello World image used for e2e tests"
@@ -105,17 +105,20 @@ jobs:
             });
             return check;
 
-      - name: Resolve registry
+      - name: Resolve registry and image
         id: resolve
         env:
           REGISTRY_SECRET: ${{ matrix.registrySecret && secrets[matrix.registrySecret] || '' }}
+          IMAGE_SECRET: ${{ matrix.imageSecret && secrets[matrix.imageSecret] || '' }}
         run: |
           REGISTRY="${REGISTRY_SECRET:-${{ matrix.registry }}}"
-          if [ -z "$REGISTRY" ]; then
+          IMAGE="${IMAGE_SECRET:-${{ matrix.image }}}"
+          if [ -z "$REGISTRY" ] || [ -z "$IMAGE" ]; then
             echo "configured=false" >> $GITHUB_OUTPUT
           else
             echo "configured=true" >> $GITHUB_OUTPUT
             echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+            echo "image=$IMAGE" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push Docker image
@@ -123,7 +126,7 @@ jobs:
         if: steps.resolve.outputs.configured == 'true'
         uses: ./
         with:
-          image: ${{ matrix.image }}
+          image: ${{ steps.resolve.outputs.image }}
           tags: ${{ github.run_id }}
           addLatest: ${{ matrix.addLatest }}
           addTimestamp: ${{ matrix.addTimestamp }}
