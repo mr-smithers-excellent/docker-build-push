@@ -8,6 +8,11 @@ on:
         default: false
         required: true
         type: boolean
+      ref:
+        description: 'Git ref to check out (used when pr-trigger is false)'
+        default: ''
+        required: false
+        type: string
 
 jobs:
   e2e:
@@ -77,6 +82,8 @@ jobs:
       - name: Check out code current branch
         if: ${{ !inputs.pr-trigger }}
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Check out merge code
         if: ${{ inputs.pr-trigger }}

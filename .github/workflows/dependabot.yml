@@ -1,7 +1,7 @@
 name: Dependabot
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -14,8 +14,10 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Check out PR code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: actions/setup-node@v6
         with:
@@ -39,6 +41,7 @@ jobs:
     secrets: inherit
     with:
       pr-trigger: false
+      ref: ${{ github.event.pull_request.head.sha }}
 
   auto-merge:
     needs: [unit-tests, e2e]
