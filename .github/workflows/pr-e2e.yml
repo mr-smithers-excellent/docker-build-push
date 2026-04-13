@@ -6,7 +6,6 @@ on:
 
 jobs:
   e2e:
-    if: ${{ github.actor != 'dependabot[bot]' }}
     uses: ./.github/workflows/e2e.yml
     secrets: inherit
     with:
