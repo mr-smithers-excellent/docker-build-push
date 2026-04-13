@@ -27,7 +27,7 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 
 ## Breaking changes
 
-If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently v6).
+If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently `v6`).
 
 ### v6
 - Multi-platform builds now supported
