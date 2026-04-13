@@ -1,12 +1,14 @@
 name: 'PR e2e Tests'
 
 on:
-  repository_dispatch:
-    types: [ok-to-test-command]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
 jobs:
   e2e:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     uses: ./.github/workflows/e2e.yml
     secrets: inherit
     with:
-      pr-trigger: true
+      pr-trigger: false
+      ref: ${{ github.event.pull_request.head.sha }}
