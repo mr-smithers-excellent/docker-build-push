@@ -1,13 +1,12 @@
 name: Ok To Test
 
 on:
-  issue_comment:
-    types: [created]
+  workflow_dispatch:
 
 jobs:
   ok-to-test:
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request }}
+    if: false
     steps:
     - name: Generate token
       id: generate_token
