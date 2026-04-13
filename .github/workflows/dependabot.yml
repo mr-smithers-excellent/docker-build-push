@@ -7,7 +7,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  packages: write
 
 jobs:
   unit-tests:
@@ -36,20 +35,12 @@ jobs:
           git add dist/
           git diff --staged --exit-code || (echo "❌ dist/ is not up-to-date. Please run 'npm run build' and commit the changes." && exit 1)
 
-  e2e:
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    uses: ./.github/workflows/e2e.yml
-    secrets: inherit
-    with:
-      pr-trigger: false
-      ref: ${{ github.event.pull_request.head.sha }}
-
   auto-merge:
-    needs: [unit-tests, e2e]
+    needs: [unit-tests]
     if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Merge PR
-        run: gh pr merge --merge "${{ github.event.pull_request.html_url }}"
+      - name: Enable auto-merge
+        run: gh pr merge --auto --merge "${{ github.event.pull_request.html_url }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
