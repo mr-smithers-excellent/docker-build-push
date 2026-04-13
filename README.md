@@ -5,7 +5,6 @@
 [![Maintainability](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push/maintainability.svg)](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push)
 [![Test Coverage](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push/coverage.svg)](https://qlty.sh/gh/mr-smithers-excellent/projects/docker-build-push)
 
-
 Builds a Docker image and pushes it to the private registry of your choosing.
 
 ## Supported Docker registries
