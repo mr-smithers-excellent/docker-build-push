@@ -1,0 +1,51 @@
+name: Dependabot
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  unit-tests:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Build
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Check dist is up-to-date
+        run: |
+          npm run build
+          git add dist/
+          git diff --staged --exit-code || (echo "❌ dist/ is not up-to-date. Please run 'npm run build' and commit the changes." && exit 1)
+
+  e2e:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    uses: ./.github/workflows/e2e.yml
+    secrets: inherit
+    with:
+      pr-trigger: false
+
+  auto-merge:
+    needs: [unit-tests, e2e]
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge PR
+        run: gh pr merge --merge "${{ github.event.pull_request.html_url }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
