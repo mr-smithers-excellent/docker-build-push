@@ -45,7 +45,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@jest/globals": "^30.3.0",
     "esbuild": "^0.28.0",
-    "eslint": "^10.2.0",
+    "eslint": "^10.2.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
