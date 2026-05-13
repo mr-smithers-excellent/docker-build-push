@@ -80,8 +80,8 @@ steps:
 | password       | Docker registry password or token                                                                        | No       | String  |
 | githubOrg      | GitHub organization to push image to (if not current)                                                    | No       | String  |
 | enableBuildKit | Enables Docker BuildKit support                                                                          | No       | Boolean |
-| cacheFrom      | Docker cache source passed via `--cache-from` (e.g. `type=gha` or `type=registry,ref=myimage:cache`). Requires `enableBuildKit: true` for advanced cache types.    | No       | String  |
-| cacheTo        | Docker cache destination passed via `--cache-to` (e.g. `type=gha,mode=max`). Requires `enableBuildKit: true`.                              | No       | String  |
+| cacheFrom      | Docker cache source(s) passed via `--cache-from`. Newline-separated for multiple sources (e.g. `type=gha` or `type=registry,ref=myimage:cache`). Requires `enableBuildKit: true` for advanced cache types.    | No       | List    |
+| cacheTo        | Docker cache destination(s) passed via `--cache-to`. Newline-separated for multiple destinations (e.g. `type=gha,mode=max`). Requires `enableBuildKit: true`.                              | No       | List    |
 | multiPlatform  | Enables Docker buildx support                                                                            | No       | Boolean |
 | overrideDriver | Disables setting up docker-container driver (if `true`, alternative docker driver must be set up)        | No       | Boolean |
 | skipLogin      | Skip the Docker login step, useful when credentials are pre-configured via a credential helper or OIDC   | No       | Boolean |

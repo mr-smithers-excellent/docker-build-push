@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as docker from './docker.js';
 import * as github from './github.js';
-import { parseArray } from './utils.js';
+import { parseArray, parseLines } from './utils.js';
 
 const buildOpts = {
   tags: undefined,
@@ -46,8 +46,8 @@ const setBuildOpts = (addLatest, addTimestamp) => {
   buildOpts.skipPush = core.getInput('pushImage') === 'false';
   buildOpts.ssh = parseArray(core.getInput('ssh'));
   buildOpts.secrets = parseArray(core.getInput('secrets'));
-  buildOpts.cacheFrom = core.getInput('cacheFrom');
-  buildOpts.cacheTo = core.getInput('cacheTo');
+  buildOpts.cacheFrom = parseLines(core.getInput('cacheFrom'));
+  buildOpts.cacheTo = parseLines(core.getInput('cacheTo'));
 };
 
 const run = () => {

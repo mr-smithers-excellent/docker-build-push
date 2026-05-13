@@ -287,8 +287,8 @@ describe('Docker build, login & push commands', () => {
     test('Build with cache from and cache to', () => {
       const image = 'docker.io/this-project/that-image';
       buildOpts.tags = ['latest'];
-      buildOpts.cacheFrom = 'type=gha';
-      buildOpts.cacheTo = 'type=gha,mode=max';
+      buildOpts.cacheFrom = ['type=gha'];
+      buildOpts.cacheTo = ['type=gha,mode=max'];
 
       docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
@@ -301,7 +301,7 @@ describe('Docker build, login & push commands', () => {
     test('Build with only cache from', () => {
       const image = 'docker.io/this-project/that-image';
       buildOpts.tags = ['latest'];
-      buildOpts.cacheFrom = 'type=registry,ref=myimage:cache';
+      buildOpts.cacheFrom = ['type=registry,ref=myimage:cache'];
 
       docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
@@ -314,12 +314,38 @@ describe('Docker build, login & push commands', () => {
     test('Build with only cache to', () => {
       const image = 'docker.io/this-project/that-image';
       buildOpts.tags = ['latest'];
-      buildOpts.cacheTo = 'type=gha,mode=max';
+      buildOpts.cacheTo = ['type=gha,mode=max'];
 
       docker.build(image, dockerfile, buildOpts);
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
         `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --cache-to type=gha,mode=max .`,
+        cpOptions
+      );
+    });
+
+    test('Build with multiple cache from sources', () => {
+      const image = 'docker.io/this-project/that-image';
+      buildOpts.tags = ['latest'];
+      buildOpts.cacheFrom = ['type=registry,ref=img:PR-1-buildcache', 'type=registry,ref=img:buildcache'];
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --cache-from type=registry,ref=img:PR-1-buildcache --cache-from type=registry,ref=img:buildcache .`,
+        cpOptions
+      );
+    });
+
+    test('Build with multiple cache to destinations', () => {
+      const image = 'docker.io/this-project/that-image';
+      buildOpts.tags = ['latest'];
+      buildOpts.cacheTo = ['type=gha,mode=max', 'type=registry,ref=img:buildcache,mode=max'];
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker build -f Dockerfile -t ${image}:${buildOpts.tags} --cache-to type=gha,mode=max --cache-to type=registry,ref=img:buildcache,mode=max .`,
         cpOptions
       );
     });

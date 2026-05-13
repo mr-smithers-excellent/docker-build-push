@@ -9,6 +9,20 @@ const parseArray = commaDelimitedString => {
   return undefined;
 };
 
+// Split a newline-separated string into trimmed, non-empty entries.
+// Used for inputs whose individual values may themselves contain commas,
+// such as `type=registry,ref=img:cache` for --cache-from / --cache-to.
+const parseLines = newlineDelimitedString => {
+  if (newlineDelimitedString) {
+    const entries = newlineDelimitedString
+      .split('\n')
+      .map(value => value.trim())
+      .filter(Boolean);
+    return entries.length ? entries : undefined;
+  }
+  return undefined;
+};
+
 const cpOptions = {
   maxBuffer: 50 * 1024 * 1024,
   stdio: 'inherit'
@@ -35,4 +49,4 @@ const asBool = value => {
   }
 };
 
-export { timestamp, parseArray, cpOptions, asBool };
+export { timestamp, parseArray, parseLines, cpOptions, asBool };

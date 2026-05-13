@@ -1,4 +1,4 @@
-import { parseArray, asBool } from '../src/utils.js';
+import { parseArray, parseLines, asBool } from '../src/utils.js';
 
 describe('Parse a comma-delimited strings', () => {
   test('Parse string with spaces and return an array', () => {
@@ -34,6 +34,47 @@ describe('Parse a comma-delimited strings', () => {
   test('Parse undefined and return undefined', () => {
     const input = undefined;
     const value = parseArray(input);
+    expect(value).toEqual(undefined);
+  });
+});
+
+describe('Parse newline-delimited strings', () => {
+  test('Parse single-line value and return single element array', () => {
+    const input = 'type=gha';
+    const value = parseLines(input);
+    expect(value).toEqual(['type=gha']);
+  });
+
+  test('Parse single value containing commas as a single entry', () => {
+    const input = 'type=registry,ref=myimage:cache';
+    const value = parseLines(input);
+    expect(value).toEqual(['type=registry,ref=myimage:cache']);
+  });
+
+  test('Parse multiple lines and return an array of entries', () => {
+    const input = 'type=registry,ref=img:PR-1-buildcache\ntype=registry,ref=img:buildcache';
+    const value = parseLines(input);
+    expect(value).toEqual(['type=registry,ref=img:PR-1-buildcache', 'type=registry,ref=img:buildcache']);
+  });
+
+  test('Parse lines with surrounding whitespace and blank lines', () => {
+    const input = '\n  type=gha  \n\n  type=registry,ref=img:cache  \n';
+    const value = parseLines(input);
+    expect(value).toEqual(['type=gha', 'type=registry,ref=img:cache']);
+  });
+
+  test('Parse empty string and return undefined', () => {
+    const value = parseLines('');
+    expect(value).toEqual(undefined);
+  });
+
+  test('Parse whitespace-only string and return undefined', () => {
+    const value = parseLines('   \n  \n');
+    expect(value).toEqual(undefined);
+  });
+
+  test('Parse undefined and return undefined', () => {
+    const value = parseLines(undefined);
     expect(value).toEqual(undefined);
   });
 });

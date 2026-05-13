@@ -93,11 +93,13 @@ const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   }
 
   if (buildOpts.cacheFrom) {
-    buildCommandPrefix = `${buildCommandPrefix} --cache-from ${buildOpts.cacheFrom}`;
+    const cacheFromSuffix = buildOpts.cacheFrom.map(ref => `--cache-from ${ref}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${cacheFromSuffix}`;
   }
 
   if (buildOpts.cacheTo) {
-    buildCommandPrefix = `${buildCommandPrefix} --cache-to ${buildOpts.cacheTo}`;
+    const cacheToSuffix = buildOpts.cacheTo.map(ref => `--cache-to ${ref}`).join(' ');
+    buildCommandPrefix = `${buildCommandPrefix} ${cacheToSuffix}`;
   }
 
   if (buildOpts.enableBuildKit) {
