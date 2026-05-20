@@ -27,7 +27,10 @@ Builds a Docker image and pushes it to the private registry of your choosing.
 
 ## Breaking changes
 
-If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently `v6`).
+If you're experiencing issues, be sure you are using the [latest stable release](https://github.com/mr-smithers-excellent/docker-build-push/releases/latest) (currently `v7`).
+
+### v7
+- Action runtime upgraded to Node.js 24 (GitHub is [deprecating Node.js 20](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/) on Actions runners). Self-hosted runners must have Node.js 24 available.
 
 ### v6
 - Multi-platform builds now supported
@@ -48,7 +51,7 @@ steps:
   - uses: actions/checkout@v3
     name: Check out code
 
-  - uses: mr-smithers-excellent/docker-build-push@v6
+  - uses: mr-smithers-excellent/docker-build-push@v7
     name: Build & push Docker image
     with:
       image: repo/image
@@ -109,7 +112,7 @@ There is a distinction between secrets at the [repository](https://docs.github.c
 - Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: docker-hub-repo/image-name
   registry: docker.io
@@ -126,7 +129,7 @@ with:
 - Ensure you set the username to `_json_key`
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: gcp-project/image-name
   registry: gcr.io
@@ -146,7 +149,7 @@ with:
 - Set the username to `_json_key` when authenticating with a JSON key
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: project-id/repository/image-name
   registry: ${{ secrets.GAR_REGISTRY }}
@@ -163,7 +166,7 @@ with:
 - Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: image-name
   registry: [aws-account-number].dkr.ecr.[region].amazonaws.com
@@ -183,7 +186,7 @@ env:
 - Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: image-name
   registry: ${{ secrets.ACR_REGISTRY }}
@@ -203,7 +206,7 @@ with:
 #### New ghcr.io
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: image-name
   registry: ghcr.io
@@ -215,7 +218,7 @@ with:
 #### Legacy docker.pkg.github.com
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: github-repo/image-name
   registry: docker.pkg.github.com
@@ -235,7 +238,7 @@ with:
 - Modify sample below and include in your workflow `.github/workflows/*.yml` file
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: docker-repo/image-name
   registry: ${{ secrets.JFROG_REGISTRY }}
@@ -309,7 +312,7 @@ By default, if you do not pass a `tags` input this action will use an algorithm 
 The `appendMode` input allows you to add additional tags while keeping the auto-generated GitOps tags:
 
 ```yaml
-uses: mr-smithers-excellent/docker-build-push@v6
+uses: mr-smithers-excellent/docker-build-push@v7
 with:
   image: repo/image
   registry: docker.io
@@ -332,7 +335,7 @@ steps:
   - uses: actions/checkout@v3
     name: Check out code
 
-  - uses: mr-smithers-excellent/docker-build-push@v6
+  - uses: mr-smithers-excellent/docker-build-push@v7
     name: Build & push Docker image
     with:
       image: repo/image
@@ -351,7 +354,7 @@ steps:
   - uses: actions/checkout@v3
     name: Check out code
 
-  - uses: mr-smithers-excellent/docker-build-push@v6
+  - uses: mr-smithers-excellent/docker-build-push@v7
     name: Build & push Docker image
     with:
       image: repo/image
@@ -375,7 +378,7 @@ steps:
     with:
       driver-opts: image=moby/buildkit:v0.11.0
 
-  - uses: mr-smithers-excellent/docker-build-push@v6
+  - uses: mr-smithers-excellent/docker-build-push@v7
     name: Build & push Docker image
     with:
       image: repo/image
