@@ -247,7 +247,7 @@ with:
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) v20 or higher
+- [Node.js](https://nodejs.org/) v24 or higher
 - npm v8 or higher
 
 ### Setup
