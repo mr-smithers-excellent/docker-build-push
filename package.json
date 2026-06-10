@@ -54,7 +54,7 @@
     "husky": "^9.1.7",
     "jest": "^30.4.2",
     "mockdate": "^3.0.5",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.4"
   },
   "jest": {
     "transform": {}
