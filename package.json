@@ -39,7 +39,7 @@
     "18": "^0.0.0",
     "@actions/core": "^3.0.1",
     "@actions/github": "^9.1.1",
-    "dayjs": "^1.11.20"
+    "dayjs": "^1.11.21"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
