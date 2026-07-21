@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          token: ${{ secrets.DEPENDABOT_DIST_TOKEN }}
 
       - uses: actions/setup-node@v6
         with:
@@ -29,11 +30,18 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-      - name: Check dist is up-to-date
+      - name: Sync dist/ if stale
         run: |
           npm run build
           git add dist/
-          git diff --staged --exit-code || (echo "❌ dist/ is not up-to-date. Please run 'npm run build' and commit the changes." && exit 1)
+          if git diff --staged --quiet; then
+            echo "dist/ is up-to-date"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: rebuild dist"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
 
   auto-merge:
     needs: [unit-tests]
