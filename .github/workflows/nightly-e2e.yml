@@ -7,6 +7,9 @@ on:
 jobs:
   e2e:
     uses: ./.github/workflows/e2e.yml
+    permissions:
+      contents: read
+      packages: write
     secrets: inherit
     with:
       pr-trigger: false
