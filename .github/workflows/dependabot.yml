@@ -5,14 +5,15 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   unit-tests:
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     name: Unit Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out PR code
         uses: actions/checkout@v6
@@ -45,8 +46,11 @@ jobs:
 
   auto-merge:
     needs: [unit-tests]
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Enable auto-merge
         run: gh pr merge --auto --merge "${{ github.event.pull_request.html_url }}"
