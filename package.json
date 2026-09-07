@@ -42,7 +42,7 @@
     "dayjs": "^1.11.23"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/eslintrc": "^3.3.7",
     "@jest/globals": "^30.5.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.9.1",
