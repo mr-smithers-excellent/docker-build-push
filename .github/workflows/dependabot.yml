@@ -44,8 +44,19 @@ jobs:
             git push origin HEAD:${{ github.event.pull_request.head.ref }}
           fi
 
+  e2e:
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
+    uses: ./.github/workflows/e2e.yml
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
+    with:
+      pr-trigger: false
+      ref: ${{ github.event.pull_request.head.sha }}
+
   auto-merge:
-    needs: [unit-tests]
+    needs: [unit-tests, e2e]
     if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
