@@ -26,3 +26,18 @@ jobs:
           npm run build
           git add dist/
           git diff --staged --exit-code || (echo "❌ dist/ is not up-to-date. Please run 'npm run build' and commit the changes." && exit 1)
+
+  e2e:
+    # Same-repo PRs already get secrets under plain `pull_request` (GitHub only
+    # withholds secrets for fork PRs), so this can run automatically on every
+    # push without the /ok-to-test gate. Fork PRs are excluded explicitly:
+    # they'd get no secrets anyway, so the e2e steps would just fail.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    uses: ./.github/workflows/e2e.yml
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
+    with:
+      pr-trigger: false
+      ref: ${{ github.event.pull_request.head.sha }}
