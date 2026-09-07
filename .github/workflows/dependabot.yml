@@ -64,6 +64,20 @@ jobs:
       pull-requests: write
     steps:
       - name: Enable auto-merge
-        run: gh pr merge --auto --merge "${{ github.event.pull_request.html_url }}"
+        run: |
+          url="${{ github.event.pull_request.html_url }}"
+          if gh pr merge --auto --merge "$url"; then
+            exit 0
+          fi
+          # gh pr merge --auto merges immediately when all required checks
+          # already passed, so the PR can become merged before this command's
+          # own follow-up merge call runs, which then fails with "not
+          # mergeable". That's not a real failure - only treat it as one if
+          # the PR isn't actually merged.
+          if [ "$(gh pr view "$url" --json merged --jq .merged)" = "true" ]; then
+            echo "PR already merged; treating as success."
+            exit 0
+          fi
+          exit 1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

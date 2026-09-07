@@ -8,6 +8,8 @@ jobs:
   ok-to-test:
     runs-on: ubuntu-latest
     if: ${{ github.event.issue.pull_request }}
+    permissions:
+      issues: write
     steps:
     - name: Generate token
       id: generate_token
