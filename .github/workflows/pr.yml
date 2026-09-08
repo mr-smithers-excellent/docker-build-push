@@ -31,8 +31,11 @@ jobs:
     # Same-repo PRs already get secrets under plain `pull_request` (GitHub only
     # withholds secrets for fork PRs), so this can run automatically on every
     # push without the /ok-to-test gate. Fork PRs are excluded explicitly:
-    # they'd get no secrets anyway, so the e2e steps would just fail.
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    # they'd get no secrets anyway, so the e2e steps would just fail. Dependabot
+    # PRs are also excluded: GitHub withholds secrets from Dependabot-triggered
+    # pull_request events regardless of same-repo status, and dependabot.yml
+    # already runs e2e for those (with secrets, via pull_request_target).
+    if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     uses: ./.github/workflows/e2e.yml
     permissions:
       contents: read
