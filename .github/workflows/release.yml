@@ -100,17 +100,26 @@ jobs:
             console.log(`Created release: ${release.html_url}`);
 
       - name: Update major version tag
-        run: |
-          MAJOR_TAG="v${{ steps.version.outputs.major }}"
-          echo "Updating major version tag: $MAJOR_TAG"
-
-          # Check if major version tag exists
-          if git ls-remote --tags origin | grep -q "refs/tags/$MAJOR_TAG$"; then
-            echo "Major version tag $MAJOR_TAG exists, updating it"
-            git tag -f $MAJOR_TAG ${{ steps.version.outputs.tag }}
-            git push origin $MAJOR_TAG --force
-          else
-            echo "Major version tag $MAJOR_TAG does not exist, creating it"
-            git tag $MAJOR_TAG ${{ steps.version.outputs.tag }}
-            git push origin $MAJOR_TAG
-          fi
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const majorTag = "v${{ steps.version.outputs.major }}";
+            const sha = context.sha;
+            try {
+              await github.rest.git.updateRef({
+                ...context.repo,
+                ref: `tags/${majorTag}`,
+                sha,
+                force: true
+              });
+              console.log(`Updated ${majorTag} to ${sha}`);
+            } catch (e) {
+              if (e.status === 422) {
+                await github.rest.git.createRef({
+                  ...context.repo,
+                  ref: `refs/tags/${majorTag}`,
+                  sha
+                });
+                console.log(`Created ${majorTag} at ${sha}`);
+              } else throw e;
+            }
