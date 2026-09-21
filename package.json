@@ -54,7 +54,7 @@
     "husky": "^9.1.7",
     "jest": "^30.5.1",
     "mockdate": "^3.0.5",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.8"
   },
   "overrides": {
     "js-yaml": "^4.3.1",
